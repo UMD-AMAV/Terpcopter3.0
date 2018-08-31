@@ -31,7 +31,7 @@ altitudeError.lastSum = 0;
 altitudeError.lastTime = 0;
 
 global ahsCmdMsg;
-ahsCmdMsg = rosmessage('terpcopter/ahsCmd');
+ahsCmdMsg = rosmessage('terpcopter_msgs/ahsCmd');
 ahsCmdMsg.AltitudeMeters = 0;
 ahsCmdMsg.HeadingRad = 0;
 ahsCmdMsg.ForwardSpeedMps = 0;
@@ -40,6 +40,6 @@ ahsCmdMsg.CrabSpeedMps = 0;
 % initialize ROS
 rosinit;
 controlNode = robotics.ros.Node('/control');
-stickCmdPublisher = robotics.ros.Publisher(controlNode,'stickCmd','terpcopter/stickCmd');
-stateEstimateSubscriber = robotics.ros.Subscriber(controlNode,'stateEstimate','terpcopter/stateEstimate',{@sendStickCmd,controlParams,stickCmdPublisher});
-ahsCmdSubscriber = robotics.ros.Subscriber(controlNode,'ahsCmd','terpcopter/ahsCmd',{@receiveAhsCmd});
+stickCmdPublisher = robotics.ros.Publisher(controlNode,'stickCmd','terpcopter_msgs/stickCmd');
+stateEstimateSubscriber = robotics.ros.Subscriber(controlNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@sendStickCmd,controlParams,stickCmdPublisher});
+ahsCmdSubscriber = robotics.ros.Subscriber(controlNode,'ahsCmd','terpcopter_msgs/ahsCmd',{@receiveAhsCmd});

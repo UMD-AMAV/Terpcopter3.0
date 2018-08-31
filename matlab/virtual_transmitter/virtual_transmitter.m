@@ -42,7 +42,7 @@ fprintf('Virtual Transmitter Node Launching...\n');
 
 % initialize first input msg
 global stickCmdMsg;
-stickCmdMsg = rosmessage('terpcopter/stickCmd');
+stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
 stickCmdMsg.Thrust = 0;
 stickCmdMsg.Yaw = 0;
 stickCmdMsg.Pitch = 0;
@@ -51,8 +51,8 @@ stickCmdMsg.Roll = 0;
 % intialize ros node
 rosinit;
 simulatorNode = robotics.ros.Node('/simulator');
-stateEstimatePublisher = robotics.ros.Publisher(simulatorNode,'stateEstimate','terpcopter/stateEstimate');
-stickCmdSubscriber = robotics.ros.Subscriber(simulatorNode,'stickCmd','terpcopter/stickCmd',@receiveStickCmd);
+stateEstimatePublisher = robotics.ros.Publisher(simulatorNode,'stateEstimate','terpcopter_msgs/stateEstimate');
+stickCmdSubscriber = robotics.ros.Subscriber(simulatorNode,'stickCmd','terpcopter_msgs/stickCmd',@receiveStickCmd);
 
 if ( strcmp(params.vtx.mode,'flight') )
     
@@ -116,7 +116,7 @@ elseif ( strcmp(params.vtx.mode,'sim') )
     k = 2;
     
     % send first simulator output
-    msg = rosmessage('terpcopter/stateEstimate');
+    msg = rosmessage('terpcopter_msgs/stateEstimate');
     msg.Up = -xi(1,3);
     msg.East = xi(1,2);
     msg.North = xi(1,1);
@@ -206,7 +206,7 @@ elseif ( strcmp(params.vtx.mode,'sim') )
         nu(k,:) = nu(k-1,:) + nudot'*dt + randn(1,3).*nu_dist_stdev*dt;
         
         % publish message
-        msg = rosmessage('terpcopter/stateEstimate');
+        msg = rosmessage('terpcopter_msgs/stateEstimate');
         msg.Time = t(k);
         msg.Up = -xi(k,3) + randn()*xi_dist_stdev(3)*dt;
         msg.East = xi(k,2);

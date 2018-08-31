@@ -25,7 +25,7 @@ else
 end
 
 % publish
-stickCmdMsg = rosmessage('terpcopter/stickCmd');
+stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
 stickCmdMsg.Thrust = u_t;
 stickCmdMsg.Yaw = 0*pi/180;
 send(stickCmdPublisher, stickCmdMsg);

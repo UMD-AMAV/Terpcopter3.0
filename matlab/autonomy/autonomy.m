@@ -53,7 +53,7 @@ autonomyParams = params.autonomy;
 % initialize ROS
 rosinit;
 autonomyNode = robotics.ros.Node('/autonomy');
-ahsCmdPublisher = robotics.ros.Publisher(autonomyNode,'ahsCmd','terpcopter/ahsCmd');
-stateEstimateSubscriber = robotics.ros.Subscriber(autonomyNode,'stateEstimate','terpcopter/stateEstimate',{@sendAhsCmd,autonomyParams,ahsCmdPublisher});
+ahsCmdPublisher = robotics.ros.Publisher(autonomyNode,'ahsCmd','terpcopter_msgs/ahsCmd');
+stateEstimateSubscriber = robotics.ros.Subscriber(autonomyNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@sendAhsCmd,autonomyParams,ahsCmdPublisher});
 
 
