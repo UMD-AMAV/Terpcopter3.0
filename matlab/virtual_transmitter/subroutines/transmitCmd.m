@@ -1,0 +1,56 @@
+function transmitCmd( trainerBox, u_stick_cmd, trim, stick_lim, trim_lim )
+
+
+#% load parameters
+#param;
+
+% the trainerBox object should be initialized the following way:
+#handles.sTrainerBox = serial(com_port);%serial('COM5');
+#handles.sTrainerBox.BaudRate = baud_rate;
+#handles.sTrainerBox.terminator = '';
+#fopen(handles.sTrainerBox);
+#disp( 'com port initialised');
+
+#% set initial stick commands
+#u_stick_cmd(1) = -1; % thrust 
+#u_stick_cmd(2) = 0;  % roll
+#u_stick_cmd(3) = 0;  % pitch
+#u_stick_cmd(4) = 0;  % yaw rat
+
+
+% default command is all zeros
+u_stick_net = zeros(4,1);
+
+% if u_stick_cmd element is Inf then we use the default zero command 
+for i = 1:4
+    if (u_stick_cmd(i) ~=inf)
+        u_stick(i,1) = u_stick_cmd(i);
+    end
+end
+
+for i = 1:4    
+    if (trim(i) ~=inf)
+        trim1(i,1) = trim(i);
+    end 
+    % scale 
+    u_stick_net(i) = u_stick(i)*stick_lim(i) + trim1(i)*trim_lim(i);
+    u_stick_net(i) = u_stick_net(i)/(stick_lim(i) + trim_lim(i));
+    u_stick_net(i)= max(-1,min(1,u_stick_net(i)));
+end
+
+% conver u_stick_net to PWM 
+channel1Command = 5000+ 4000*u_stick_net(1);  % throttle (up)
+channel2Command = 5000- 4000*u_stick_net(2);  % roll     (right)
+channel3Command = 5000+ 4000*u_stick_net(3);  % pitch    (forward)
+channel4Command = 5000- 4000*u_stick_net(4);  % yaw
+
+% transmit to trainer box 
+% change sign to reverse
+fprintf(trainerBox,'a');
+fprintf(trainerBox,int2str(channel1Command));
+fprintf(trainerBox,int2str(channel2Command));
+fprintf(trainerBox,int2str(channel3Command));
+fprintf(trainerBox,int2str(channel4Command));
+fprintf(trainerBox,'z');
+
+
