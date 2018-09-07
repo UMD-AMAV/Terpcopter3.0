@@ -13,6 +13,9 @@ Ubuntu 16.04 Installation Procedure:
       re-download MATLAB and run the installation procedure (selecting
       Robotics Systems Toolbox')
 
+- Install the interface for ROS Custom messages:
+  https://www.mathworks.com/matlabcentral/fileexchange/49810-robotics-system-toolbox-interface-for-ros-custom-messages
+
 - Follow instructions for installing ROS Kinetic
   http://wiki.ros.org/kinetic
 
@@ -26,16 +29,17 @@ Ubuntu 16.04 Installation Procedure:
   $ catkin_make
 
 - Modify the params.terpcopterRosDir field in loadParams.m to give the absolute
-  path to your catkin_ws/src folder. Save loadParams.m 
-
-- Run updateMsgs.m and follow on-screen instructions 
-  (this will generate custom AMAV ROS messages)
+  path to your catkin_ws/src folder. Do not modify params.env.terpcopterMatlabMsgs. 
+  Save loadParams.m 
 
 - Run updatePaths.m
   All of the folder icons in the matlab directory window should change from
   transparent to solid (indicating they are now in MATLAB's pathu).
   If you receive a warning that you cannot update pathdef.m  you may need  
   to change permissions of that file. 
+
+- Run updateMsgs.m and follow on-screen instructions 
+  (this will generate custom AMAV ROS messages)
 
 - For instructions for installing the MAVLink toolchain:
   https://mavlink.io/en/getting_started/installation.htm
@@ -52,6 +56,14 @@ Running the Example Mission:
   >> updatePaths
     
   Note: you can modify your path.def file permanently to avoid this step.
+  Note: It is important that you run the updatePaths step before calling any ROS
+  related functions (e.g., rosinit, rosmsg list) 
+
+- Once you have updated your path, you can verify that the terpcopter_msgs are
+  available to matlab by runing:
+  >> rosmsg list
+
+  and scrolling through the list.
 
 - Next, type the following commands, in the corresponding MATLAB instance:
  
@@ -77,6 +89,9 @@ Creating custom AMAV messages
 - Obtain the terpcopter_msgs package and move it into your catkin_ws/src
   if you have note done so already.
   e.g. /home/wolek/catkin_ws/src/terpcopter_msgs
+
+- Install the interface for ROS Custom messages (if you have not done so):
+  https://www.mathworks.com/matlabcentral/fileexchange/49810-robotics-system-toolbox-interface-for-ros-custom-messages
 
 - Follow instructions to define custom messages in catkin_ws here:
   http://wiki.ros.org/ROS/Tutorials/DefiningCustomMessages
