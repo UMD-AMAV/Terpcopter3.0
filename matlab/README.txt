@@ -1,6 +1,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Terpcopter 2019 Installation and Users Guide
-% Last Updated: 31-Aug-2018, A. Wolek
+% Last Updated: 07-Sep-2018, A. Wolek
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Ubuntu 16.04 Installation Procedure: 
@@ -46,8 +46,31 @@ Ubuntu 16.04 Installation Procedure:
 
 Running the Example Mission:
 ---------------------------------------------------------------------------
-- The first mission requires 5 instances of MATLAB, one for each of the nodes 
+- The first mission requires 4 instances of MATLAB, one for each of the nodes 
   and one for the rosmaster. 
+
+- If you can only start a single instance of MATLAB from the GUI, then launch
+  each one from the terminal with the command:
+  $ matlab &
+
+  If you receive the error: "No command 'matlab' found"
+  Then, you must update your PATH variable.
+    - first determine where the 'matlab' program is located by running:
+      $ sudo updatedb
+      $ locate bin/matlab  
+    - You should see a folder such as: /usr/local/MATLAB/R2018a/bin/matlab
+    - Open your .bashrc file for editing
+      $ gedit ~/.bashrc
+    - Scroll to the bottom and add the following line:
+      PATH=$PATH:/usr/local/MATLAB/R2018a/bin/
+      Note: change the above line to match your specific system (i.e., to match
+      the output from the locate bin/matlab) command
+    - Click save, and close gedit
+    - Run your .bashrc script for the change to take effect
+      $ source ~/.bashrc
+    - You can confirm the PATH has been updated by check that your entry has 
+      been added:
+      $ echo $PATH
 
 - In each MATLAB window, navigate the the terpcopter19/matlab folder.
 
@@ -63,7 +86,7 @@ Running the Example Mission:
   available to matlab by runing:
   >> rosmsg list
 
-  and scrolling through the list.
+  and scrolling through the list to see terpcopter_msgs listed.
 
 - Next, type the following commands, in the corresponding MATLAB instance:
  
