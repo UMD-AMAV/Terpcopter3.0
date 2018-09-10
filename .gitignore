@@ -1,0 +1,46 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+*.DS_Store
+
+# Catkin_Make directories and files
+/build/
+/devel/
+.catkin_workspace
+/mavros
+/mavlink
+.rosinstall
+.rosinstall.bak
+
+# Matlab extras
+*.mat
+*.txt
