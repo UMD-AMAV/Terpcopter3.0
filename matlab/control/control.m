@@ -38,7 +38,9 @@ ahsCmdMsg.ForwardSpeedMps = 0;
 ahsCmdMsg.CrabSpeedMps = 0;
 
 % initialize ROS
-rosinit;
+if(~robotics.ros.internal.Global.isNodeActive)
+    rosinit;
+end
 controlNode = robotics.ros.Node('/control');
 stickCmdPublisher = robotics.ros.Publisher(controlNode,'stickCmd','terpcopter_msgs/stickCmd');
 stateEstimateSubscriber = robotics.ros.Subscriber(controlNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@sendStickCmd,controlParams,stickCmdPublisher});

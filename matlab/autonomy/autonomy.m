@@ -51,7 +51,10 @@ fprintf('Launching Autonomy Node...\n');
 autonomyParams = params.autonomy;
 
 % initialize ROS
-rosinit;
+if(~robotics.ros.internal.Global.isNodeActive)
+    rosinit;
+end
+    
 autonomyNode = robotics.ros.Node('/autonomy');
 ahsCmdPublisher = robotics.ros.Publisher(autonomyNode,'ahsCmd','terpcopter_msgs/ahsCmd');
 stateEstimateSubscriber = robotics.ros.Subscriber(autonomyNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@sendAhsCmd,autonomyParams,ahsCmdPublisher});

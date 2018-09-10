@@ -49,7 +49,9 @@ stickCmdMsg.Pitch = 0;
 stickCmdMsg.Roll = 0;
 
 % intialize ros node
-rosinit;
+if(~robotics.ros.internal.Global.isNodeActive)
+    rosinit;
+end
 simulatorNode = robotics.ros.Node('/simulator');
 stateEstimatePublisher = robotics.ros.Publisher(simulatorNode,'stateEstimate','terpcopter_msgs/stateEstimate');
 stickCmdSubscriber = robotics.ros.Subscriber(simulatorNode,'stickCmd','terpcopter_msgs/stickCmd',@receiveStickCmd);
