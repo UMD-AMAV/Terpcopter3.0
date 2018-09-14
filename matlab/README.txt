@@ -5,6 +5,13 @@
 
 Ubuntu 16.04 Installation Procedure: 
 ---------------------------------------------------------------------------
+
+- Install git:
+  $ sudo apt install git-all
+
+- Clone the TerpCopter2019 Repository
+  $ git clone https://github.com/UMD-AMAV/TerpCopter2019.git
+
 - Ensure you have MATLAB installed with the Robotics Systems Toolbox
   You can verify this by typing 'rosinit' into the Command Window
     - If you see a message containing 'Initializing ROS master...' then proceed
