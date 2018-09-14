@@ -52,14 +52,32 @@ stickCmdMsg.Roll = 0;
 if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
+
+% if we are running in flight mode the connection to the transmitter
+% through the trainer cable is initialized as follows:
+if ( strcmp(params.vtx.mode,'flight') )
+    trainerBox = serial(params.env.com_port); 
+    trainerBox.BaudRate = params.env.baud_rate;
+    trainerBox.terminator = '';
+    fopen(trainerBox);
+    disp('com port initialised');    
+end
+
 simulatorNode = robotics.ros.Node('/simulator');
 stateEstimatePublisher = robotics.ros.Publisher(simulatorNode,'stateEstimate','terpcopter_msgs/stateEstimate');
 stickCmdSubscriber = robotics.ros.Subscriber(simulatorNode,'stickCmd','terpcopter_msgs/stickCmd',@receiveStickCmd);
 
-if ( strcmp(params.vtx.mode,'flight') )
+if ( strcmp(params.vtx.mode,'sim') )
     
-    % modify summer virtual_transmitter to run here
-    
+    while(1)
+        % extract u_stick_cmd from the latest stickCmd ROS message
+        u_stick_cmd(1) = stickCmdMsg.Thrust;
+        u_stick_cmd(2) = stickCmdMsg.Roll;
+        u_stick_cmd(3) = stickCmdMsg.Pitch;
+        u_stick_cmd(4) = stickCmdMsg.Yaw;
+        % transmit to quad
+        transmitCmd( trainerBox, u_stick_cmd, params.trim_val, params.vtx.stick_lim, params.vtxtrim_lim );
+    end
     
 elseif ( strcmp(params.vtx.mode,'sim') )
     

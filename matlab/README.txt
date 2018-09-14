@@ -149,6 +149,33 @@ Creating custom AMAV messages
 
         3. Restart MATLAB and verify that you can use the custom messages. 
            Type "rosmsg list" and ensure that the output contains the generated
-           custom message types.
+           custom message types. 
+
+Using Git
+--------------------------------------------------------------------------- 
+
+- Clone the TerpCopter2019 Repository
+  $ git clone https://github.com/UMD-AMAV/TerpCopter2019.git
+
+- You can now move into the directory and make some changes
+
+- If you changed a tracked filed then it will be labeled as modified (red) when
+  you run
+  $ git status
+
+- To commit your change first add the file to commit
+  $ git add fileName
+
+- Or, to add all changes:
+  $ git add *
+
+- Add a message to the commit 
+  $ git commit -m "describe your change"
+
+- Push your change
+  $ git push
+
+- If you want to merge your local copy of the repository with the latest changes
+  $ git pull
 
 

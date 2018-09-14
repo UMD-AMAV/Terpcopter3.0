@@ -1,23 +1,5 @@
 function transmitCmd( trainerBox, u_stick_cmd, trim, stick_lim, trim_lim )
 
-
-#% load parameters
-#param;
-
-% the trainerBox object should be initialized the following way:
-#handles.sTrainerBox = serial(com_port);%serial('COM5');
-#handles.sTrainerBox.BaudRate = baud_rate;
-#handles.sTrainerBox.terminator = '';
-#fopen(handles.sTrainerBox);
-#disp( 'com port initialised');
-
-#% set initial stick commands
-#u_stick_cmd(1) = -1; % thrust 
-#u_stick_cmd(2) = 0;  % roll
-#u_stick_cmd(3) = 0;  % pitch
-#u_stick_cmd(4) = 0;  % yaw rat
-
-
 % default command is all zeros
 u_stick_net = zeros(4,1);
 
@@ -52,5 +34,5 @@ fprintf(trainerBox,int2str(channel2Command));
 fprintf(trainerBox,int2str(channel3Command));
 fprintf(trainerBox,int2str(channel4Command));
 fprintf(trainerBox,'z');
-
+end
 
