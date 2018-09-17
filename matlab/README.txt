@@ -22,6 +22,10 @@ Ubuntu 16.04 Installation Procedure:
 
 - Install the interface for ROS Custom messages:
   https://www.mathworks.com/matlabcentral/fileexchange/49810-robotics-system-toolbox-interface-for-ros-custom-messages
+    - Download roscustommsg.mlpkginstall
+    - Navigate to the download folder *in MATLAB* 
+    - Double click roscustommsg(1).mlpkginstall and follow Add-On Manager instructions
+
 
 - Follow instructions for installing ROS Kinetic
   http://wiki.ros.org/kinetic
