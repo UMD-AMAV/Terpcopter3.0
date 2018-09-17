@@ -29,6 +29,16 @@ Ubuntu 16.04 Installation Procedure:
 - Install mavros:
   $ sudo apt-get install ros-kinetic-mavros ros-kinetic-mavros-extras
 
+- If the above command produces the follwing error (or similar):
+	produces the error:
+	Setting up runit (2.1.2-3ubuntu1) ...
+	start: Unable to connect to Upstart: Failed to connect to socket /com/ubuntu/upstart: Connection refused
+	
+ Try running the following commands and then repeate the mavros and mavros-extras install:
+$ sudo apt-get purge runit
+$ sudo apt-get autoremove
+
+
 - Obtain the terpcopter_msgs package and move it into your catkin_ws/src
   e.g. /home/wolek/catkin_ws/src/terpcopter_msgs
 
