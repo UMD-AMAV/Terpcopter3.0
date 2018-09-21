@@ -31,4 +31,7 @@ source ~/.bashrc
 echo "Installing Dependencies" 
 sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool build-essential
 
+echo "Installing MAVROS" 
+sudo apt-get install ros-kinetic-mavros ros-kinetic-mavros-extras
+
 echo "you are set to use ros! GO AMAV TERPS!"
