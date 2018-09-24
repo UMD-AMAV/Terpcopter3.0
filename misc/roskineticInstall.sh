@@ -34,4 +34,7 @@ sudo apt-get install python-rosinstall python-rosinstall-generator python-wstool
 echo "Installing MAVROS" 
 sudo apt-get install ros-kinetic-mavros ros-kinetic-mavros-extras
 
+echo "Insatlling catkin tools"
+sudo apt-get install python-catkin-tools
+
 echo "you are set to use ros! GO AMAV TERPS!"
