@@ -46,4 +46,7 @@ sudo apt-get install ros-kinetic-cv-bridge
 echo "Installing image transport"
 sudo apt-get install ros-kinetic-image-transport
 
+echo "Installing camera manager"
+sudo apt-get install ros-kinetic-camera-info-manager
+
 echo "you are set to use ros! GO AMAV TERPS!"
