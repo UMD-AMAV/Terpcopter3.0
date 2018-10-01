@@ -40,4 +40,7 @@ sudo apt-get install python-catkin-tools
 echo "Installing gazebo msgs"
 sudo apt-get install ros-kinetic-gazebo-msgs
 
+echo "Installing cv bridge for vision"
+sudo apt-get install ros-kinetic-cv-bridge
+
 echo "you are set to use ros! GO AMAV TERPS!"
