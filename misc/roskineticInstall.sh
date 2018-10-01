@@ -37,4 +37,7 @@ sudo apt-get install ros-kinetic-mavros ros-kinetic-mavros-extras
 echo "Insatlling catkin tools"
 sudo apt-get install python-catkin-tools
 
+echo "Installing gazebo msgs"
+sudo apt-get install ros-kinetic-gazebo-msgs
+
 echo "you are set to use ros! GO AMAV TERPS!"
