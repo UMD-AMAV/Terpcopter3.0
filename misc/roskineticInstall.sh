@@ -43,4 +43,7 @@ sudo apt-get install ros-kinetic-gazebo-msgs
 echo "Installing cv bridge for vision"
 sudo apt-get install ros-kinetic-cv-bridge
 
+echo "Installing image transport"
+sudo apt-get install ros-kinetic-image-transport
+
 echo "you are set to use ros! GO AMAV TERPS!"
