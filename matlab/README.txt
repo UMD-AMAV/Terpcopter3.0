@@ -42,6 +42,8 @@ Ubuntu 16.04 Installation Procedure:
 $ sudo apt-get purge runit
 $ sudo apt-get autoremove
 
+- Set up an appropriate catkin_ws, see the following page (select ROS Kinetic at the top):
+  http://wiki.ros.org/catkin/Tutorials/create_a_workspace	
 
 - Obtain the terpcopter_msgs package and move it into your catkin_ws/src
   e.g. /home/wolek/catkin_ws/src/terpcopter_msgs
