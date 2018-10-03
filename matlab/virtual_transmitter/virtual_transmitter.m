@@ -67,7 +67,7 @@ simulatorNode = robotics.ros.Node('/simulator');
 stateEstimatePublisher = robotics.ros.Publisher(simulatorNode,'stateEstimate','terpcopter_msgs/stateEstimate');
 stickCmdSubscriber = robotics.ros.Subscriber(simulatorNode,'stickCmd','terpcopter_msgs/stickCmd',@receiveStickCmd);
 
-if ( strcmp(params.vtx.mode,'sim') )
+if ( strcmp(params.vtx.mode,'flight') )
     
     while(1)
         % extract u_stick_cmd from the latest stickCmd ROS message
