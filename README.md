@@ -9,3 +9,11 @@ system.
 
 - To build the module in your catkin_ws copy and paste all the folders inside
  ROSTerpcopterModule into catkin_ws/src folder and run catkin build 
+
+# Issues Noticed
+
+When launching launch files one might get "... is not a launch file". If this is the case: 
+
+```
+source ./devel/setup.bash 
+```
