@@ -1,3 +1,0 @@
-std_msgs/Empty req
----
-geometry_msgs/Pose target_pose #
