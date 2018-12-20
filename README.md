@@ -1,4 +1,4 @@
-# TerpCopter2019
+# TerpCopter 3.0
 
 # Overview
 This repository contains work done for AHS micro aerial vehicle challenge 
