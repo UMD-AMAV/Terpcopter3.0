@@ -60,6 +60,7 @@ $ sudo apt-get autoremove
   transparent to solid (indicating they are now in MATLAB's pathu).
   If you receive a warning that you cannot update pathdef.m  you may need  
   to change permissions of that file. 
+  In Ubuntu: "sudo chown amav /usr/local/MATLAB/R2018b/toolbox/local/pathdef.m"
 
 - Run updateMsgs.m and follow on-screen instructions 
   (this will generate custom AMAV ROS messages)

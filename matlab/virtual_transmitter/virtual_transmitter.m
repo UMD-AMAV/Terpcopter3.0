@@ -76,7 +76,7 @@ if ( strcmp(params.vtx.mode,'flight') )
         u_stick_cmd(3) = stickCmdMsg.Pitch;
         u_stick_cmd(4) = stickCmdMsg.Yaw;
         % transmit to quad
-        transmitCmd( trainerBox, u_stick_cmd, params.trim_val, params.vtx.stick_lim, params.vtxtrim_lim );
+        transmitCmd( trainerBox, u_stick_cmd, params.vtx.trim_val, params.vtx.stick_lim, params.vtx.trim_lim );
     end
     
 elseif ( strcmp(params.vtx.mode,'sim') )

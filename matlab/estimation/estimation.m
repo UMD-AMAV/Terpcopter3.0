@@ -28,6 +28,7 @@ fprintf('Estimation Node Launching...\n');
 rosinit;
 estimationNode = robotics.ros.Node('/estimation');
 imuDataSubscriber = robotics.ros.Publisher(estimationNode,'imuData','/mavros/imu/data');
+lidarDataSubscriber = robotics.ros.Publisher(estimationNode,'lidarData','/terarangerone');
 stateEstimatePublisher = robotics.ros.Publisher(estimationNode,'stateEstimate','terpcopter/stateEstimate');
 
 % Note: estimation may be implemented in the form of a call-back when each
