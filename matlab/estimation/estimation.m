@@ -24,6 +24,7 @@
 clear; close all; clc; format compact;
 global imuMsg lidarMsg inertial_yaw_initial; %where to clear them?
 run('loadParams.m');
+%run('updatePaths.m');
 fprintf('Estimation Node Launching...\n');
 
 % intialize ros node
@@ -37,7 +38,7 @@ stateEstimatePublisher = robotics.ros.Publisher(estimationNode,'/stateEstimate',
 
 stateMsg = rosmessage('terpcopter_msgs/stateEstimate');
 %stateMsg.Range = 0.2;
-
+t0 = [];
 while(1)
     % Imu data receiver
     %imuMsg = receive(imuDataSubscriber,3);
@@ -88,10 +89,22 @@ while(1)
     % phi and theta are in deg. so use cosd to calculate the compensated range
     stateMsg.Range = cosd(state.phi)*cosd(state.theta)*stateMsg.Range;
     stateMsg.Range = round(stateMsg.Range,2);
+    %change Up to the estimated output from the filter instead of from the
+    %range 
+    stateMsg.Up = stateMsg.Range;
     
     stateMsg.Yaw = state.psi_relative;
     stateMsg.Roll = state.phi;
     stateMsg.Pitch = state.theta;
+    
+    ti= rostime('now');
+    abs_t = eval([int2str(ti.Sec) '.' ...
+        int2str(ti.Nsec)]);
+   
+    if isempty(t0), t0 = abs_t; end
+    t = abs_t-t0;
+    
+    stateMsg.Time = t;
     pause(0.1);
     %% complimentay filter goes here
     

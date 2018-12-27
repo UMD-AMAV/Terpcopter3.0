@@ -7,8 +7,9 @@ fprintf('Received Msg, Quad Alttiude is : %3.3f m\n', z );
 
 % get setpoint
 global ahsCmdMsg;
-z_d = ahsCmdMsg.AltitudeMeters;
-
+%z_d = ahsCmdMsg.AltitudeMeters;
+% DEBUG
+z_d =1;
 % update errors
 global altitudeError;
 altError = z - z_d;
@@ -19,9 +20,11 @@ if ( altitudeError.lastTime == 0 )
     altitudeError.lastVal = z_d;
     altitudeError.lastSum = 0;
     u_t = controlParams.altitudeGains.ffterm;
+    disp('initialize loop');
 else
     % compute controls
     [u_t, altitudeError] = FF_PID(controlParams.altitudeGains, altitudeError, t, altError);
+    disp('pid loop');
 end
 
 % publish
@@ -32,13 +35,13 @@ send(stickCmdPublisher, stickCmdMsg);
 fprintf('Published Stick Cmd., Thurst : %3.3f, Error : %3.3f \n', u_t , ( z - z_d ) );
 
 % plot
-figure(1);
-plot(t, z,'bo');
-hold on;
-plot(t, z_d,'r*');
-set(gca,'FontSize',16)
-xlabel('Ros Time Sec.');
-ylabel('Altitude (m)')
-grid on;
+% figure(1);
+% plot(t, z,'bo');
+% hold on;
+% plot(t, z_d,'r*');
+% set(gca,'FontSize',16)
+% xlabel('Ros Time Sec.');
+% ylabel('Altitude (m)')
+% grid on;
 
 end

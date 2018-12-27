@@ -41,15 +41,18 @@ ahsCmdMsg.CrabSpeedMps = 0;
 if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
+
 controlNode = robotics.ros.Node('/control');
 stickCmdPublisher = robotics.ros.Publisher(controlNode,'stickCmd','terpcopter_msgs/stickCmd');
 stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
 stickCmdMsg.Thrust = 0;
 stickCmdMsg.Yaw = 0*pi/180;
 
-while(1)
-    send(stickCmdPublisher, stickCmdMsg);
-    pause(0.1);
-end
 stateEstimateSubscriber = robotics.ros.Subscriber(controlNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@sendStickCmd,controlParams,stickCmdPublisher});
 ahsCmdSubscriber = robotics.ros.Subscriber(controlNode,'ahsCmd','terpcopter_msgs/ahsCmd',{@receiveAhsCmd});
+
+% while(1)
+%     send(stickCmdPublisher, stickCmdMsg);
+%     pause(0.1);
+% end
+
