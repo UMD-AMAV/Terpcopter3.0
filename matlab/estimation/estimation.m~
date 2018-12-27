@@ -85,8 +85,8 @@ while(1)
     end
      
     %lidar data is in imu frame; convert to inertial frame
-    % phi and theta are in deg. so use cosd to calculate the compensated range
-    stateMsg.Range = cosd(state.phi)*cosd(state.theta)*stateMsg.Range;
+    % phi and theta are in deg
+    stateMsg.Range = cosd(state.phi)*cosd(state.theta)*stateMsg.Range
     stateMsg.Range = round(stateMsg.Range,2);
     
     stateMsg.Yaw = state.psi_relative;
