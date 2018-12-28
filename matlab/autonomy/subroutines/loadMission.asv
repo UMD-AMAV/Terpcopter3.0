@@ -1,0 +1,7 @@
+function mission = loadMission()
+
+mission.bhv{1}.name = 'bhv_takeoff';
+mission.bhv{1}.ahs.desiredAltMeters = 0.5;    %
+% mission.bhv{1}.ahs.forwardSpeed = 0;
+% mission.bhv{1}.ahs.crabSpeed = 0;
+mission.bhv{1}.ahs
