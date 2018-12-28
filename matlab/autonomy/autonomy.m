@@ -59,4 +59,3 @@ autonomyNode = robotics.ros.Node('/autonomy');
 ahsCmdPublisher = robotics.ros.Publisher(autonomyNode,'ahsCmd','terpcopter_msgs/ahsCmd');
 stateEstimateSubscriber = robotics.ros.Subscriber(autonomyNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@sendAhsCmd,autonomyParams,ahsCmdPublisher});
 
-

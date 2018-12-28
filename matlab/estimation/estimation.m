@@ -27,6 +27,13 @@ run('loadParams.m');
 %run('updatePaths.m');
 fprintf('Estimation Node Launching...\n');
 
+%Clear COM Ports-----------------------------------------------
+if ~isempty(instrfind)
+fclose(instrfind);
+delete(instrfind);
+end
+%--------------------------------------------------------------
+
 % intialize ros node
 if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;

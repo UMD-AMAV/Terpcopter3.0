@@ -23,7 +23,7 @@ end
 % publish
 ahsCmdMsg = rosmessage('terpcopter_msgs/ahsCmd');
 ahsCmdMsg.AltitudeMeters = z_d;
-send(ahsCmdPublisher, ahsCmdMsg);
+%send(ahsCmdPublisher, ahsCmdMsg);
 fprintf('Published Ahs Cmd. Alt : %3.3f \n', z_d );
 
 
