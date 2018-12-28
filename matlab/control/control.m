@@ -21,6 +21,8 @@
 clear; close all; clc; format compact;
 addpath('../')
 params = loadParams();
+
+global controlParams
 controlParams = params.ctrl;
 fprintf('Control Node Launching...\n');
 
@@ -37,6 +39,9 @@ ahsCmdMsg.HeadingRad = 0;
 ahsCmdMsg.ForwardSpeedMps = 0;
 ahsCmdMsg.CrabSpeedMps = 0;
 
+global stateEstimateMsg;
+% initialize  stateEstimate --pending--
+
 % initialize ROS
 if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
@@ -46,13 +51,52 @@ controlNode = robotics.ros.Node('/control');
 stickCmdPublisher = robotics.ros.Publisher(controlNode,'stickCmd','terpcopter_msgs/stickCmd');
 stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
 stickCmdMsg.Thrust = 0;
-stickCmdMsg.Yaw = 0*pi/180;
+stickCmdMsg.Yaw = 0;
 
-stateEstimateSubscriber = robotics.ros.Subscriber(controlNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@sendStickCmd,controlParams,stickCmdPublisher});
-ahsCmdSubscriber = robotics.ros.Subscriber(controlNode,'ahsCmd','terpcopter_msgs/ahsCmd',{@receiveAhsCmd});
+stateEstimateSubscriber = robotics.ros.Subscriber(controlNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
+ahsCmdSubscriber = robotics.ros.Subscriber(controlNode,'ahsCmd','terpcopter_msgs/ahsCmd',{@ahsCmdCallback});
+pidSettingSubscriber = robotics.ros.Subscriber(controlNode,'pidSetting','terpcopter_msgs/ffpidSetting',{@ffpidSettingCallback});
 
-% while(1)
-%     send(stickCmdPublisher, stickCmdMsg);
-%     pause(0.1);
-% end
+altitudeError.lastTime = stateEstimateMsg.Time;
+altitudeError.lastVal = ahsCmdMsg.AltitudeMeters;
+altitudeError.lastSum = 0;
+u_t = controlParams.altitudeGains.ffterm;
+disp('initialize loop');
+
+r = robotics.Rate(10);
+reset(r);
+
+while(1)
+    
+
+    % unpack statestimate
+    t = stateEstimateMsg.Time;
+    z = stateEstimateMsg.Range;
+    fprintf('Current Quad Alttiude is : %3.3f m\n', z );
+
+    % get setpoint
+    z_d = ahsCmdMsg.AltitudeMeters;
+    % DEBUG
+    %z_d =1;
+    % update errors
+    altError = z - z_d;
+
+
+    % compute controls
+    [u_t, altitudeError] = FF_PID(controlParams.altitudeGains, altitudeError, t, altError);
+    disp('pid loop');
+    disp(controlParams.altitudeGains)
+
+
+    % publish
+    stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
+    stickCmdMsg.Thrust = u_t;%max(min(1,u_t),-1);
+    stickCmdMsg.Yaw = 0*pi/180;
+    send(stickCmdPublisher, stickCmdMsg);
+    fprintf('Published Stick Cmd., Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ) );
+
+    time = r.TotalElapsedTime;
+	fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
+	waitfor(r);
+ end
 
