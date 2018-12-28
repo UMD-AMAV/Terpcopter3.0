@@ -1,5 +1,5 @@
 function mission = loadMission()
-mission.config.firstLoop == 1;
+mission.config.firstLoop = 1;
 
 % Behavior 1: Takeoff
 mission.bhv{1}.name = 'bhv_takeoff';

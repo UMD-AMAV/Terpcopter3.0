@@ -10,21 +10,22 @@ currentBehavior = 1;
 if mission.config.firstLoop == 1
     disp('Behavior Manager Started')
     % initialize time variables 
-    mission.variables.initial_event_time = datetime;  
-    mission.variables.behavior_switched_timestamp = datetime;
-    mission.variables.behavior_satisfied_timestamp = datetime;
+    mission.variables.initial_event_time = t;  
+    mission.variables.behavior_switched_timestamp = t;
+    mission.variables.behavior_satisfied_timestamp = t;
     mission.config.firstLoop = false; % ends the first loop
 end
 
 name = mission.bhv{currentBehavior}.name;
 flag = mission.bhv{currentBehavior}.completion.status;
+timestamps = mission.variables;
 ahs = mission.bhv{currentBehavior}.ahs;
 completion = mission.bhv{currentBehavior}.completion;
 
 if flag == true
         disp('completion is true. move to next behavior');
-        mission.bhv = pop(mission.bhv);
-    else
+        mission.bhv = pop(mission.bhv,timestamps,t);
+else
         disp('checking to see what the current behavior is') 
         
         %Set Handles within each behavior
@@ -33,8 +34,16 @@ if flag == true
         %Eval command eval([mission.bhv(CurrentBehavior).name,status)
         switch name
             case 'bhv_takeoff'
-                 disp('takeoff behavior');
-                 
+                disp('takeoff behavior');
+                [completionFlag] = bhv_takeoff_status(stateEstimateMsg, ahs);
+            case 'bhv_hover'
+                disp('hover behavior');
+                [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion,timestamps, t);
+            otherwise
+        end
+        mission.bhv{currentBehavior}.completion.status = completionFlag;
+        z_d = ahs.desiredAltMeters;
+end
 % % % a crude sequence of three behaviors 
 % % tol = 0.1;
 % % if ( z <= 2-tol && t <= 10 || t <= 10 ) 

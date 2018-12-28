@@ -1,6 +1,5 @@
-function mission = pop(mission)
-global behavior_switched_timestamp;
-behavior_switched_timestamp = datetime;
+function mission = pop(mission, timestamp, t)
+timestamp.behavior_switched_timestamp = t;
 [numRow numCol] = size(mission);
 
 if numCol == 1
