@@ -73,7 +73,7 @@ while(1)
     % unpack statestimate
     t = stateEstimateMsg.Time;
     z = stateEstimateMsg.Up;
-    fprintf('Received Msg, Quad Alttiude is : %3.3f m\n', z );
+    % fprintf('Received Msg, Quad Alttiude is : %3.3f m\n', z );
 
     currentBehavior = 1; 
     
@@ -91,24 +91,28 @@ while(1)
     timestamps = mission.variables;
     ahs = mission.bhv{currentBehavior}.ahs;
     completion = mission.bhv{currentBehavior}.completion;
+    
+    totalTime = t - timestamps.initial_event_time;
+    bhvTime = t - timestamps.behavior_switched_timestamp;
+    
+    fprintf('Current Behavior: %s\tTime Spent in Behavior: %f\t Total Time of Mission: %f \n\n',name,bhvTime,totalTime); 
 
     if flag == true
-        disp('completion is true. move to next behavior');
         mission.bhv = pop(mission.bhv,timestamps,t);
-    else
-        disp('checking to see what the current behavior is')  
+    else  
         %Set Handles within each behavior
         
         %switch to 
         %Eval command eval([mission.bhv(CurrentBehavior).name,status)
         switch name
             case 'bhv_takeoff'
-                disp('takeoff behavior');
+                %disp('takeoff behavior');
                 [completionFlag] = bhv_takeoff_status(stateEstimateMsg, ahs);
             case 'bhv_hover'
-                disp('hover behavior');
+                %disp('hover behavior');
                 [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion,timestamps, t);
             otherwise
+                
         end
         mission.bhv{currentBehavior}.completion.status = completionFlag;
         z_d = ahs.desiredAltMeters;
