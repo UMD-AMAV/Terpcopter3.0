@@ -46,6 +46,10 @@ stateEstimatePublisher = robotics.ros.Publisher(estimationNode,'/stateEstimate',
 stateMsg = rosmessage('terpcopter_msgs/stateEstimate');
 %stateMsg.Range = 0.2;
 t0 = [];
+
+r = robotics.Rate(20);
+reset(r);
+
 while(1)
     % Imu data receiver
     %imuMsg = receive(imuDataSubscriber,3);
@@ -112,7 +116,7 @@ while(1)
     t = abs_t-t0;
     
     stateMsg.Time = t;
-    pause(0.1);
+    waitfor(r);
     %% complimentay filter goes here
     
     

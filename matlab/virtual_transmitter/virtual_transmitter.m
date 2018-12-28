@@ -57,6 +57,10 @@ stickCmdMsg.Yaw = 0;
 stickCmdMsg.Pitch = 0;
 stickCmdMsg.Roll = 0;
 
+global lastStickCmd_time
+lastStickCmd_time = rostime('now');
+idleDuration = rosduration(1,0);
+
 % intialize ros node
 if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
@@ -77,6 +81,8 @@ stateEstimatePublisher = robotics.ros.Publisher(simulatorNode,'stateEstimate','t
 stickCmdSubscriber = robotics.ros.Subscriber(simulatorNode,'stickCmd','terpcopter_msgs/stickCmd',@receiveStickCmd);
 
 if ( strcmp(params.vtx.mode,'flight') )
+    r = robotics.Rate(20);
+    reset(r);
     
     while(1)
         % extract u_stick_cmd from the latest stickCmd ROS message
@@ -84,9 +90,20 @@ if ( strcmp(params.vtx.mode,'flight') )
         u_stick_cmd(2) = stickCmdMsg.Roll;
         u_stick_cmd(3) = stickCmdMsg.Pitch;
         u_stick_cmd(4) = stickCmdMsg.Yaw;
+        
+        % if the controller is off for more than 1 second enter emergency
+        % decent mode
+        if (rostime('now') > lastStickCmd_time + idleDuration)
+            u_stick_cmd(1) = -0.6;
+            u_stick_cmd(2) = 0;
+            u_stick_cmd(3) = 0;
+            u_stick_cmd(4) = 0;
+            disp('Emergency Decent!')
+        end
+        
         % transmit to quad
         transmitCmd( trainerBox, u_stick_cmd, params.vtx.trim_val, params.vtx.stick_lim, params.vtx.trim_lim );
-        pause(0.1)
+        waitfor(r);
     end
     
 elseif ( strcmp(params.vtx.mode,'sim') )
