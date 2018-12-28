@@ -7,9 +7,11 @@ fprintf('Received Msg, Quad Alttiude is : %3.3f m\n', z );
 
 % get setpoint
 global ahsCmdMsg;
-%z_d = ahsCmdMsg.AltitudeMeters;
+z_d = ahsCmdMsg.AltitudeMeters;
+disp('desired altitude');
+disp(z_d)
 % DEBUG
-z_d =1;
+%z_d =1;
 % update errors
 global altitudeError;
 altError = z - z_d;
@@ -29,10 +31,10 @@ end
 
 % publish
 stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
-stickCmdMsg.Thrust = u_t;
+stickCmdMsg.Thrust = u_t;%max(min(1,u_t),-1);
 stickCmdMsg.Yaw = 0*pi/180;
 send(stickCmdPublisher, stickCmdMsg);
-fprintf('Published Stick Cmd., Thurst : %3.3f, Error : %3.3f \n', u_t , ( z - z_d ) );
+fprintf('Published Stick Cmd., Thrust : %3.3f, Error : %3.3f \n', stickCmdMsg.Thrust , ( z - z_d ) );
 
 % plot
 % figure(1);

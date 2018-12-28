@@ -22,14 +22,14 @@ end
 
 % conver u_stick_net to PWM 
 channel1Command = 5000+ 4000*u_stick_net(1);  % throttle (up)
-channel2Command = 5000- 4000*u_stick_net(2);  % roll     (right)
+channel2Command = 5000+ 4000*u_stick_net(2);  % roll     (right)
 channel3Command = 5000+ 4000*u_stick_net(3);  % pitch    (forward)
-channel4Command = 5000- 4000*u_stick_net(4);  % yaw
+channel4Command = 5000+ 4000*u_stick_net(4);  % yaw
 
 % transmit to trainer box 
 % change sign to reverse
 fprintf(trainerBox,'a');
-fprintf(trainerBox,int2str(channel1Command));
+fprintf(trainerBox,int2str(channel1Command)); %channel1Command
 fprintf(trainerBox,int2str(channel2Command));
 fprintf(trainerBox,int2str(channel3Command));
 fprintf(trainerBox,int2str(channel4Command));

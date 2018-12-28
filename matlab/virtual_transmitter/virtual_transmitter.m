@@ -1,4 +1,5 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Node: virtual_transmitter
 %
 % Purpose:
@@ -35,6 +36,14 @@
 
 % prepare workspace
 clear; close all; clc; format compact;
+
+% Clear COM ports -----------------------
+if ~isempty(instrfind)
+fclose(instrfind);
+delete(instrfind);
+end
+%----------------------------------------
+
 addpath('../')
 params = loadParams();
 fprintf('Virtual Transmitter Node Launching...\n');
@@ -43,7 +52,7 @@ fprintf('Virtual Transmitter Node Launching...\n');
 % initialize first input msg
 global stickCmdMsg;
 stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
-stickCmdMsg.Thrust = 0;
+stickCmdMsg.Thrust = -1;
 stickCmdMsg.Yaw = 0;
 stickCmdMsg.Pitch = 0;
 stickCmdMsg.Roll = 0;
@@ -77,6 +86,7 @@ if ( strcmp(params.vtx.mode,'flight') )
         u_stick_cmd(4) = stickCmdMsg.Yaw;
         % transmit to quad
         transmitCmd( trainerBox, u_stick_cmd, params.vtx.trim_val, params.vtx.stick_lim, params.vtx.trim_lim );
+        pause(0.1)
     end
     
 elseif ( strcmp(params.vtx.mode,'sim') )
