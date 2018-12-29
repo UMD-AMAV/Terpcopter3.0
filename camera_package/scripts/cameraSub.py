@@ -42,29 +42,25 @@ from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
+#image callback function, no need to change this
 def callbackImage(data):
     rospy.loginfo('I heard ')
     cv_image = CvBridge().imgmsg_to_cv2(data, desired_encoding="passthrough")
     imageProcessing(cv_image)
     
-
+#subscriber function which subscribes to the camera topic
 def imageSubscriber():
-
-    # In ROS, nodes are uniquely named. If two nodes with the same
-    # name are launched, the previous one is kicked off. The
-    # anonymous=True flag means that rospy will choose a unique
-    # name for our 'listener' node so that multiple listeners can
-    # run simultaneously.
     rospy.init_node('imageSubscriber', anonymous=True)
-
     rospy.Subscriber('camera', Image, callbackImage)
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
-
+    
+# this is the function where we can make changes to perform image processing tasks 
 def imageProcessing(image):
     cv2.imshow('img',image)
     cv2.waitKey(3)
 
+# main loop 
 if __name__ == '__main__':
     imageSubscriber()
