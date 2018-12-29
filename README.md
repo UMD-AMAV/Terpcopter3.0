@@ -28,3 +28,46 @@ When launching launch files one might get "... is not a launch file". If this is
 ```
 source ./devel/setup.bash 
 ```
+
+# Image Processing
+
+For working with the camera_package following are the instructions
+
+Clone the repository by using the following command
+ 
+ ```
+ git clone https://github.com/UMD-AMAV/Terpcopter3.0
+ ```
+ 
+ Now, create a catkin workspace for running rosnode.
+ ```
+ cd
+ mkdir catkin_ws/src
+ ```
+ 
+ Now, from the Terpcopter3.0 folder created in the home directory, copy the camera_package and paste it in the newly created workspace with path (~/catkin_ws/src)
+ 
+ Now build the package
+ ```
+ cd ~/catkin_ws
+ catkin_make
+ source devel/setup.bash
+ ``` 
+ To run the scripts
+ Open 3 terminals
+ In 1st terminal, open roscore
+ ```
+ roscore
+ ```
+ In 2nd terminal, run publisher
+ ```
+ cd ~/catkin_ws
+ source devel/setup.bash
+ rosrun camera_package cameraPub.py
+ ```
+ In 3rd terminal, run subscriber
+ ```
+ cd ~/catkin_ws
+ source devel/setup.bash
+ rosrun camera_package cameraSub.py
+ ```
