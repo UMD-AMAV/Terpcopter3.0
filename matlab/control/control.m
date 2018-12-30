@@ -21,6 +21,7 @@
 clear; close all; clc; format compact;
 addpath('../')
 params = loadParams();
+rosinit;
 
 global controlParams
 controlParams = params.ctrl;

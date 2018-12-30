@@ -36,6 +36,7 @@
 
 % prepare workspace
 clear; close all; clc; format compact;
+rosinit;
 
 % Clear COM ports -----------------------
 if ~isempty(instrfind)
