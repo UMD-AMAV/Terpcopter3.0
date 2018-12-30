@@ -25,7 +25,7 @@ clear; close all; clc; format compact;
 global imuMsg lidarMsg inertial_yaw_initial; %where to clear them?
 run('loadParams.m');
 addpath('../');
-rosinit;
+
 %run('updatePaths.m');
 fprintf('Estimation Node Launching...\n');
 
@@ -48,6 +48,10 @@ stateEstimatePublisher = robotics.ros.Publisher(estimationNode,'/stateEstimate',
 stateMsg = rosmessage('terpcopter_msgs/stateEstimate');
 %stateMsg.Range = 0.2;
 t0 = [];
+
+% lidar data receiver
+    imuMsg = receive(imuDataSubscriber,20);
+    lidarMsg = receive(lidarDataSubscriber,20);
 
 r = robotics.Rate(30);
 reset(r);
@@ -96,10 +100,6 @@ while(1)
     %yaw lies between [-180 +180];
     if state.psi_relative> 180, state.psi_relative = state.psi_relative-360;
     elseif state.psi_relative<-180, state.psi_relative = 360+state.psi_relative;end
-
-
-    % lidar data receiver
-    %lidarMsg = receive(lidarDataSubscriber,2);
 
     % condition lidar reading
     if isempty(lidarMsg) || lidarMsg.Range_ <= 0.2

@@ -1,2 +1,2 @@
 #!/bin/bash
-xterm -e matlab -nodesktop -nosplash -r "run('../../control/control')"
+xterm -e matlab -nodesktop -nosplash -r "run('../control/control')"

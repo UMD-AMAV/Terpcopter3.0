@@ -1,2 +1,2 @@
 #!/bin/bash
-xterm -e ./autolaunch_lidar
+xterm -e ./scripts/autolaunch_lidar

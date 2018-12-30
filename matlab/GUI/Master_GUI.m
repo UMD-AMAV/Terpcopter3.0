@@ -22,7 +22,7 @@ function varargout = Master_GUI(varargin)
 
 % Edit the above text to modify the response to help Master_GUI
 
-% Last Modified by GUIDE v2.5 30-Dec-2018 02:13:46
+% Last Modified by GUIDE v2.5 30-Dec-2018 05:12:59
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -64,6 +64,7 @@ guidata(hObject, handles);
 
 % --- Outputs from this function are returned to the command line.
 function varargout = Master_GUI_OutputFcn(hObject, eventdata, handles) 
+rosinit;
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -75,7 +76,25 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
-    system('./scripts/px4_script.sh &')
+ set(handles.text2,'String','launching');
+ system('./scripts/px4_script.sh &');
+ first_run = 1;
+ error_flag = 0;
+ while( error_flag==1 || first_run == 1 )
+    pause(0.1);
+    try
+        sub = rossubscriber('/mavros/imu/data');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+ end
+ msg = receive(sub,20);
+ set(handles.text2,'String','active');
+
+ 
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -83,7 +102,23 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)
+ set(handles.text3,'String','launching');
  system('./scripts/lidar_script.sh &')
+ first_run = 1;
+ error_flag = 0;
+ while( error_flag==1 || first_run == 1 )
+     pause(0.1);
+    try
+        sub = rossubscriber('/terarangerone');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+ end
+ msg = receive(sub,20);
+ set(handles.text3,'String','active');
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -91,7 +126,23 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in pushbutton4.
 function pushbutton4_Callback(hObject, eventdata, handles)
+  set(handles.text4,'String','launching');
  system('./scripts/estimation_script.sh &')
+ first_run = 1;
+ error_flag = 0;
+ while( error_flag==1 || first_run == 1 )
+     pause(0.1);
+    try
+        sub = rossubscriber('/stateEstimate');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+ end
+ msg = receive(sub,20);
+ set(handles.text4,'String','active');
 % hObject    handle to pushbutton4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -99,7 +150,22 @@ function pushbutton4_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in pushbutton5.
 function pushbutton5_Callback(hObject, eventdata, handles)
+   set(handles.text5,'String','launching');
  system('./scripts/virtual_transmitter_script.sh &')
+ first_run = 1;
+ error_flag = 0;
+ while( error_flag==1 || first_run == 1 )
+    try
+        sub = rossubscriber('/vtxStatus');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+ end
+ msg = receive(sub,20);
+ set(handles.text5,'String','active');
 % hObject    handle to pushbutton5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -107,7 +173,23 @@ function pushbutton5_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in pushbutton6.
 function pushbutton6_Callback(hObject, eventdata, handles)
+    set(handles.text6,'String','launching');
  system('./scripts/autonomy_script.sh &')
+ first_run = 1;
+ error_flag = 0;
+ while( error_flag==1 || first_run == 1 )
+     pause(0.1);
+    try
+        sub = rossubscriber('/ahsCmd');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+ end
+ msg = receive(sub,20);
+ set(handles.text6,'String','active');
 % hObject    handle to pushbutton6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -115,7 +197,137 @@ function pushbutton6_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in pushbutton7.
 function pushbutton7_Callback(hObject, eventdata, handles)
+     set(handles.text7,'String','launching');
  system('./scripts/control_script.sh &')
+ first_run = 1;
+ error_flag = 0;
+ while( error_flag==1 || first_run == 1 )
+     pause(0.1);
+    try
+        sub = rossubscriber('/stickCmd');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+ end
+ msg = receive(sub,20);
+ set(handles.text7,'String','active');
 % hObject    handle to pushbutton7 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbutton9.
+function pushbutton9_Callback(hObject, eventdata, handles)
+ set(handles.text2,'String','launching');
+ system('./scripts/px4_script.sh &');
+ first_run = 1;
+ error_flag = 0;
+ while( error_flag==1 || first_run == 1 )
+    pause(0.1);
+    try
+        sub = rossubscriber('/mavros/imu/data');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+ end
+ msg = receive(sub,20);
+ set(handles.text2,'String','active');
+ 
+ set(handles.text3,'String','launching');
+ system('./scripts/lidar_script.sh &')
+ first_run = 1;
+ error_flag = 0;
+ while( error_flag==1 || first_run == 1 )
+     pause(0.1);
+    try
+        sub = rossubscriber('/terarangerone');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+ end
+ msg = receive(sub,20);
+ set(handles.text3,'String','active');
+ 
+  set(handles.text4,'String','launching');
+ system('./scripts/estimation_script.sh &')
+ first_run = 1;
+ error_flag = 0;
+ while( error_flag==1 || first_run == 1 )
+     pause(0.1);
+    try
+        sub = rossubscriber('/stateEstimate');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+ end
+ msg = receive(sub,20);
+ set(handles.text4,'String','active');
+ 
+
+ 
+   set(handles.text5,'String','launching');
+ system('./scripts/virtual_transmitter_script.sh &')
+ first_run = 1;
+ error_flag = 0;
+ while( error_flag==1 || first_run == 1 )
+    try
+        sub = rossubscriber('/vtxStatus');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+ end
+ msg = receive(sub,20);
+ set(handles.text5,'String','active');
+
+ 
+%     set(handles.text6,'String','launching');
+%  system('./scripts/autonomy_script.sh &')
+%  first_run = 1;
+%  error_flag = 0;
+%  while( error_flag==1 || first_run == 1 )
+%      pause(0.1);
+%     try
+%         sub = rossubscriber('/ahsCmd');
+%         first_run = 0;
+%         error_flag = 0;
+%     catch error
+%         disp(error.identifier)
+%         error_flag = 1;
+%     end
+%  end
+%  msg = receive(sub,20);
+%  set(handles.text6,'String','active');
+
+ 
+     set(handles.text7,'String','launching');
+ system('./scripts/control_script.sh &')
+ first_run = 1;
+ error_flag = 0;
+ while( error_flag==1 || first_run == 1 )
+     pause(0.1);
+    try
+        sub = rossubscriber('/stickCmd');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+ end
+ msg = receive(sub,20);
+ set(handles.text7,'String','active');

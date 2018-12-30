@@ -3,6 +3,6 @@
 spawn ssh odroid@192.168.1.99
 expect "password"
 send "odroid\r"
-expect "$"
+expect "odroid"
 send "roslaunch mavros px4.launch\r"
 interact

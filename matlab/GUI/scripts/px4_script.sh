@@ -1,2 +1,2 @@
 #!/bin/bash
-xterm -e ./autolaunch_px4
+xterm -e ./scripts/autolaunch_px4

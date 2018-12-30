@@ -21,7 +21,6 @@
 clear; close all; clc; format compact;
 addpath('../')
 params = loadParams();
-rosinit;
 
 global controlParams
 controlParams = params.ctrl;
@@ -57,6 +56,8 @@ stickCmdMsg.Yaw = 0;
 stateEstimateSubscriber = robotics.ros.Subscriber(controlNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
 ahsCmdSubscriber = robotics.ros.Subscriber(controlNode,'ahsCmd','terpcopter_msgs/ahsCmd',{@ahsCmdCallback});
 pidSettingSubscriber = robotics.ros.Subscriber(controlNode,'pidSetting','terpcopter_msgs/ffpidSetting',{@ffpidSettingCallback});
+
+stateEstimateMsg = receive(stateEstimateSubscriber,5);
 
 altitudeError.lastTime = stateEstimateMsg.Time;
 altitudeError.lastVal = ahsCmdMsg.AltitudeMeters;
