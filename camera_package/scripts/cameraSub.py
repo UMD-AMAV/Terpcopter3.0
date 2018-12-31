@@ -10,6 +10,7 @@ import math
 from std_msgs.msg import String
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
+from _feedback import feedback
 
 #image callback function, no need to change this
 def callbackImage(data):
@@ -27,6 +28,7 @@ def imageSubscriber():
     
 # this is the function where we can make changes to perform image processing tasks 
 def imageProcessing(frame):
+    pubIP = rospy.Publisher('feedback', feedback, queue_size=10)
     hsv_frame = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) #convert RGB color scheme to HSV color scheme for better color recognition
     w,h= frame.shape[:2]
     lower_red = np.array([0,70,50])  #set the lower bound for red
@@ -53,6 +55,11 @@ def imageProcessing(frame):
 	#print distx,"  ", disty
     distX = str(int(distx))#"{:2d}".format(dist)
     distY = str(int(disty))
+    #error in horizontal direction
+    hError = int(distx);
+    #error in vertical direction
+    vError = int(disty);
+    
 	#The output is displayed on the frame in the form of:
 	#  (dist in X axis)   move (direction)     to reach the goal
 	#  (dist in Y axis)   move (direction)     to reach the goal
@@ -61,12 +68,17 @@ def imageProcessing(frame):
     if cX>h/2:
         cv2.putText(frame,"move right", (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255),2, lineType=cv2.LINE_AA)
     else: 
+        hError = (-1)*hError
 	cv2.putText(frame,"move left", (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255),2, lineType=cv2.LINE_AA)
     if cY>w/2:
 	cv2.putText(frame,"move down", (100, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255),2, lineType=cv2.LINE_AA)
     else: 
+        vError = (-1)*vError
 	cv2.putText(frame,"move up", (100, 200), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255),2, lineType=cv2.LINE_AA)
     #no need to show image while running the code
+    a = feedback()
+    a.datafb = [hError,vError]
+    pubIP.publish(a)
     cv2.imshow("frames", frame)
     cv2.waitKey(3)
     
