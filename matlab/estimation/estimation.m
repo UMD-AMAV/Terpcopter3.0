@@ -24,8 +24,6 @@
 clear; close all; clc; format compact;
 global imuMsg lidarMsg inertial_yaw_initial; %where to clear them?
 run('loadParams.m');
-addpath('../');
-
 %run('updatePaths.m');
 fprintf('Estimation Node Launching...\n');
 
@@ -49,24 +47,8 @@ stateMsg = rosmessage('terpcopter_msgs/stateEstimate');
 %stateMsg.Range = 0.2;
 t0 = [];
 
-% lidar data receiver
-    imuMsg = receive(imuDataSubscriber,20);
-    lidarMsg = receive(lidarDataSubscriber,20);
-
-r = robotics.Rate(30);
+r = robotics.Rate(20);
 reset(r);
-
-% smooting filter
-a = 0;
-b = 0;
-c = 0;
-d = 0;
-e = 0;
-f = 0;
-g = 0;
-h = 0;
-i = 0;
-j = 0;
 
 while(1)
     % Imu data receiver
@@ -101,26 +83,17 @@ while(1)
     if state.psi_relative> 180, state.psi_relative = state.psi_relative-360;
     elseif state.psi_relative<-180, state.psi_relative = 360+state.psi_relative;end
 
-    % condition lidar reading
+
+    % lidar data receiver
+    %lidarMsg = receive(lidarDataSubscriber,2);
+
+    %state estimate publisher
     if isempty(lidarMsg) || lidarMsg.Range_ <= 0.2
         disp('no lidar data');
         %get min range from lidar msg
         stateMsg.Range = 0.2;
     else
-        % moving average filter
-        i = j;
-        h = i;
-        g = h;
-        f = g;
-        e = f;
-        d = e;
-        c = d;
-        b = c;
-        a = b;
-        j = lidarMsg.Range_;
-        smoothed_range = (a+b+c+d+e+f+g+h+i+j)/10;
-        
-        stateMsg.Range = smoothed_range;
+        stateMsg.Range = lidarMsg.Range_;
     end
      
     %lidar data is in imu frame; convert to inertial frame
@@ -135,19 +108,22 @@ while(1)
     stateMsg.Roll = state.phi;
     stateMsg.Pitch = state.theta;
     
-    % timestamp
     ti= rostime('now');
     abs_t = eval([int2str(ti.Sec) '.' ...
         int2str(ti.Nsec)]);
    
     if isempty(t0), t0 = abs_t; end
     t = abs_t-t0;
+    
     stateMsg.Time = t;
-    
-    % fixed loop pause
     waitfor(r);
+    %% complimentay filter goes here
     
-    % publish stateEstimate
+    
+    
+    
+    
+    %%
     send(stateEstimatePublisher,stateMsg);
 end
 
