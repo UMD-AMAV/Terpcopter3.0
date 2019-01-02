@@ -57,6 +57,8 @@ stateEstimateSubscriber = robotics.ros.Subscriber(controlNode,'stateEstimate','t
 ahsCmdSubscriber = robotics.ros.Subscriber(controlNode,'ahsCmd','terpcopter_msgs/ahsCmd',{@ahsCmdCallback});
 pidSettingSubscriber = robotics.ros.Subscriber(controlNode,'pidSetting','terpcopter_msgs/ffpidSetting',{@ffpidSettingCallback});
 
+stateEstimateMsg = receive(stateEstimateSubscriber,5);
+
 altitudeError.lastTime = stateEstimateMsg.Time;
 altitudeError.lastVal = ahsCmdMsg.AltitudeMeters;
 altitudeError.lastSum = 0;
