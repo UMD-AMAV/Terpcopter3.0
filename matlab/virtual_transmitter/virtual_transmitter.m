@@ -37,9 +37,14 @@
 % prepare workspace
 clear; close all; clc; format compact;
 
+% intialize ros node
+if(~robotics.ros.internal.Global.isNodeActive)
+    rosinit;
+end
+
 % Clear COM ports -----------------------
-if ~isempty(instrfind)
-fclose(instrfind);
+if ~isempty(instrfind())
+fclose(instrfind());
 delete(instrfind);
 end
 %----------------------------------------
@@ -47,6 +52,8 @@ end
 addpath('../')
 params = loadParams();
 fprintf('Virtual Transmitter Node Launching...\n');
+
+first_run = 1;
 
 
 % initialize first input msg
@@ -61,10 +68,6 @@ global lastStickCmd_time
 lastStickCmd_time = rostime('now');
 idleDuration = rosduration(1,0);
 
-% intialize ros node
-if(~robotics.ros.internal.Global.isNodeActive)
-    rosinit;
-end
 
 % if we are running in flight mode the connection to the transmitter
 % through the trainer cable is initialized as follows:
@@ -79,6 +82,7 @@ end
 simulatorNode = robotics.ros.Node('/simulator');
 stateEstimatePublisher = robotics.ros.Publisher(simulatorNode,'stateEstimate','terpcopter_msgs/stateEstimate');
 stickCmdSubscriber = robotics.ros.Subscriber(simulatorNode,'stickCmd','terpcopter_msgs/stickCmd',@receiveStickCmd);
+vtxStatusPublisher = robotics.ros.Publisher(simulatorNode,'vtxStatus','std_msgs/Bool');
 
 if ( strcmp(params.vtx.mode,'flight') )
     r = robotics.Rate(20);
@@ -103,6 +107,7 @@ if ( strcmp(params.vtx.mode,'flight') )
         
         % transmit to quad
         transmitCmd( trainerBox, u_stick_cmd, params.vtx.trim_val, params.vtx.stick_lim, params.vtx.trim_lim );
+        if (first_run), send(vtxStatusPublisher,rosmessage('std_msgs/Bool')), first_run=0; end
         waitfor(r);
     end
     
