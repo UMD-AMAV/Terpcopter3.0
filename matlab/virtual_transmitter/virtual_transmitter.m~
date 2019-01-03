@@ -83,16 +83,12 @@ if ( strcmp(params.vtx.mode,'flight') )
             break;
         end
     end
-    if foundComPort == false
-        disp('No USB COM Port found')
-    elseif foundComPort == true
-        trainerBox = serial(params.env.com_port); 
-        trainerBox.BaudRate = params.env.baud_rate;
-        trainerBox.terminator = '';
-        fopen(trainerBox);
-        disp('com port initialised');  
-        disp(params.env.com_port)
-    end
+    if foundComPort 
+    trainerBox = serial(params.env.com_port); 
+    trainerBox.BaudRate = params.env.baud_rate;
+    trainerBox.terminator = '';
+    fopen(trainerBox);
+    disp('com port initialised');    
 end
 
 simulatorNode = robotics.ros.Node('/simulator');
