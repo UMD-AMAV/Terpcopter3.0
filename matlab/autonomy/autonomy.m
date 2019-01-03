@@ -54,6 +54,7 @@ fprintf('Launching Autonomy Node...\n');
 autonomyParams = params.autonomy;
 
 global stateEstimateMsg;
+global timestamps
 
 % initialize ROS
 if(~robotics.ros.internal.Global.isNodeActive)
@@ -80,15 +81,15 @@ while(1)
     if mission.config.firstLoop == 1
         disp('Behavior Manager Started')
         % initialize time variables 
-        mission.variables.initial_event_time = t;  
-        mission.variables.behavior_switched_timestamp = t;
-        mission.variables.behavior_satisfied_timestamp = t;
+        timestamps.initial_event_time = t;  
+        timestamps.behavior_switched_timestamp = t;
+        timestamps.behavior_satisfied_timestamp = t;
         mission.config.firstLoop = false; % ends the first loop
     end
 
     name = mission.bhv{currentBehavior}.name;
     flag = mission.bhv{currentBehavior}.completion.status;
-    timestamps = mission.variables;
+    %timestamps = mission.variables;
     ahs = mission.bhv{currentBehavior}.ahs;
     completion = mission.bhv{currentBehavior}.completion;
     
@@ -98,7 +99,7 @@ while(1)
     fprintf('Current Behavior: %s\tTime Spent in Behavior: %f\t Total Time of Mission: %f \n\n',name,bhvTime,totalTime); 
 
     if flag == true
-        mission.bhv = pop(mission.bhv,timestamps,t);
+        [mission.bhv] = pop(mission.bhv, t);
     else  
         %Set Handles within each behavior
         
@@ -110,7 +111,7 @@ while(1)
                 [completionFlag] = bhv_takeoff_status(stateEstimateMsg, ahs);
             case 'bhv_hover'
                 %disp('hover behavior');
-                [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, timestamps, t);
+                [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t);
             case 'landing'
                 %disp('landing behavior');
                 [completionFlag] = bhv_landing_status(stateEstimateMsg, ahs);

@@ -143,6 +143,7 @@ while(1)
     if isempty(t0), t0 = abs_t; end
     t = abs_t-t0;
     stateMsg.Time = t;
+    disp(t0
     % fixed loop pause
     waitfor(r);
     
