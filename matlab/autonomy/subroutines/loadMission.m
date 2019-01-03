@@ -16,10 +16,9 @@ mission.bhv{2}.completion.status = false;     % completion flag
 
 %Behavior 3: Land
 mission.bhv{3}.name = 'bhv_land';
-mission.bhv{3}.params.maxDescentRateMps = 0.2;
-mission.bhv{3}.ahs.desiredAltMeters = 0.25;
+%mission.bhv{3}.params.maxDescentRateMps = 0.2;
+mission.bhv{3}.ahs.desiredAltMeters = 0.20; % .25 previously shub
 mission.bhv{3}.completion.threshold = 0.1;
 mission.bhv{3}.completion.status = false;
-
 
 end

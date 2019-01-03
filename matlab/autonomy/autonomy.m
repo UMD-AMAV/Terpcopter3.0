@@ -110,7 +110,10 @@ while(1)
                 [completionFlag] = bhv_takeoff_status(stateEstimateMsg, ahs);
             case 'bhv_hover'
                 %disp('hover behavior');
-                [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion,timestamps, t);
+                [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, timestamps, t);
+            case 'landing'
+                %disp('landing behavior');
+                [completionFlag] = bhv_landing_status(stateEstimateMsg, ahs);
             otherwise
                 
         end
