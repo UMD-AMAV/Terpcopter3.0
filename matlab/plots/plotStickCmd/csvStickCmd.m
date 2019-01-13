@@ -54,10 +54,9 @@ ptime = msgTime.Time;
 % if isempty(t1), t1 = state.dt; else, t1 = t1+state.dt; end
 while(1) 
  data = [ptime pthrust pyaw ppitch proll];
-  fname='plotStickCmd.csv' ;
-  fid=fopen(fname,'a');
+ fname = sprintf('plotStickCmd_%s.csv', datestr(now,'mm-dd-yyyy_HH:MM:SS'));
+ fid=fopen(fname,'a');
  fprintf(fid,'%6.6f,%6.6f,%6.6f,%6.6f,%6.6f\n',data(1),data(2),data(3),data(4), data(5));
  pause(0.1);
  fclose(fid);
 end
- 

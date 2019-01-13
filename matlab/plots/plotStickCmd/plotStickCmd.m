@@ -28,19 +28,19 @@ lear all; close all; clc
     grid on;
 
     subplot(4,1,2)
-    plot(pyaw, 'r-');
+    plot(prYaw, 'r-');
     xlabel('iteration');
     ylabel('Yaw');
     grid on;
     
     subplot(4,1,3)
-    plot( ppitch , 'r-');
+    plot( prPitch , 'r-');
     xlabel('iteration');
     ylabel('Pitch');
     grid on;
     
     subplot(4,1,4)
-    plot(proll, 'r-');
+    plot(prRoll, 'r-');
     xlabel('iteration');
     ylabel('Roll');
     grid on;
