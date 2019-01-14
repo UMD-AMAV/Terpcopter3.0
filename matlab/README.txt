@@ -65,7 +65,7 @@ $ sudo apt-get autoremove
   (this will generate custom AMAV ROS messages)
 
 - For instructions for installing the MAVLink toolchain:
-  https://mavlink.io/en/getting_started/installation.htm
+  https://mavlink.io/en/getting_started/installation.html
 
 Running the Example Mission:
 ---------------------------------------------------------------------------
