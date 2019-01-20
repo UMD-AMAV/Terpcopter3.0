@@ -1,61 +1,61 @@
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 % Author - Team AMAV 2018-2019
 % 
-% About - reads the csv file conatining the stick command parameter values 
+% About - reads the csv file conatining the state estimate parameter values 
 %         And displays into the graphical plot
 % 
-% Input - 'plotStickCmd_xx-xx-xxxx_xx:xx.csv'
+% Input - 'plotPIDSetting_xx-xx-xxxx_xx:xx.csv'
 % 
-% Output - 4x1 Graphical plot containing Thrust Yaw Pitch Roll
+% Output - 4x1 Graphical plot containing Kp Ki Kd Ff
 % 
 % Note - Run this file in the results folder
 % 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
 clear all; close all; clc
-
- % Reading the csv file data
-    data = csvread('plotStickCmd_01-17-2019_01:28.csv');
-    prThrust = data(:,1);
-    prYaw = data(:,2);
-    prPitch = data(:,3);
-    prRoll = data(:,4);
-
+ 
+% Reading the csv file data
+    data = csvread('plotPIDSetting_01-17-2019_02:09.csv');
+    prKp = data(:,1);
+    prKi = data(:,2);
+    prKd = data(:,3);
+    prFf = data(:,4);
+    
 % Printing the figures
     figure(1)
     a1 = subplot(4,1,1);
-    plot(prThrust, 'r');
+    plot(prKp, 'r');
     xlabel('Time');
-    ylabel('Thrust');
+    ylabel('Kp');
     set(gca,'FontSize',25)
-    legend('Thrust')
+    legend('Kp')
     set(gca,'FontSize',16)
     grid on;
 
     a2 = subplot(4,1,2);
-    plot(prYaw, 'g');
+    plot(prKi, 'g');
     xlabel('Time');
-    ylabel('Yaw');
+    ylabel('Ki');
     set(gca,'FontSize',25)
-    legend('Yaw')
+    legend('Ki')
     set(gca,'FontSize',16)
     grid on;
-    
+
     a3 = subplot(4,1,3);
-    plot( prPitch , 'b');
+    plot(prKd, 'b');
     xlabel('Time');
-    ylabel('Pitch');
+    ylabel('Kd');
     set(gca,'FontSize',25)
-    legend('Pitch')
+    legend('Kd')
     set(gca,'FontSize',16)
     grid on;
-    
+
     a4 = subplot(4,1,4);
-    plot(prRoll, 'k');
+    plot(prFf, 'k');
     xlabel('Time');
-    ylabel('Roll');
+    ylabel('Ff');
     set(gca,'FontSize',25)
-    legend('Roll')
+    legend('FeedForward')
     set(gca,'FontSize',16)
     grid on;
     

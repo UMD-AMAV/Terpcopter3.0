@@ -29,6 +29,7 @@ clear all; close all; clc;
 
 global stateEstimateMsg;
 stateEstimateMsg = rosmessage('terpcopter_msgs/stateEstimate');
+stateEstimateMsg.Range = 0 ;
 stateEstimateMsg.Time = 0 ;
 stateEstimateMsg.North = 0 ;
 stateEstimateMsg.East = 0 ;
@@ -40,23 +41,25 @@ stateEstimateMsg.Roll = 0 ;
 plotStateEstimateNode = robotics.ros.Node('/plotStateEstimate');
 pStateEstimateSub = robotics.ros.Subscriber(plotStateEstimateNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
 
-msg = receive(pStateEstimateSub);
+msg = receive(pStateEstimateSub,20);
 
-pTime = msg.Time;
-pNorth = msg.North;
-pEast = msg.East;
-pUp = msg.Up;
-pYaw = msg.Yaw;
-pPitch = msg.Pitch;
-pRoll = msg.Roll;
-    
+fname = sprintf('plotStateEstimate_%s.csv', datestr(now,'mm-dd-yyyy_HH:MM'));
+fid=fopen(fname,'a');
+
 % Add loop to check if the command is received
   while(1)
 % if isempty(t1), t1 = state.dt; else, t1 = t1+state.dt; end   
-    data = [pTime pNorth pEast pUp pYaw pPitch pRoll];
-    fname = sprintf('plotStateEstimate_%s.csv', datestr(now,'mm-dd-yyyy_HH:MM:SS'));
-    fid=fopen(fname,'a');
-    fprintf(fid,'%6.6f,%6.6f,%6.6f,%6.6f,%6.6f, %6.6f,%6.6f\n',data(1),data(2),data(3),data(4), data(5), data(6), data(7));
-    pause(0.1);
-    fclose(fid); 
+    pRange = stateEstimateMsg.Range;
+    pTime = stateEstimateMsg.Time;
+    pNorth = stateEstimateMsg.North;
+    pEast = stateEstimateMsg.East;
+    pUp = stateEstimateMsg.Up;
+    pYaw = stateEstimateMsg.Yaw;
+    pPitch = stateEstimateMsg.Pitch;
+    pRoll = stateEstimateMsg.Roll;
+    data = [pRange pTime pNorth pEast pUp pYaw pPitch pRoll];
+    fprintf(fid,'%6.6f,%6.6f,%6.6f,%6.6f,%6.6f,%6.6f, %6.6f,%6.6f\n',data(1),data(2),data(3),data(4), data(5), data(6), data(7), data(8));
+    pause(0.1); 
   end
+fclose(fid);
+

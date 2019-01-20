@@ -17,7 +17,7 @@
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
 clear all; close all; clc;
-% addpath('./results and plots');
+%addpath('./results');
 
 %  ahsCmd
 %  altitudeMeters
@@ -41,23 +41,22 @@ pahsCmdMsg = robotics.ros.Subscriber(plotahsCmdNode,'ahsCmd','terpcopter_msgs/ah
 pStateEstimateSub = robotics.ros.Subscriber(plotahsCmdNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
 
 
-msg = receive(pahsCmdMsg);
-msgTime = receive(pStateEstimateSub);
+msg = receive(pahsCmdMsg,20);
+msgTime = receive(pStateEstimateSub,20);
 
-pAltitudeMeters = msg.AltitudeMeters;
-pForwardSpeedMps = msg.ForwardSpeedMps;
-pCrabSpeedMps = msg.CrabSpeedMps;
-pHeadingRad = msg.HeadingRad;
-pTime = msgTime.Time;
-
+fname = sprintf('plotahsCmd_%s.csv', datestr(now,'mm-dd-yyyy_HH:MM:'));
+fid=fopen(fname,'a');
 
 % Creating the csv file for the ahs Command data.
 %     if isempty(t1), t1 = state.dt; else, t1 = t1+state.dt; end 
    while(1)
-    data = [pTime pAltitudeMeters pForwardSpeedMps pCrabSpeedMps pHeadingRad];
-    fname = sprintf('plotahsCmd_%s.csv', datestr(now,'mm-dd-yyyy_HH:MM:SS'));
-    fid=fopen(fname,'a');
-    fprintf(fid,'%6.6f,%6.6f,%6.6f,%6.6f,%6.6f\n',data(1),data(2),data(3),data(4), data(5));
-    pause(0.1);
-    fclose(fid); 
+ pAltitudeMeters = ahsCmdMsg.AltitudeMeters;
+ pForwardSpeedMps = ahsCmdMsg.ForwardSpeedMps;
+ pCrabSpeedMps = ahsCmdMsg.CrabSpeedMps;
+ pHeadingRad = ahsCmdMsg.HeadingRad; 
+ pTime = stateEstimateMsg.Time;
+ data = [pTime pAltitudeMeters pForwardSpeedMps pCrabSpeedMps pHeadingRad];
+ fprintf(fid,'%6.6f,%6.6f,%6.6f,%6.6f,%6.6f\n',data(1),data(2),data(3),data(4), data(5));
+ pause(0.1); 
    end
+fclose(fid);
