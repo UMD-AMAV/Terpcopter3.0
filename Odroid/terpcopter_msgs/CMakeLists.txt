@@ -54,6 +54,8 @@ message_generation
    ahsCmd.msg
    stateEstimate.msg
    stickCmd.msg
+   ffpidSetting.msg
+   targetDetection.msg
  )
 
 ## Generate services in the 'srv' folder
