@@ -93,7 +93,7 @@ function pushbutton1_Callback(hObject, eventdata, handles)
         error_flag = 1;
     end
  end
- msg = receive(sub,20);
+ msg = receive(sub,30);
  set(handles.text2,'String','active');
 
  
