@@ -1,3 +1,4 @@
+float32 range
 float32 time
 float32 north
 float32 east

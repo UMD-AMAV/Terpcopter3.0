@@ -1,6 +1,6 @@
 function updatePaths()
-try 
-    cd  '/home/amav/amav/Terpcopter3.0/matlab'
+%try 
+%    cd  '/home/amav/amav/Terpcopter3.0/matlab'
 params = loadParams();
 addpath(params.env.terpcopterMatlabMsgs);
 addpath('./control')

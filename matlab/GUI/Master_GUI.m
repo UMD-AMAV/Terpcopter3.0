@@ -64,7 +64,13 @@ guidata(hObject, handles);
 
 % --- Outputs from this function are returned to the command line.
 function varargout = Master_GUI_OutputFcn(hObject, eventdata, handles) 
+<<<<<<< HEAD
 rosinit;
+=======
+if(~robotics.ros.internal.Global.isNodeActive)
+    rosinit;
+end
+>>>>>>> 2014ff4516d8efe4abe47652f0384210df863139
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -91,7 +97,11 @@ function pushbutton1_Callback(hObject, eventdata, handles)
         error_flag = 1;
     end
  end
+<<<<<<< HEAD
  msg = receive(sub,20);
+=======
+ msg = receive(sub,30);
+>>>>>>> 2014ff4516d8efe4abe47652f0384210df863139
  set(handles.text2,'String','active');
 
  

@@ -1,4 +1,5 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Node: virtual_transmitter
 %
 % Purpose:
@@ -35,39 +36,73 @@
 
 % prepare workspace
 clear; close all; clc; format compact;
-addpath('../')
-params = loadParams();
-fprintf('Virtual Transmitter Node Launching...\n');
-
-
-% initialize first input msg
-global stickCmdMsg;
-stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
-stickCmdMsg.Thrust = 0;
-stickCmdMsg.Yaw = 0;
-stickCmdMsg.Pitch = 0;
-stickCmdMsg.Roll = 0;
 
 % intialize ros node
 if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
 
+% Clear COM ports -----------------------
+if ~isempty(instrfind())
+fclose(instrfind());
+delete(instrfind);
+end
+%----------------------------------------
+
+addpath('../')
+params = loadParams();
+fprintf('Virtual Transmitter Node Launching...\n');
+
+first_run = 1;
+
+
+% initialize first input msg
+global stickCmdMsg;
+stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
+stickCmdMsg.Thrust = -1;
+stickCmdMsg.Yaw = 0;
+stickCmdMsg.Pitch = 0;
+stickCmdMsg.Roll = 0;
+
+global lastStickCmd_time
+lastStickCmd_time = rostime('now');
+idleDuration = rosduration(1,0);
+
+
 % if we are running in flight mode the connection to the transmitter
 % through the trainer cable is initialized as follows:
+foundComPort = false;
 if ( strcmp(params.vtx.mode,'flight') )
-    trainerBox = serial(params.env.com_port); 
-    trainerBox.BaudRate = params.env.baud_rate;
-    trainerBox.terminator = '';
-    fopen(trainerBox);
-    disp('com port initialised');    
+    % avialable serial ports
+    comlist = seriallist();
+    for i = 1:size(comlist,2)
+        if contains(comlist(i),'USB')
+            params.env.com_port = comlist(i);
+            foundComPort = true;
+            disp('Found USB COM port')
+            break;
+        end
+    end
+    if foundComPort == false
+        disp('No USB COM Port found')
+    elseif foundComPort == true
+        trainerBox = serial(params.env.com_port); 
+        trainerBox.BaudRate = params.env.baud_rate;
+        trainerBox.terminator = '';
+        fopen(trainerBox);
+        disp('com port initialised');  
+        disp(params.env.com_port)
+    end
 end
 
 simulatorNode = robotics.ros.Node('/simulator');
 stateEstimatePublisher = robotics.ros.Publisher(simulatorNode,'stateEstimate','terpcopter_msgs/stateEstimate');
 stickCmdSubscriber = robotics.ros.Subscriber(simulatorNode,'stickCmd','terpcopter_msgs/stickCmd',@receiveStickCmd);
+vtxStatusPublisher = robotics.ros.Publisher(simulatorNode,'vtxStatus','std_msgs/Bool');
 
 if ( strcmp(params.vtx.mode,'flight') )
+    r = robotics.Rate(20);
+    reset(r);
     
     while(1)
         % extract u_stick_cmd from the latest stickCmd ROS message
@@ -75,8 +110,21 @@ if ( strcmp(params.vtx.mode,'flight') )
         u_stick_cmd(2) = stickCmdMsg.Roll;
         u_stick_cmd(3) = stickCmdMsg.Pitch;
         u_stick_cmd(4) = stickCmdMsg.Yaw;
+        
+        % if the controller is off for more than 1 second enter emergency
+        % decent mode
+        if (rostime('now') > lastStickCmd_time + idleDuration)
+            u_stick_cmd(1) = -0.6;
+            u_stick_cmd(2) = 0;
+            u_stick_cmd(3) = 0;
+            u_stick_cmd(4) = 0;
+            disp('Emergency Decent!')
+        end
+        
         % transmit to quad
-        transmitCmd( trainerBox, u_stick_cmd, params.trim_val, params.vtx.stick_lim, params.vtxtrim_lim );
+        transmitCmd( trainerBox, u_stick_cmd, params.vtx.trim_val, params.vtx.stick_lim, params.vtx.trim_lim );
+        if (first_run), send(vtxStatusPublisher,rosmessage('std_msgs/Bool')), first_run=0; end
+        waitfor(r);
     end
     
 elseif ( strcmp(params.vtx.mode,'sim') )
