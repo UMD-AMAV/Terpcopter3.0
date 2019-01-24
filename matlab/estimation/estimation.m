@@ -22,7 +22,7 @@
 
 % prepare workspace
 clear; close all; clc; format compact;
-global imuMsg lidarMsg inertial_yaw_initial; %where to clear them?
+global inertial_yaw_initial; %where to clear them?
 run('loadParams.m');
 addpath('../');
 
@@ -34,20 +34,18 @@ if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
 
-estimationNode = robotics.ros.Node('/estimation');
-imuDataSubscriber = robotics.ros.Subscriber(estimationNode,'/mavros/imu/data','sensor_msgs/Imu',@imuCallback,"BufferSize",1);
-lidarDataSubscriber = robotics.ros.Subscriber(estimationNode,'/terarangerone','sensor_msgs/Range',@lidarCallback,"BufferSize",1);
-stateEstimatePublisher = robotics.ros.Publisher(estimationNode,'/stateEstimate','terpcopter_msgs/stateEstimate');
+% Subscribers
+imuDataSubscriber = rossubscriber('/mavros/imu/data');
+lidarDataSubscriber = rossubscriber('/terarangerone');
+
+% Publishers
+stateEstimatePublisher = rospublisher('/stateEstimate', 'terpcopter_msg/stateEstimate');
 
 stateMsg = rosmessage('terpcopter_msgs/stateEstimate');
 %stateMsg.Range = 0.2;
 t0 = [];
 
-% lidar data receiver
-    imuMsg = receive(imuDataSubscriber,20);
-    lidarMsg = receive(lidarDataSubscriber,20);
-
-r = robotics.Rate(30);
+r = rosrate(30);
 reset(r);
 
 % smooting filter
@@ -63,8 +61,10 @@ i = 0;
 j = 0;
 
 while(1)
-    % Imu data receiver
-    %imuMsg = receive(imuDataSubscriber,3);
+    % Receive Latest Imu and Lidar data
+    imuMsg = receive(imuDataSubscriber, 20);
+    lidarMsg = receive(lidarDataSubscriber, 20);
+    
     if isempty(imuMsg)
         state = NaN;
         disp('No imu data\n');
