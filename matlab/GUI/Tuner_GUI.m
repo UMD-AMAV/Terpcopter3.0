@@ -280,7 +280,7 @@ msg.Ki = str2num(get(handles.edit2, 'String'));
 msg.Kd = str2num(get(handles.edit3, 'String'));
 msg.Ff = str2num(get(handles.edit4, 'String'));
 
-pidSettingsPublisher = rospublisher('/pidSettings3',msg);
+pidSettingsPublisher = rospublisher('/pidSetting',msg);
 %send(pidSettingsPublisher,msg);
 % hObject    handle to pushbutton3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB

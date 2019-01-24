@@ -34,7 +34,7 @@ if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
 
-estimationNode = robotics.ros.Node('/estimation1');
+estimationNode = robotics.ros.Node('/estimation');
 imuDataSubscriber = robotics.ros.Subscriber(estimationNode,'/mavros/imu/data','sensor_msgs/Imu',@imuCallback,"BufferSize",1);
 lidarDataSubscriber = robotics.ros.Subscriber(estimationNode,'/terarangerone','sensor_msgs/Range',@lidarCallback,"BufferSize",1);
 stateEstimatePublisher = robotics.ros.Publisher(estimationNode,'/stateEstimate','terpcopter_msgs/stateEstimate');
