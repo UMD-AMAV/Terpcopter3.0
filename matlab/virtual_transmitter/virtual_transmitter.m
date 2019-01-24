@@ -71,12 +71,28 @@ idleDuration = rosduration(1,0);
 
 % if we are running in flight mode the connection to the transmitter
 % through the trainer cable is initialized as follows:
+foundComPort = false;
 if ( strcmp(params.vtx.mode,'flight') )
-    trainerBox = serial(params.env.com_port); 
-    trainerBox.BaudRate = params.env.baud_rate;
-    trainerBox.terminator = '';
-    fopen(trainerBox);
-    disp('com port initialised');    
+    % avialable serial ports
+    comlist = seriallist();
+    for i = 1:size(comlist,2)
+        if contains(comlist(i),'USB')
+            params.env.com_port = comlist(i);
+            foundComPort = true;
+            disp('Found USB COM port')
+            break;
+        end
+    end
+    if foundComPort == false
+        disp('No USB COM Port found')
+    elseif foundComPort == true
+        trainerBox = serial(params.env.com_port); 
+        trainerBox.BaudRate = params.env.baud_rate;
+        trainerBox.terminator = '';
+        fopen(trainerBox);
+        disp('com port initialised');  
+        disp(params.env.com_port)
+    end
 end
 
 simulatorNode = robotics.ros.Node('/simulator');

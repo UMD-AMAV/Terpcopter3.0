@@ -29,17 +29,11 @@ addpath('../');
 %run('updatePaths.m');
 fprintf('Estimation Node Launching...\n');
 
-%Clear COM Ports-----------------------------------------------
-if ~isempty(instrfind)
-fclose(instrfind);
-delete(instrfind);
-end
-%--------------------------------------------------------------
-
 % intialize ros node
 if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
+
 estimationNode = robotics.ros.Node('/estimation');
 imuDataSubscriber = robotics.ros.Subscriber(estimationNode,'/mavros/imu/data','sensor_msgs/Imu',@imuCallback,"BufferSize",1);
 lidarDataSubscriber = robotics.ros.Subscriber(estimationNode,'/terarangerone','sensor_msgs/Range',@lidarCallback,"BufferSize",1);
@@ -148,5 +142,6 @@ while(1)
     
     % publish stateEstimate
     send(stateEstimatePublisher,stateMsg);
+
 end
 
