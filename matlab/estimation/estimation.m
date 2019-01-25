@@ -41,7 +41,8 @@ lidarDataSubscriber = rossubscriber('/terarangerone');
 % Publishers
 stateEstimatePublisher = rospublisher('/stateEstimate', 'terpcopter_msg/stateEstimate');
 
-stateMsg = rosmessage('terpcopter_msgs/stateEstimate');
+pause(2)
+stateMsg = rosmessage(stateEstimatePublisher);
 %stateMsg.Range = 0.2;
 t0 = [];
 
@@ -62,8 +63,8 @@ j = 0;
 
 while(1)
     % Receive Latest Imu and Lidar data
-    imuMsg = receive(imuDataSubscriber, 20);
-    lidarMsg = receive(lidarDataSubscriber, 20);
+    imuMsg = imuDataSubscriber.LatestMessage;
+    lidarMsg = lidarDataSubscriber.LatestMessage;
     
     if isempty(imuMsg)
         state = NaN;
@@ -141,7 +142,7 @@ while(1)
     waitfor(r);
     
     % publish stateEstimate
-    send(stateEstimatePublisher,stateMsg);
+    send(stateEstimatePublisher, stateMsg);
 
 end
 

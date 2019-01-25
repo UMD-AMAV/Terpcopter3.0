@@ -53,7 +53,7 @@ mission = loadMission();
 fprintf('Launching Autonomy Node...\n');
 autonomyParams = params.autonomy;
 
-global stateEstimateMsg;
+
 global timestamps
 
 % initialize ROS
@@ -61,16 +61,24 @@ if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
     
-autonomyNode = robotics.ros.Node('/autonomy');
-ahsCmdPublisher = robotics.ros.Publisher(autonomyNode,'ahsCmd','terpcopter_msgs/ahsCmd');
+% Subscribers
+stateEstimateSubscriber = rossubscriber('/stateEstimate');
 
-stateEstimateSubscriber = robotics.ros.Subscriber(autonomyNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
+% Publishers
+ahsCmdPublisher = rospublisher('/ahsCmd', 'terpcopter_msgs/ahsCmd');
+pidSettingPublisher = rospublisher('/pisSetting', 'terpcopter_msgs/ffpidSetting');
+
+pause(2)
+ahsCmdMsg = rosmessage(ahsCmdPublisher);
+
+pidSettingMsg = rosmessage(pidSettingPublisher);
 
 r = robotics.Rate(10);
 reset(r);
 
 while(1)
-    
+    stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
+
     % unpack statestimate
     t = stateEstimateMsg.Time;
     z = stateEstimateMsg.Up;
@@ -123,7 +131,6 @@ while(1)
     end
 
     % publish
-    ahsCmdMsg = rosmessage('terpcopter_msgs/ahsCmd');
     ahsCmdMsg.AltitudeMeters = z_d;
     send(ahsCmdPublisher, ahsCmdMsg);
     fprintf('Published Ahs Cmd. Alt : %3.3f \n', z_d );
