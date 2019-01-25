@@ -62,4 +62,3 @@ fid=fopen(fname,'a');
     pause(0.1); 
   end
 fclose(fid);
-

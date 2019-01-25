@@ -32,16 +32,16 @@ stickCmdMsg.Yaw= 0;
 stickCmdMsg.Pitch= 0;
 stickCmdMsg.Roll=0;
 
-global stateEstimateMsg;
-stateEstimateMsg = rosmessage('terpcopter_msgs/stateEstimate');
-stateEstimateMsg.Time = 0 ;
+% global stateEstimateMsg;
+% stateEstimateMsg = rosmessage('terpcopter_msgs/stateEstimate');
+% stateEstimateMsg.Time = 0 ;
 
 plotStickCmdNode = robotics.ros.Node('/plotStickCmd');
 plotStickCmdSub = robotics.ros.Subscriber(plotStickCmdNode,'stickCmd','terpcopter_msgs/stickCmd',{@stickCmdCallback});
-pStateEstimateSub = robotics.ros.Subscriber(plotStickCmdNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
+% pStateEstimateSub = robotics.ros.Subscriber(plotStickCmdNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
 
 msg = receive(plotStickCmdSub,20);
-msgTime = receive(pStateEstimateSub,20);
+% msgTime = receive(pStateEstimateSub,20);
 
 fname = sprintf('plotStickCmd_%s.csv', datestr(now,'mm-dd-yyyy_HH:MM'));
 fid=fopen(fname,'a');
@@ -52,7 +52,7 @@ while(1)
  pyaw = stickCmdMsg.Yaw;
  ppitch = stickCmdMsg.Pitch;
  proll = stickCmdMsg.Roll;
- ptime = stateEstimateMsg.Time;
+%  ptime = stateEstimateMsg.Time;
  data = [pthrust pyaw ppitch proll];
  fprintf(fid,'%6.6f,%6.6f,%6.6f,%6.6f\n',data(1),data(2),data(3),data(4));
  pause(0.1);

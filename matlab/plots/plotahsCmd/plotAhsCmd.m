@@ -12,19 +12,19 @@
 % 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-clear all; close all; clc;
+clear all; clc;
 
 % Reading the csv file data
-    data = csvread('plotahsCmd.csv');
+    data = csvread('plotahsCmd_01-17-2019_02:00.csv');
     prAltitudeMeters = data(:,1);
     prForwardSpeedMps = data(:,2);
     prCrabSpeedMps = data(:,3);
     prHeadingRad = data(:,4);
 
     % Printing the figures
-    figure(1)
+    figure()
     a1 = subplot(4,1,1);
-    plot(prAltitudeMeters, 'r-');
+    plot(prAltitudeMeters, 'r','LineWidth',3);
     xlabel('iteration');
     ylabel('Altitude');
     set(gca,'FontSize',25)
@@ -33,7 +33,7 @@ clear all; close all; clc;
     grid on;
 
     a2 = subplot(4,1,2);
-    plot(prForwardSpeedMps, 'g');
+    plot(prForwardSpeedMps, 'g','LineWidth',3);
     xlabel('iteration');
     ylabel('Forward Speed');
     set(gca,'FontSize',25)
@@ -42,7 +42,7 @@ clear all; close all; clc;
     grid on;
 
     a3 = subplot(4,1,3);
-    plot(prCrabSpeedMps, 'b');
+    plot(prCrabSpeedMps, 'b','LineWidth',3);
     xlabel('iteration');
     ylabel('Crab speed');
     set(gca,'FontSize',25)
@@ -51,12 +51,16 @@ clear all; close all; clc;
     grid on;
 
     a4 = subplot(4,1,4);
-    plot(prHeadingRad, 'k');
+    plot(prHeadingRad, 'k','LineWidth',3);
     xlabel('iteration');
     ylabel('Heading Rad');
     set(gca,'FontSize',25)
     legend('Heading Rad')
     set(gca,'FontSize',16)
     grid on;
+    
+    %     Title for subplots
+    sgt = sgtitle('AHS plots'); %raw data
+    sgt.FontSize = 25;
     
     linkaxes([a1,a2,a3,a4],'x')

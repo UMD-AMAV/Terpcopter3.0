@@ -32,17 +32,17 @@ ahsCmdMsg.HeadingRad = 0;
 ahsCmdMsg.ForwardSpeedMps = 0;
 ahsCmdMsg.CrabSpeedMps = 0;
 
-global stateEstimateMsg;
-stateEstimateMsg = rosmessage('terpcopter_msgs/stateEstimate');
-stateEstimateMsg.Time = 0 ;
+% global stateEstimateMsg;
+% stateEstimateMsg = rosmessage('terpcopter_msgs/stateEstimate');
+% stateEstimateMsg.Time = 0 ;
 
 plotahsCmdNode = robotics.ros.Node('/plotahsCmd');
 pahsCmdMsg = robotics.ros.Subscriber(plotahsCmdNode,'ahsCmd','terpcopter_msgs/ahsCmd',{@ahsCmdCallback});
-pStateEstimateSub = robotics.ros.Subscriber(plotahsCmdNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
+% pStateEstimateSub = robotics.ros.Subscriber(plotahsCmdNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
 
 
 msg = receive(pahsCmdMsg,20);
-msgTime = receive(pStateEstimateSub,20);
+% msgTime = receive(pStateEstimateSub,20);
 
 fname = sprintf('plotahsCmd_%s.csv', datestr(now,'mm-dd-yyyy_HH:MM:'));
 fid=fopen(fname,'a');
@@ -54,9 +54,9 @@ fid=fopen(fname,'a');
  pForwardSpeedMps = ahsCmdMsg.ForwardSpeedMps;
  pCrabSpeedMps = ahsCmdMsg.CrabSpeedMps;
  pHeadingRad = ahsCmdMsg.HeadingRad; 
- pTime = stateEstimateMsg.Time;
- data = [pTime pAltitudeMeters pForwardSpeedMps pCrabSpeedMps pHeadingRad];
- fprintf(fid,'%6.6f,%6.6f,%6.6f,%6.6f,%6.6f\n',data(1),data(2),data(3),data(4), data(5));
+%  pTime = stateEstimateMsg.Time;
+ data = [pAltitudeMeters pForwardSpeedMps pCrabSpeedMps pHeadingRad];
+ fprintf(fid,'%6.6f,%6.6f,%6.6f,%6.6f\n',data(1),data(2),data(3),data(4));
  pause(0.1); 
    end
 fclose(fid);

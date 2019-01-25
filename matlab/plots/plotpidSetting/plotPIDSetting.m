@@ -12,7 +12,7 @@
 % 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-clear all; close all; clc
+clear all;  clc
  
 % Reading the csv file data
     data = csvread('plotPIDSetting_01-17-2019_02:09.csv');
@@ -22,41 +22,45 @@ clear all; close all; clc
     prFf = data(:,4);
     
 % Printing the figures
-    figure(1)
+    figure()
     a1 = subplot(4,1,1);
-    plot(prKp, 'r');
+    plot(prKp, 'r','LineWidth',3);
     xlabel('Time');
     ylabel('Kp');
     set(gca,'FontSize',25)
-    legend('Kp')
+    legend('Proportional gain')
     set(gca,'FontSize',16)
     grid on;
 
     a2 = subplot(4,1,2);
-    plot(prKi, 'g');
+    plot(prKi, 'g','LineWidth',3);
     xlabel('Time');
     ylabel('Ki');
     set(gca,'FontSize',25)
-    legend('Ki')
+    legend('Integral gain')
     set(gca,'FontSize',16)
     grid on;
 
     a3 = subplot(4,1,3);
-    plot(prKd, 'b');
+    plot(prKd, 'b','LineWidth',3);
     xlabel('Time');
     ylabel('Kd');
     set(gca,'FontSize',25)
-    legend('Kd')
+    legend('Differential gain')
     set(gca,'FontSize',16)
     grid on;
 
     a4 = subplot(4,1,4);
-    plot(prFf, 'k');
+    plot(prFf, 'k','LineWidth',3);
     xlabel('Time');
     ylabel('Ff');
     set(gca,'FontSize',25)
     legend('FeedForward')
     set(gca,'FontSize',16)
     grid on;
+    
+    %     Title for subplots
+    sgt = sgtitle('PID Gains'); %raw data
+    sgt.FontSize = 25;
     
     linkaxes([a1,a2,a3,a4],'x')

@@ -12,7 +12,7 @@
 % 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-clear all; close all; clc
+clear all; clc
 
 % Reading the csv file data
     data = csvread('plotStateEstimate_01-17-2019_02:08.csv');
@@ -25,9 +25,10 @@ clear all; close all; clc
     prRoll = data(:,7);
     
 % Printing the figures
-    figure(1)
+    figure()
+    title('State Estimate')
     a1 = subplot(3,2,1);
-    plot(prNorth,'g');
+    plot(prNorth,'g','LineWidth',3);
     xlabel('Time');
     ylabel('North direction');
     set(gca,'FontSize',25)
@@ -36,7 +37,7 @@ clear all; close all; clc
     grid on;
 
     a2 = subplot(3,2,3);
-    plot(prEast, 'c');
+    plot(prEast, 'c','LineWidth',3);
     xlabel('Time');
     ylabel('East direction');
     set(gca,'FontSize',25)
@@ -46,17 +47,16 @@ clear all; close all; clc
 %     linkaxes([a1,a2],'xy')
 
     a3 = subplot(3,2,5);
-    plot(prRange, 'b');
+    plot(prRange, 'b','LineWidth',3);
     xlabel('Time');
-    ylabel('Range');
+    ylabel('Up');
     set(gca,'FontSize',25)
-    legend('Range')
+    legend('Up')
     set(gca,'FontSize',16)
     grid on;
-    
-    
+        
     a4 = subplot(3,2,2);
-    plot(prYaw, 'm');
+    plot(prYaw, 'm','LineWidth',3);
     xlabel('Time');
     ylabel('Yaw');
     set(gca,'FontSize',25)
@@ -65,7 +65,7 @@ clear all; close all; clc
     grid on;
 
     a5 = subplot(3,2,4);
-    plot(prPitch, 'r');
+    plot(prPitch, 'r','LineWidth',3);
     xlabel('Time');
     ylabel('Pitch');
     set(gca,'FontSize',25)
@@ -74,13 +74,17 @@ clear all; close all; clc
     grid on;
 
     a6 = subplot(3,2,6);
-    plot(prRoll, 'k');
+    plot(prRoll, 'k','LineWidth',3);
     xlabel('Time');
     ylabel('Roll');
     set(gca,'FontSize',25)
     legend('Roll')
     set(gca,'FontSize',16)
     grid on;
+    
+%     Title for subplots
+    sgt = sgtitle('State Estimate '); %raw data
+    sgt.FontSize = 25;
     
     linkaxes([a1,a2,a3,a4,a5,a6],'x')
     % linkaxes([a3,a4],'xy')

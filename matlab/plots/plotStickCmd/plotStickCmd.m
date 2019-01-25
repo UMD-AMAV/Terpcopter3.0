@@ -12,7 +12,7 @@
 % 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-clear all; close all; clc
+clear all; clc
 
  % Reading the csv file data
     data = csvread('plotStickCmd_01-17-2019_01:28.csv');
@@ -22,9 +22,9 @@ clear all; close all; clc
     prRoll = data(:,4);
 
 % Printing the figures
-    figure(1)
+    figure()
     a1 = subplot(4,1,1);
-    plot(prThrust, 'r');
+    plot(prThrust, 'r','LineWidth',3);
     xlabel('Time');
     ylabel('Thrust');
     set(gca,'FontSize',25)
@@ -33,7 +33,7 @@ clear all; close all; clc
     grid on;
 
     a2 = subplot(4,1,2);
-    plot(prYaw, 'g');
+    plot(prYaw, 'g','LineWidth',3);
     xlabel('Time');
     ylabel('Yaw');
     set(gca,'FontSize',25)
@@ -42,7 +42,7 @@ clear all; close all; clc
     grid on;
     
     a3 = subplot(4,1,3);
-    plot( prPitch , 'b');
+    plot( prPitch , 'b','LineWidth',3);
     xlabel('Time');
     ylabel('Pitch');
     set(gca,'FontSize',25)
@@ -51,12 +51,16 @@ clear all; close all; clc
     grid on;
     
     a4 = subplot(4,1,4);
-    plot(prRoll, 'k');
+    plot(prRoll, 'k','LineWidth',3);
     xlabel('Time');
     ylabel('Roll');
     set(gca,'FontSize',25)
     legend('Roll')
     set(gca,'FontSize',16)
     grid on;
+        
+    %     Title for subplots
+    sgt = sgtitle('Stick Cmd '); %raw data
+    sgt.FontSize = 25;
     
     linkaxes([a1,a2,a3,a4],'x')
