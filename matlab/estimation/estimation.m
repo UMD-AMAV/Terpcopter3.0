@@ -39,7 +39,7 @@ imuDataSubscriber = rossubscriber('/mavros/imu/data');
 lidarDataSubscriber = rossubscriber('/terarangerone');
 
 % Publishers
-stateEstimatePublisher = rospublisher('/stateEstimate', 'terpcopter_msg/stateEstimate');
+stateEstimatePublisher = rospublisher('/stateEstimate', 'terpcopter_msgs/stateEstimate');
 
 pause(2)
 stateMsg = rosmessage(stateEstimatePublisher);
