@@ -22,21 +22,21 @@
 
 % prepare workspace
 clear; close all; clc; format compact;
-global imuMsg lidarMsg inertial_yaw_initial; %where to clear them?
+global imuMsg fpMsg lidarMsg inertial_yaw_initial; %where to clear them?
 run('loadParams.m');
 addpath('../');
 
 %run('updatePaths.m');
 fprintf('Estimation Node Launching...\n');
 
-% intialize ros node
+% intialize ros  node
 if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
-
-estimationNode = robotics.ros.Node('/estimation1');
+estimationNode = robotics.ros.Node('/estimation');
 imuDataSubscriber = robotics.ros.Subscriber(estimationNode,'/mavros/imu/data','sensor_msgs/Imu',@imuCallback,"BufferSize",1);
 lidarDataSubscriber = robotics.ros.Subscriber(estimationNode,'/terarangerone','sensor_msgs/Range',@lidarCallback,"BufferSize",1);
+flowProbeDataSubscriber = robotics.ros.Subscriber(estimationNode,'/flowProbe','std_msgs/Float32',@flowProbeCallback,"BufferSize",1);
 stateEstimatePublisher = robotics.ros.Publisher(estimationNode,'/stateEstimate','terpcopter_msgs/stateEstimate');
 
 stateMsg = rosmessage('terpcopter_msgs/stateEstimate');
@@ -46,6 +46,7 @@ t0 = [];
 % lidar data receiver
     imuMsg = receive(imuDataSubscriber,20);
     lidarMsg = receive(lidarDataSubscriber,20);
+    fpMsg = receive(flowProbeDataSubscriber,20);
 
 r = robotics.Rate(30);
 reset(r);
@@ -129,6 +130,13 @@ while(1)
     stateMsg.Roll = state.phi;
     stateMsg.Pitch = state.theta;
     
+    if isempty(fpMsg)
+        state = NaN;
+        disp('No flow probe data\n');
+        return;
+    end
+    stateMsg.forwardVelocity = fpMsg.Data;
+    
     % timestamp
     ti= rostime('now');
     abs_t = eval([int2str(ti.Sec) '.' ...
@@ -137,12 +145,9 @@ while(1)
     if isempty(t0), t0 = abs_t; end
     t = abs_t-t0;
     stateMsg.Time = t;
-    
     % fixed loop pause
     waitfor(r);
     
     % publish stateEstimate
     send(stateEstimatePublisher,stateMsg);
-
 end
-
