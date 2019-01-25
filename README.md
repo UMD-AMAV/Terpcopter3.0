@@ -28,3 +28,9 @@ When launching launch files one might get "... is not a launch file". If this is
 ```
 source ./devel/setup.bash 
 ```
+
+# Flow Probe Nodes
+
+- The teensy board on which the flow probe is attached might not work (Serial input pauses after a few lines). Follow instructions on this link rdboato install the latest UDEV Rules for the : https://www.pjrc.com/teensy/49-teensy.rules
+
+- The serial porst need root access to run. Try steps in this link to change : https://askubuntu.com/a/58122
