@@ -11,7 +11,7 @@
 % 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-clear all; close all; clc;
+clear all; clc;
 
 global stateEstimateMsg;
 stateEstimateMsg = rosmessage('terpcopter_msgs/stateEstimate');
@@ -30,12 +30,13 @@ pStateEstimateSub = robotics.ros.Subscriber(plotStateEstimateNode,'stateEstimate
 msg = receive(pStateEstimateSub,20);
 
 % Acquire and display live data
-figure
+figure()
 subplot(3,2,1)
 
 % Creating animated lines for live plots
-NorthDri = animatedline('Color','g');
+NorthDri = animatedline('Color','g','LineWidth',3);
 xNorthDri = gca;
+xNorthDri.XGrid = 'on';
 xNorthDri.YGrid = 'on';
 xlabel('Time');
 ylabel('North direction');
@@ -44,8 +45,9 @@ legend('North direction')
 set(gca,'FontSize',16)
 
 subplot(3,2,3)
-EastDri = animatedline('Color','c');
+EastDri = animatedline('Color','c','LineWidth',3);
 xEastDri = gca;
+xEastDri.XGrid = 'on';
 xEastDri.YGrid = 'on';
 xlabel('Time');
 ylabel('East direction');
@@ -54,8 +56,9 @@ legend('East direction')
 set(gca,'FontSize',16)
 
 subplot(3,2,5)
-Range = animatedline('Color','b');
+Range = animatedline('Color','b','LineWidth',3);
 xRange = gca;
+xRange.XGrid = 'on';
 xRange.YGrid = 'on';
 xlabel('Time');
 ylabel('Range');
@@ -64,8 +67,9 @@ legend('Range')
 set(gca,'FontSize',16)
 
 subplot(3,2,2)
-Yaw = animatedline('Color','m');
+Yaw = animatedline('Color','m','LineWidth',3);
 xYaw = gca;
+xYaw.XGrid = 'on';
 xYaw.YGrid = 'on';
 xlabel('Time');
 ylabel('Yaw');
@@ -74,8 +78,9 @@ legend('Yaw')
 set(gca,'FontSize',16)
 
 subplot(3,2,4)
-Pitch = animatedline('Color','r');
+Pitch = animatedline('Color','r','LineWidth',3);
 xPitch = gca;
+xPitch.XGrid = 'on';
 xPitch.YGrid = 'on';
 xlabel('Time');
 ylabel('Pitch');
@@ -84,14 +89,19 @@ legend('Pitch')
 set(gca,'FontSize',16)
 
 subplot(3,2,6)
-Roll = animatedline('Color','k');
+Roll = animatedline('Color','k','LineWidth',3);
 xRoll = gca;
+xRoll.XGrid = 'on';
 xRoll.YGrid = 'on';
 xlabel('Time');
 ylabel('Roll');
 set(gca,'FontSize',25)
 legend('Roll')
 set(gca,'FontSize',16)
+
+% Title for subplots
+sgt = sgtitle('State Estimate'); %raw data
+sgt.FontSize = 25;
 
 stop = false;
 startTime = datetime('now');

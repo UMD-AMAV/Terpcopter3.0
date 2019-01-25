@@ -11,7 +11,7 @@
 % 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-clear all; close all; clc;
+clear all; clc;
 % addpath('./results');
 
 % pidSetting
@@ -33,12 +33,13 @@ pidSettingSub = robotics.ros.Subscriber(plotpidSettingNode,'pidSetting','terpcop
 msg = receive(pidSettingSub,20);
 
 % Creating the Plots
-figure
+figure()
 subplot(4,1,1)
 
 % Creating animated lines for live plots
-Kp = animatedline('Color','g');
+Kp = animatedline('Color','g','LineWidth',3);
 xKp = gca;
+xKp.XGrid = 'on';
 xKp.YGrid = 'on';
 xlabel('Time');
 ylabel('Kp');
@@ -47,8 +48,9 @@ legend('Kp')
 set(gca,'FontSize',16)
 
 subplot(4,1,2)
-Ki = animatedline('Color','g');
+Ki = animatedline('Color','g','LineWidth',3);
 xKi = gca;
+xKi.XGrid = 'on';
 xKi.YGrid = 'on';
 xlabel('Time');
 ylabel('Ki');
@@ -57,8 +59,9 @@ legend('Ki')
 set(gca,'FontSize',16)
 
 subplot(4,1,3)
-Kd = animatedline('Color','g');
+Kd = animatedline('Color','g','LineWidth',3);
 xKd = gca;
+xKd.XGrid = 'on';
 xKd.YGrid = 'on';
 xlabel('Time');
 ylabel('Kd');
@@ -67,14 +70,19 @@ legend('Kd')
 set(gca,'FontSize',16)
 
 subplot(4,1,4);
-Ff = animatedline('Color','g');
+Ff = animatedline('Color','g','LineWidth',3);
 xFf = gca;
+xFf.XGrid = 'on';
 xFf.YGrid = 'on';
 xlabel('Time');
 ylabel('Ff');
 set(gca,'FontSize',25)
 legend('FeedForward')
 set(gca,'FontSize',16)
+
+% Title for subplots
+sgt = sgtitle('PID Gains'); %raw data
+sgt.FontSize = 25;
 
 stop = false;
 startTime = datetime('now');

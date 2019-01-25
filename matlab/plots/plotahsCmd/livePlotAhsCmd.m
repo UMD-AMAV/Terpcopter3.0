@@ -13,7 +13,7 @@
 % 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-clear all; close all; clc;
+clear all; clc;
 %addpath('./results');
 
 %  ahsCmd
@@ -29,25 +29,26 @@ ahsCmdMsg.HeadingRad = 0;
 ahsCmdMsg.ForwardSpeedMps = 0;
 ahsCmdMsg.CrabSpeedMps = 0;
 
-global stateEstimateMsg;
-stateEstimateMsg = rosmessage('terpcopter_msgs/stateEstimate');
-stateEstimateMsg.Time = 0 ;
+% global stateEstimateMsg;
+% stateEstimateMsg = rosmessage('terpcopter_msgs/stateEstimate');
+% stateEstimateMsg.Time = 0 ;
 
-plotahsCmdNode = robotics.ros.Node('/plotahsCmd');
+plotahsCmdNode = robotics.ros.Node('/liveplotahsCmd');
 pahsCmdMsg = robotics.ros.Subscriber(plotahsCmdNode,'ahsCmd','terpcopter_msgs/ahsCmd',{@ahsCmdCallback});
-pStateEstimateSub = robotics.ros.Subscriber(plotahsCmdNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
+% pStateEstimateSub = robotics.ros.Subscriber(plotahsCmdNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
 
 
 msg = receive(pahsCmdMsg,20);
-msgTime = receive(pStateEstimateSub,20);
+% msgTime = receive(pStateEstimateSub,20);
 
 % Displaying figure
-figure
+figure()
 subplot(4,1,1)
 
 % Creating animated lines for live plots
-Altitude = animatedline('Color','k');
+Altitude = animatedline('Color','k','LineWidth',3);
 xAltitude = gca;
+xAltitude.XGrid = 'on';
 xAltitude.YGrid = 'on';
 xlabel('iteration');
 ylabel('Altitude');
@@ -57,8 +58,9 @@ set(gca,'FontSize',16)
 grid on;
 
 subplot(4,1,1)
-ForwardSpeed = animatedline('Color','k');
+ForwardSpeed = animatedline('Color','k','LineWidth',3);
 xForwardSpeed = gca;
+xForwardSpeed.XGrid = 'on';
 xForwardSpeed.YGrid = 'on';
 xlabel('iteration');
 ylabel('Forward Speed');
@@ -68,8 +70,9 @@ set(gca,'FontSize',16)
 grid on;
 
 subplot(4,1,1)
-CrabSpeed = animatedline('Color','k');
+CrabSpeed = animatedline('Color','k','LineWidth',3);
 xCrabSpeed = gca;
+xCrabSpeed.XGrid = 'on';
 xCrabSpeed.YGrid = 'on';
 xlabel('iteration');
 ylabel('Crab speed');
@@ -79,8 +82,9 @@ set(gca,'FontSize',16)
 grid on;
 
 subplot(4,1,4)
-Heading = animatedline('Color','k');
+Heading = animatedline('Color','k','LineWidth',3);
 xHeading = gca;
+xHeading.XGrid = 'on';
 xHeading.YGrid = 'on';
 xlabel('iteration');
 ylabel('Heading Rad');
@@ -88,6 +92,10 @@ set(gca,'FontSize',25)
 legend('Heading Rad')
 set(gca,'FontSize',16)
 grid on;
+
+% Title for subplots
+sgt = sgtitle('AHS Cmd'); %raw data
+sgt.FontSize = 25;
 
 stop = false;
 startTime = datetime('now');

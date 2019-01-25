@@ -13,7 +13,7 @@
 % 
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
-clear all; close all; clc;
+clear all; clc;
 % addpath('./results');
 
 % stickCmd
@@ -41,12 +41,13 @@ msg = receive(plotStickCmdSub,20);
 msgTime = receive(pStateEstimateSub,20);
 
 % Displaying figure
-figure
+figure()
 subplot(4,1,1)
 
 % Creating animated lines for live plots
-Thrust = animatedline('Color','k');
+Thrust = animatedline('Color','k','LineWidth',3);
 xThrust = gca;
+xThrust.XGrid = 'on';
 xThrust.YGrid = 'on';
 xlabel('Time');
 ylabel('Thrust');
@@ -56,8 +57,9 @@ set(gca,'FontSize',16)
 grid on;
 
 subplot(4,1,2)
-Yaw = animatedline('Color','r');
+Yaw = animatedline('Color','r','LineWidth',3);
 xYaw = gca;
+xYaw.XGrid = 'on';
 xYaw.YGrid = 'on';
 xlabel('Time');
 ylabel('Yaw');
@@ -67,8 +69,9 @@ set(gca,'FontSize',16)
 grid on;
 
 subplot(4,1,3)
-Pitch = animatedline('Color','g');
+Pitch = animatedline('Color','g','LineWidth',3);
 xPitch = gca;
+xPitch.XGrid = 'on';
 xPitch.YGrid = 'on';
 xlabel('Time');
 ylabel('Pitch');
@@ -78,14 +81,19 @@ set(gca,'FontSize',16)
 grid on;
 
 subplot(4,1,1)
-Roll = animatedline('Color','b');
+Roll = animatedline('Color','b','LineWidth',3);
 xRoll = gca;
+xRoll.XGrid = 'on';
 xRoll.YGrid = 'on';
 xlabel('Time');
 ylabel('Roll');
 set(gca,'FontSize',25)
 legend('Roll')
 set(gca,'FontSize',16)
+
+% Title for subplots
+sgt = sgtitle('Stick Cmd'); %raw data
+sgt.FontSize = 25;
 
 stop = false;
 startTime = datetime('now');
