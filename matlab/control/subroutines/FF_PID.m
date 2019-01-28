@@ -14,8 +14,8 @@ errorDot = (altError - altitudeErrorHistory.lastVal) / dt;
 
 fprintf("errorDot: %6.2f",errorDot);
 
-u = gains.kp *altError + gains.kd * errorDot + gains.ffterm + ...
-    gains.ki * altitudeErrorHistory.lastSum;
+u = gains.Kp *altError + gains.Kd * errorDot + gains.Ff + ...
+    gains.Ki * altitudeErrorHistory.lastSum;
 
 fprintf("u: %6.2f",u);
 

@@ -51,7 +51,6 @@ params = loadParams();
 mission = loadMission();
 
 fprintf('Launching Autonomy Node...\n');
-autonomyParams = params.autonomy;
 
 
 global timestamps
@@ -66,74 +65,89 @@ stateEstimateSubscriber = rossubscriber('/stateEstimate');
 
 % Publishers
 ahsCmdPublisher = rospublisher('/ahsCmd', 'terpcopter_msgs/ahsCmd');
-pidSettingPublisher = rospublisher('/pisSetting', 'terpcopter_msgs/ffpidSetting');
+pidSettingPublisher = rospublisher('/pidSetting', 'terpcopter_msgs/ffpidSetting');
 
 pause(2)
 ahsCmdMsg = rosmessage(ahsCmdPublisher);
+ahsCmdMsg.AltitudeMeters = 0;
+ahsCmdMsg.HeadingRad = 0;
+ahsCmdMsg.ForwardSpeedMps = 0;
+ahsCmdMsg.CrabSpeedMps = 0;
 
 pidSettingMsg = rosmessage(pidSettingPublisher);
+pidSettingMsg.Kp = params.ctrl.altitudeGains.kp;
+pidSettingMsg.Ki = params.ctrl.altitudeGains.ki;
+pidSettingMsg.Kd = params.ctrl.altitudeGains.kd;
+pidSettingMsg.Ff = params.ctrl.altitudeGains.ffterm;
 
-r = robotics.Rate(10);
-reset(r);
+if ( strcmp(params.auto.mode,'auto'))
 
-while(1)
-    stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
+    r = robotics.Rate(10);
+    reset(r);
 
-    % unpack statestimate
-    t = stateEstimateMsg.Time;
-    z = stateEstimateMsg.Up;
-    % fprintf('Received Msg, Quad Alttiude is : %3.3f m\n', z );
+    while(1)
+        stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 
-    currentBehavior = 1; 
-    
-    if mission.config.firstLoop == 1
-        disp('Behavior Manager Started')
-        % initialize time variables 
-        timestamps.initial_event_time = t;  
-        timestamps.behavior_switched_timestamp = t;
-        timestamps.behavior_satisfied_timestamp = t;
-        mission.config.firstLoop = false; % ends the first loop
-    end
+        % unpack statestimate
+        t = stateEstimateMsg.Time;
+        z = stateEstimateMsg.Up;
+        % fprintf('Received Msg, Quad Alttiude is : %3.3f m\n', z );
 
-    name = mission.bhv{currentBehavior}.name;
-    flag = mission.bhv{currentBehavior}.completion.status;
-    %timestamps = mission.variables;
-    ahs = mission.bhv{currentBehavior}.ahs;
-    completion = mission.bhv{currentBehavior}.completion;
-    
-    totalTime = t - timestamps.initial_event_time;
-    bhvTime = t - timestamps.behavior_switched_timestamp;
-    
-    fprintf('Current Behavior: %s\tTime Spent in Behavior: %f\t Total Time of Mission: %f \n\n',name,bhvTime,totalTime); 
-
-    if flag == true
-        [mission.bhv] = pop(mission.bhv, t);
-    else  
-        %Set Handles within each behavior
+        currentBehavior = 1; 
         
-        %switch to 
-        %Eval command eval([mission.bhv(CurrentBehavior).name,status)
-        switch name
-            case 'bhv_takeoff'
-                %disp('takeoff behavior');
-                [completionFlag] = bhv_takeoff_status(stateEstimateMsg, ahs);
-            case 'bhv_hover'
-                %disp('hover behavior');
-                [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t);
-            case 'landing'
-                %disp('landing behavior');
-                [completionFlag] = bhv_landing_status(stateEstimateMsg, ahs);
-            otherwise
-                
+        if mission.config.firstLoop == 1
+            disp('Behavior Manager Started')
+            % initialize time variables 
+            timestamps.initial_event_time = t;  
+            timestamps.behavior_switched_timestamp = t;
+            timestamps.behavior_satisfied_timestamp = t;
+            mission.config.firstLoop = false; % ends the first loop
         end
-        mission.bhv{currentBehavior}.completion.status = completionFlag;
-        z_d = ahs.desiredAltMeters;
-    end
 
-    % publish
-    ahsCmdMsg.AltitudeMeters = z_d;
+        name = mission.bhv{currentBehavior}.name;
+        flag = mission.bhv{currentBehavior}.completion.status;
+        %timestamps = mission.variables;
+        ahs = mission.bhv{currentBehavior}.ahs;
+        completion = mission.bhv{currentBehavior}.completion;
+        
+        totalTime = t - timestamps.initial_event_time;
+        bhvTime = t - timestamps.behavior_switched_timestamp;
+        
+        fprintf('Current Behavior: %s\tTime Spent in Behavior: %f\t Total Time of Mission: %f \n\n',name,bhvTime,totalTime); 
+
+        if flag == true
+            [mission.bhv] = pop(mission.bhv, t);
+        else  
+            %Set Handles within each behavior
+            
+            %switch to 
+            %Eval command eval([mission.bhv(CurrentBehavior).name,status)
+            switch name
+                case 'bhv_takeoff'
+                    %disp('takeoff behavior');
+                    [completionFlag] = bhv_takeoff_status(stateEstimateMsg, ahs);
+                case 'bhv_hover'
+                    %disp('hover behavior');
+                    [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t);
+                case 'landing'
+                    %disp('landing behavior');
+                    [completionFlag] = bhv_landing_status(stateEstimateMsg, ahs);
+                otherwise
+                    
+            end
+            mission.bhv{currentBehavior}.completion.status = completionFlag;
+            z_d = ahs.desiredAltMeters;
+        end
+
+        % publish
+        ahsCmdMsg.AltitudeMeters = z_d;
+        send(ahsCmdPublisher, ahsCmdMsg);
+        fprintf('Published Ahs Cmd. Alt : %3.3f \n', z_d );
+        
+        waitfor(r);
+    end
+elseif ( strcmp(params.auto.mode, 'manual'))
+    fprintf('Autonomy Mode: Manual');
     send(ahsCmdPublisher, ahsCmdMsg);
-    fprintf('Published Ahs Cmd. Alt : %3.3f \n', z_d );
-    
-    waitfor(r);
+    send(pidSettingPublisher, pidSettingMsg);
 end
