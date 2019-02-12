@@ -66,13 +66,14 @@ stateEstimateSubscriber = rossubscriber('/stateEstimate');
 % Publishers
 ahsCmdPublisher = rospublisher('/ahsCmd', 'terpcopter_msgs/ahsCmd');
 pidSettingPublisher = rospublisher('/pidSetting', 'terpcopter_msgs/ffpidSetting');
-
-pause(2)
+pause(0.1)
 ahsCmdMsg = rosmessage(ahsCmdPublisher);
 ahsCmdMsg.AltitudeMeters = 0;
 ahsCmdMsg.HeadingRad = 0;
 ahsCmdMsg.ForwardSpeedMps = 0;
 ahsCmdMsg.CrabSpeedMps = 0;
+
+send(ahsCmdPublisher, ahsCmdMsg);
 
 pidSettingMsg = rosmessage(pidSettingPublisher);
 pidSettingMsg.Kp = params.ctrl.altitudeGains.kp;
@@ -80,11 +81,11 @@ pidSettingMsg.Ki = params.ctrl.altitudeGains.ki;
 pidSettingMsg.Kd = params.ctrl.altitudeGains.kd;
 pidSettingMsg.Ff = params.ctrl.altitudeGains.ffterm;
 
+r = robotics.Rate(10);
+reset(r);
+
 if ( strcmp(params.auto.mode,'auto'))
-
-    r = robotics.Rate(10);
-    reset(r);
-
+   
     while(1)
         stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 
@@ -148,6 +149,11 @@ if ( strcmp(params.auto.mode,'auto'))
     end
 elseif ( strcmp(params.auto.mode, 'manual'))
     fprintf('Autonomy Mode: Manual');
-    send(ahsCmdPublisher, ahsCmdMsg);
     send(pidSettingPublisher, pidSettingMsg);
+    % send(ahsCmdPublisher, ahsCmdMsg);
+    while(1)
+        send(ahsCmdPublisher, ahsCmdMsg);
+        %send(pidSettingPublisher, pidSettingMsg);
+        waitfor(r);
+    end
 end

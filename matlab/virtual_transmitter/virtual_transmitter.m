@@ -76,7 +76,7 @@ if ( strcmp(params.vtx.mode,'flight') )
     % avialable serial ports
     comlist = seriallist();
     for i = 1:size(comlist,2)
-        if contains(comlist(i),'USB')
+        if contains(comlist(i),'USB0')
             params.env.com_port = comlist(i);
             foundComPort = true;
             disp('Found USB COM port')
@@ -95,16 +95,22 @@ if ( strcmp(params.vtx.mode,'flight') )
     end
 end
 
-simulatorNode = robotics.ros.Node('/simulator');
-stateEstimatePublisher = robotics.ros.Publisher(simulatorNode,'stateEstimate','terpcopter_msgs/stateEstimate');
-stickCmdSubscriber = robotics.ros.Subscriber(simulatorNode,'stickCmd','terpcopter_msgs/stickCmd',@receiveStickCmd);
-vtxStatusPublisher = robotics.ros.Publisher(simulatorNode,'vtxStatus','std_msgs/Bool');
+% simulatorNode = robotics.ros.Node('/simulator1');
+% stateEstimatePublisher = robotics.ros.Publisher(simulatorNode,'stateEstimate','terpcopter_msgs/stateEstimate');
+% stickCmdSubscriber = robotics.ros.Subscriber(simulatorNode,'stickCmd','terpcopter_msgs/stickCmd',@receiveStickCmd);
+% vtxStatusPublisher = robotics.ros.Publisher(simulatorNode,'vtxStatus','std_msgs/Bool');
+stateEstimatePublisher = rospublisher('stateEstimate','terpcopter_msgs/stateEstimate');
+vtxStatusPublisher = rospublisher('vtxStatus','std_msgs/Bool');
+
+stickCmdSubscriber = rossubscriber('stickCmd','terpcopter_msgs/stickCmd');
 
 if ( strcmp(params.vtx.mode,'flight') )
     r = robotics.Rate(20);
     reset(r);
     
     while(1)
+        stickCmdMsg = stickCmdSubscriber.LatestMessage;
+        
         % extract u_stick_cmd from the latest stickCmd ROS message
         u_stick_cmd(1) = stickCmdMsg.Thrust;
         u_stick_cmd(2) = stickCmdMsg.Roll;
@@ -123,7 +129,7 @@ if ( strcmp(params.vtx.mode,'flight') )
         
         % transmit to quad
         transmitCmd( trainerBox, u_stick_cmd, params.vtx.trim_val, params.vtx.stick_lim, params.vtx.trim_lim );
-        if (first_run), send(vtxStatusPublisher,rosmessage('std_msgs/Bool')), first_run=0; end
+        if (first_run), send(vtxStatusPublisher,rosmessage(vtxStatusPublisher)), first_run=0; end
         waitfor(r);
     end
     

@@ -48,6 +48,7 @@ stateEstimateSubscriber = rossubscriber('/stateEstimate');
 ahsCmdSubscriber = rossubscriber('/ahsCmd');
 pidSettingSubscriber = rossubscriber('/pidSetting');
 
+
 % Publishers
 stickCmdPublisher = rospublisher('/stickCmd', 'terpcopter_msgs/stickCmd');
 
@@ -72,6 +73,10 @@ if isempty(t0), t0 = abs_t; end
 
 
 altitudeErrorHistory.lastTime = 0; %stateEstimateMsg.Time;
+display("alt meters")
+display(ahsCmdMsg.AltitudeMeters)
+%display("alt meters")
+%display(altitudeErrorHistory.lastVal)
 altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
 altitudeErrorHistory.lastSum = 0;
 u_t_alt = controlParams.altitudeGains.ffterm;
@@ -83,7 +88,7 @@ u_t_yaw = 0;
 
 disp('initialize loop');
 
-r = robotics.Rate(10);
+r = robotics.Rate(100);
 reset(r);
 
 send(stickCmdPublisher, stickCmdMsg);
@@ -93,7 +98,7 @@ while(1)
     ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
     pidSettingMsg = pidSettingSubscriber.LatestMessage;
 
-     % timestamp
+    % timestamp
     ti= rostime('now');
     abs_t = double(ti.Sec)+double(ti.Nsec)*10^-9;
     t = abs_t-t0;

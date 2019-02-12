@@ -272,6 +272,7 @@ ahsCmdPublisher = rospublisher('/ahsCmd', 'terpcopter_msgs/ahsCmd');
 ahsCmdMsg = rosmessage(ahsCmdPublisher);
 ahsCmdMsg.AltitudeMeters = str2num(get(handles.edit5, 'String'));;
 ahsCmdMsg.HeadingRad = str2num(get(handles.edit6, 'String'));
+
 send(ahsCmdPublisher, ahsCmdMsg);
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -298,6 +299,7 @@ pidSettingMsg.Kp = str2num(get(handles.edit1, 'String'));
 pidSettingMsg.Ki = str2num(get(handles.edit2, 'String'));
 pidSettingMsg.Kd = str2num(get(handles.edit3, 'String'));
 pidSettingMsg.Ff = str2num(get(handles.edit4, 'String'));
+pause(0.1)
 send(pidSettingPublisher, pidSettingMsg);
 
 
