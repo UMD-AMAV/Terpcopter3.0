@@ -22,7 +22,7 @@ function varargout = Master_GUI(varargin)
 
 % Edit the above text to modify the response to help Master_GUI
 
-% Last Modified by GUIDE v2.5 30-Dec-2018 05:12:59
+% Last Modified by GUIDE v2.5 12-Feb-2019 18:57:46
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -51,7 +51,7 @@ function Master_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to Master_GUI (see VARARGIN)
-
+cd("/home/amav/amav/Terpcopter3.0/matlab/GUI")
 % Choose default command line output for Master_GUI
 handles.output = hObject;
 
@@ -333,3 +333,12 @@ function pushbutton9_Callback(hObject, eventdata, handles)
  end
  msg = receive(sub,20);
  set(handles.text7,'String','active');
+
+
+% --- Executes on button press in pushbutton10.
+function pushbutton10_Callback(hObject, eventdata, handles)
+rosshutdown;
+close();
+% hObject    handle to pushbutton10 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

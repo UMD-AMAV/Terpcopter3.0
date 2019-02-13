@@ -51,7 +51,7 @@ function Tuner_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to Tuner_GUI (see VARARGIN)
-
+cd("/home/amav/amav/Terpcopter3.0/matlab/GUI")
 % Choose default command line output for Tuner_GUI
 handles.output = hObject;
 
@@ -107,10 +107,11 @@ end
 
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
-set(handles.edit1,'String','0.0');
-set(handles.edit2,'String','0.0');
-set(handles.edit3,'String','0.0');
-set(handles.edit4,'String','0.0');
+persistent pidResetPublisher
+pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
+pidResetMsg = rosmessage(pidResetPublisher);
+pidResetMsg.Data = true;
+send(pidResetPublisher,pidResetMsg);
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)

@@ -47,6 +47,8 @@ end
 stateEstimateSubscriber = rossubscriber('/stateEstimate');
 ahsCmdSubscriber = rossubscriber('/ahsCmd');
 pidSettingSubscriber = rossubscriber('/pidSetting');
+pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
+pidResetSubscriber = rossubscriber('/pidReset');
 
 
 % Publishers
@@ -120,6 +122,20 @@ while(1)
    
     % update errors
     altError = z_d - z;
+    
+    % reset Integral
+    pidResetMsg = rosmessage('std_msgs/Bool');
+    pidResetMsg.Data = false;
+    pidResetMsg = pidResetSubscriber.LatestMessage;
+    if ~isempty(pidResetMsg)
+        if pidResetMsg.Data == true 
+            disp("Resetting PID ...")
+            altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
+            altitudeErrorHistory.lastSum = 0;
+            pidResetMsg.Data = false;
+            send(pidResetPublisher, pidResetMsg);
+        end
+    end
 
     % compute controls
     % FF_PID(gains, error, newTime, newErrVal)

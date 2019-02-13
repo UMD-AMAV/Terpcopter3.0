@@ -150,9 +150,9 @@ if ( strcmp(params.auto.mode,'auto'))
 elseif ( strcmp(params.auto.mode, 'manual'))
     fprintf('Autonomy Mode: Manual');
     send(pidSettingPublisher, pidSettingMsg);
-    % send(ahsCmdPublisher, ahsCmdMsg);
+    send(ahsCmdPublisher, ahsCmdMsg);
     while(1)
-        send(ahsCmdPublisher, ahsCmdMsg);
+        %send(ahsCmdPublisher, ahsCmdMsg);
         %send(pidSettingPublisher, pidSettingMsg);
         waitfor(r);
     end

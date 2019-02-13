@@ -57,12 +57,13 @@ first_run = 1;
 
 
 % initialize first input msg
-global stickCmdMsg;
 stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
 stickCmdMsg.Thrust = -1;
 stickCmdMsg.Yaw = 0;
 stickCmdMsg.Pitch = 0;
 stickCmdMsg.Roll = 0;
+
+u_stick_cmd = [0 0 0 0];
 
 global lastStickCmd_time
 lastStickCmd_time = rostime('now');
@@ -110,26 +111,33 @@ if ( strcmp(params.vtx.mode,'flight') )
     
     while(1)
         stickCmdMsg = stickCmdSubscriber.LatestMessage;
-        
+        %fprintf(stickCmdMsg);
+        %waitfor(r);
         % extract u_stick_cmd from the latest stickCmd ROS message
-        u_stick_cmd(1) = stickCmdMsg.Thrust;
-        u_stick_cmd(2) = stickCmdMsg.Roll;
-        u_stick_cmd(3) = stickCmdMsg.Pitch;
-        u_stick_cmd(4) = stickCmdMsg.Yaw;
-        
+%         if ~isempty(stickCmdMsg)
+%             u_stick_cmd(1) = 0;%stickCmdMsg.Thrust;
+%             u_stick_cmd(2) = stickCmdMsg.Roll;
+%             u_stick_cmd(3) = stickCmdMsg.Pitch;
+%             u_stick_cmd(4) = stickCmdMsg.Yaw;
+%         end
         % if the controller is off for more than 1 second enter emergency
         % decent mode
-        if (rostime('now') > lastStickCmd_time + idleDuration)
-            u_stick_cmd(1) = -0.6;
-            u_stick_cmd(2) = 0;
-            u_stick_cmd(3) = 0;
-            u_stick_cmd(4) = 0;
-            disp('Emergency Decent!')
-        end
-        
+%         if (rostime('now') > lastStickCmd_time + idleDuration)
+%             u_stick_cmd(1) = -0.6;
+%             u_stick_cmd(2) = 0;
+%             u_stick_cmd(3) = 0;
+%             u_stick_cmd(4) = 0;
+%             disp('Emergency Decent!')
+%         end
+         u_stick_cmd(1) = 0;%stickCmdMsg.Thrust;
+         u_stick_cmd(2) = 0; %stickCmdMsg.Roll;
+         u_stick_cmd(3) = 0; %stickCmdMsg.Pitch;
+         u_stick_cmd(4) = 0; %stickCmdMsg.Yaw;
         % transmit to quad
+        display("transmitting")
         transmitCmd( trainerBox, u_stick_cmd, params.vtx.trim_val, params.vtx.stick_lim, params.vtx.trim_lim );
-        if (first_run), send(vtxStatusPublisher,rosmessage(vtxStatusPublisher)), first_run=0; end
+        %if (first_run), send(vtxStatusPublisher,rosmessage(vtxStatusPublisher)), first_run=0; end
+        send(vtxStatusPublisher,rosmessage(vtxStatusPublisher))
         waitfor(r);
     end
     
