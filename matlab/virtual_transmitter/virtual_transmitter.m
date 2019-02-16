@@ -129,10 +129,10 @@ if ( strcmp(params.vtx.mode,'flight') )
 %             u_stick_cmd(4) = 0;
 %             disp('Emergency Decent!')
 %         end
-         u_stick_cmd(1) = 0;%stickCmdMsg.Thrust;
-         u_stick_cmd(2) = 0; %stickCmdMsg.Roll;
-         u_stick_cmd(3) = 0; %stickCmdMsg.Pitch;
-         u_stick_cmd(4) = 0; %stickCmdMsg.Yaw;
+         u_stick_cmd(1) = stickCmdMsg.Thrust;
+         u_stick_cmd(2) = stickCmdMsg.Roll;
+         u_stick_cmd(3) = stickCmdMsg.Pitch;
+         u_stick_cmd(4) = stickCmdMsg.Yaw;
         % transmit to quad
         display("transmitting")
         transmitCmd( trainerBox, u_stick_cmd, params.vtx.trim_val, params.vtx.stick_lim, params.vtx.trim_lim );
