@@ -114,12 +114,15 @@ if ( strcmp(params.vtx.mode,'flight') )
         %fprintf(stickCmdMsg);
         %waitfor(r);
         % extract u_stick_cmd from the latest stickCmd ROS message
-%         if ~isempty(stickCmdMsg)
-%             u_stick_cmd(1) = 0;%stickCmdMsg.Thrust;
-%             u_stick_cmd(2) = stickCmdMsg.Roll;
-%             u_stick_cmd(3) = stickCmdMsg.Pitch;
-%             u_stick_cmd(4) = stickCmdMsg.Yaw;
-%         end
+        if ~isempty(stickCmdMsg)
+            u_stick_cmd(1) = stickCmdMsg.Thrust;
+            u_stick_cmd(2) = stickCmdMsg.Roll;
+            u_stick_cmd(3) = stickCmdMsg.Pitch;
+            u_stick_cmd(4) = stickCmdMsg.Yaw;
+            disp("transmitting")
+        else
+            disp('Empty AHSCmd!')
+            end
         % if the controller is off for more than 1 second enter emergency
         % decent mode
 %         if (rostime('now') > lastStickCmd_time + idleDuration)
@@ -129,12 +132,9 @@ if ( strcmp(params.vtx.mode,'flight') )
 %             u_stick_cmd(4) = 0;
 %             disp('Emergency Decent!')
 %         end
-         u_stick_cmd(1) = stickCmdMsg.Thrust;
-         u_stick_cmd(2) = stickCmdMsg.Roll;
-         u_stick_cmd(3) = stickCmdMsg.Pitch;
-         u_stick_cmd(4) = stickCmdMsg.Yaw;
+
         % transmit to quad
-        display("transmitting")
+        
         transmitCmd( trainerBox, u_stick_cmd, params.vtx.trim_val, params.vtx.stick_lim, params.vtx.trim_lim );
         %if (first_run), send(vtxStatusPublisher,rosmessage(vtxStatusPublisher)), first_run=0; end
         send(vtxStatusPublisher,rosmessage(vtxStatusPublisher))

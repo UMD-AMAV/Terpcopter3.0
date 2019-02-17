@@ -81,6 +81,7 @@ display(ahsCmdMsg.AltitudeMeters)
 %display(altitudeErrorHistory.lastVal)
 altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
 altitudeErrorHistory.lastSum = 0;
+altitudeErrorHistory.lastError = 0;
 u_t_alt = controlParams.altitudeGains.ffterm;
 
 yawError.lastTime = stateEstimateMsg.Time;
@@ -90,7 +91,7 @@ u_t_yaw = 0;
 
 disp('initialize loop');
 
-r = robotics.Rate(100);
+r = robotics.Rate(10);
 reset(r);
 
 send(stickCmdPublisher, stickCmdMsg);
@@ -107,13 +108,13 @@ while(1)
     %timeMatrix = [timeMatrix;t];
     %if isempty(t0), t0 = abs_t; end
    
-    fprintf("t %6.4f",t);
+    %fprintf("t %6.4f",t);
 
     % unpack statestimate
     %t = stateEstimateMsg.Time;
     z = stateEstimateMsg.Range;
     yaw = stateEstimateMsg.Yaw;
-    fprintf('Current Quad Alttiude is : %3.3f m\n', z );
+    %fprintf('Current Quad Alttiude is : %3.3f m\n', z );
 
     % get setpoint
     z_d = ahsCmdMsg.AltitudeMeters;
@@ -140,8 +141,8 @@ while(1)
     % compute controls
     % FF_PID(gains, error, newTime, newErrVal)
     [u_t_alt, altitudeErrorHistory] = FF_PID(pidSettingMsg, altitudeErrorHistory, t, altError);
-    disp('pid loop');
-    disp(pidSettingMsg)
+    %disp('pid loop');
+    %disp(pidSettingMsg)
     
       if (abs(yaw-yaw_d) >= abs(yaw_d-yaw))
         yawSetpointError = yaw - yaw_d;
@@ -156,13 +157,13 @@ while(1)
     
 
     % publish
-    stickCmdMsg.Thrust = 2*max(min(1,u_t_alt),0)-1;
+    stickCmdMsg.Thrust = max(min(2,u_t_alt),0)-1;
     stickCmdMsg.Yaw = u_t_yaw;
     send(stickCmdPublisher, stickCmdMsg);
-    fprintf('Published Stick Cmd., Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ) );
+    fprintf('Stick Cmd.Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ) );
 
     time = r.TotalElapsedTime;
-	fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
+	%fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
 	waitfor(r);
  end
 
