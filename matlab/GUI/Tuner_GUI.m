@@ -22,7 +22,7 @@ function varargout = Tuner_GUI(varargin)
 
 % Edit the above text to modify the response to help Tuner_GUI
 
-% Last Modified by GUIDE v2.5 22-Jan-2019 17:53:31
+% Last Modified by GUIDE v2.5 01-Mar-2019 14:34:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -293,7 +293,7 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 % pause(0.1)
 % send(pidSettingPublisher,msg);
 persistent pidSettingPublisher
-pidSettingPublisher = rospublisher('/pidSetting', 'terpcopter_msgs/ffpidSetting');
+pidSettingPublisher = rospublisher('/pidAltSetting', 'terpcopter_msgs/ffpidSetting');
 pidSettingMsg = rosmessage(pidSettingPublisher);
 pidSettingMsg.Kp = str2num(get(handles.edit1, 'String'));
 pidSettingMsg.Ki = str2num(get(handles.edit2, 'String'));
@@ -314,3 +314,15 @@ close();
 % hObject    handle to pushbutton4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbutton5.
+function pushbutton5_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+persistent startMissionPublisher;
+startMissionPublisher = rospublisher('/startMission', 'std_msgs/Bool');
+startMissionMsg = rosmessage(startMissionPublisher);
+startMissionMsg.Data = true;
+send(startMissionPublisher, startMissionMsg);

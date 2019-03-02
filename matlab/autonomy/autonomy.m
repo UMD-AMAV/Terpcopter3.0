@@ -48,10 +48,9 @@
 clear; close all; clc; format compact;
 addpath('../')
 params = loadParams();
-mission = loadMission();
+mission = loadMissionTest();
 
 fprintf('Launching Autonomy Node...\n');
-
 
 global timestamps
 
@@ -62,10 +61,14 @@ end
     
 % Subscribers
 stateEstimateSubscriber = rossubscriber('/stateEstimate');
+startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
+
 
 % Publishers
 ahsCmdPublisher = rospublisher('/ahsCmd', 'terpcopter_msgs/ahsCmd');
-pidSettingPublisher = rospublisher('/pidSetting', 'terpcopter_msgs/ffpidSetting');
+pidAltSettingPublisher = rospublisher('/pidAltSetting', 'terpcopter_msgs/ffpidSetting');
+pidYawSettingPublisher = rospublisher('/pidYawSetting', 'terpcopter_msgs/ffpidSetting');
+
 pause(0.1)
 ahsCmdMsg = rosmessage(ahsCmdPublisher);
 ahsCmdMsg.AltitudeMeters = 0;
@@ -73,20 +76,37 @@ ahsCmdMsg.HeadingRad = 0;
 ahsCmdMsg.ForwardSpeedMps = 0;
 ahsCmdMsg.CrabSpeedMps = 0;
 
-send(ahsCmdPublisher, ahsCmdMsg);
+pidAltSettingMsg = rosmessage(pidAltSettingPublisher);
+pidAltSettingMsg.Kp = params.ctrl.altitudeGains.kp;
+pidAltSettingMsg.Ki = params.ctrl.altitudeGains.ki;
+pidAltSettingMsg.Kd = params.ctrl.altitudeGains.kd;
+pidAltSettingMsg.Ff = params.ctrl.altitudeGains.ffterm;
 
-pidSettingMsg = rosmessage(pidSettingPublisher);
-pidSettingMsg.Kp = params.ctrl.altitudeGains.kp;
-pidSettingMsg.Ki = params.ctrl.altitudeGains.ki;
-pidSettingMsg.Kd = params.ctrl.altitudeGains.kd;
-pidSettingMsg.Ff = params.ctrl.altitudeGains.ffterm;
+pidYawSettingMsg = rosmessage(pidYawSettingPublisher);
+pidYawSettingMsg.Kp = params.ctrl.yawGains.kp;
+pidYawSettingMsg.Ki = params.ctrl.yawGains.ki;
+pidYawSettingMsg.Kd = params.ctrl.yawGains.kd;
+pidYawSettingMsg.Ff = 0;
+
+
 
 r = robotics.Rate(10);
 reset(r);
 
 if ( strcmp(params.auto.mode,'auto'))
-   
+    send(pidAltSettingPublisher, pidAltSettingMsg);
+    send(pidYawSettingPublisher, pidYawSettingMsg);
+    send(ahsCmdPublisher, ahsCmdMsg);
+    
+    startMissionFlag = false;
+    startMissionMsg = receive(startMissionSubscriber);
+    startMissionFlag = startMissionMsg.Data;
+    
     while(1)
+%         if(w~=1)
+%             disp('not pressed')
+%             continue;
+%         end
         stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 
         % unpack statestimate
@@ -132,7 +152,7 @@ if ( strcmp(params.auto.mode,'auto'))
                     [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t);
                 case 'landing'
                     %disp('landing behavior');
-                    [completionFlag] = bhv_landing_status(stateEstimateMsg, ahs);
+                    [completionFlag, ahs] = bhv_landing_status(stateEstimateMsg, completion, t);
                 otherwise
                     
             end
@@ -149,8 +169,10 @@ if ( strcmp(params.auto.mode,'auto'))
     end
 elseif ( strcmp(params.auto.mode, 'manual'))
     fprintf('Autonomy Mode: Manual');
-    send(pidSettingPublisher, pidSettingMsg);
+    send(pidAltSettingPublisher, pidAltSettingMsg);
+    send(pidYawSettingPublisher, pidYawSettingMsg);
     send(ahsCmdPublisher, ahsCmdMsg);
+    
     while(1)
         %send(ahsCmdPublisher, ahsCmdMsg);
         %send(pidSettingPublisher, pidSettingMsg);

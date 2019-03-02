@@ -13,7 +13,7 @@ function varargout = Master_GUI(varargin)
 %      existing singleton*.  Starting from the left, property value pairs are
 %      applied to the GUI before Master_GUI_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to Master_GUI_OpeningFcn via varargin.
+%      stop.  All inputs are passed to Master_GUI_OpeningxiFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
