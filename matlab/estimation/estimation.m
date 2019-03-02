@@ -21,8 +21,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % prepare workspace
-clear; close all; clc; format compact;
-global inertial_yaw_initial; %where to clear them?
+clear all; close all; clc; format compact;
 run('loadParams.m');
 addpath('../');
 
@@ -61,6 +60,31 @@ h = 0;
 i = 0;
 j = 0;
 
+
+    % Receive Latest Imu and Lidar data
+    imuMsg = imuDataSubscriber.LatestMessage;
+    lidarMsg = lidarDataSubscriber.LatestMessage;
+    
+    if isempty(imuMsg)
+        state = NaN;
+        disp('No imu data\n');
+        return;
+    end
+    w = imuMsg.Orientation.W;
+    x = imuMsg.Orientation.X;
+    y = imuMsg.Orientation.Y;
+    z = imuMsg.Orientation.Z;
+
+    euler = quat2eul([w x y z]);
+    %yaw measured clock wise is negative.
+    state.psi_inertial = rad2deg(euler(1));
+    state.theta = rad2deg(euler(2));
+    state.phi = rad2deg(euler(3));
+
+    %get relative yaw = - inertial yaw_intial - inertial yaw 
+    inertial_yaw_initial = state.psi_inertial;
+
+
 while(1)
     % Receive Latest Imu and Lidar data
     imuMsg = imuDataSubscriber.LatestMessage;
@@ -85,6 +109,10 @@ while(1)
     %get relative yaw = - inertial yaw_intial - inertial yaw 
     if isempty(inertial_yaw_initial), inertial_yaw_initial = state.psi_inertial; end
     state.psi_relative = inertial_yaw_initial - state.psi_inertial;
+    disp('intial yaw');
+    disp(inertial_yaw_initial);
+    disp('relative yaw');
+    disp(state.psi_relative);
 
     %rounding off angles to 1 decimal place
     state.psi_inertial = round(state.psi_inertial,1);
