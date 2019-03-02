@@ -6,10 +6,10 @@ e=altError;
 
 vDes = max(min(Kv*e,0.2),-0.2);
 dt = currTime - altitudeErrorHistory.lastTime;
-fprintf("e: %6.2f \n",e);
+%fprintf("e: %6.2f \n",e);
 
 eDot = (e - altitudeErrorHistory.lastVal) / dt;
-fprintf("eDot: %6.2f",eDot);
+%fprintf("eDot: %6.2f",eDot);
 v = -eDot;
 
 eDotDot = (eDot - altitudeErrorHistory.lastError) / dt;
@@ -17,10 +17,10 @@ vDot = -eDotDot;
 vDesDot = Kv*eDot;
 
 eVel = vDes - v;
-fprintf("eVel: %6.2f",eVel);
+%fprintf("eVel: %6.2f",eVel);
 
 eDotVel = vDesDot - vDot;
-fprintf("eDotVel: %6.2f",eDotVel);
+%fprintf("eDotVel: %6.2f",eDotVel);
 
 % This error is for eVel, NOT e (last sum of velocity errors)
 altitudeErrorHistory.lastSum = altitudeErrorHistory.lastSum + (eVel * dt);
@@ -29,7 +29,7 @@ altitudeErrorHistory.lastSum = altitudeErrorHistory.lastSum + (eVel * dt);
 u = gains.Kp *eVel + gains.Kd * eDotVel + ...
     gains.Ki * altitudeErrorHistory.lastSum;
 
-fprintf("u: %6.3f",u);
+%fprintf("u: %6.3f",u);
 
 altitudeErrorHistory.lastError = eDot;
 altitudeErrorHistory.lastTime = currTime;
