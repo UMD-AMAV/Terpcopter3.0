@@ -2,7 +2,6 @@ function mission = loadMission()
 mission.config.firstLoop = 1;
 
 i = 1;
-
 % Behavior 1: Takeoff
 mission.bhv{i}.name = 'bhv_takeoff';
 mission.bhv{i}.ahs.desiredAltMeters = 0.5;    %
@@ -11,7 +10,6 @@ mission.bhv{i}.ahs.desiredAltMeters = 0.5;    %
 mission.bhv{i}.completion.status = false;
 
 i = i + 1;
-
 % Behavior 2: Hover in Place
 mission.bhv{i}.name = 'bhv_hover';
 mission.bhv{i}.ahs.desiredAltMeters = 1;

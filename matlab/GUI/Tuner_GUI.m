@@ -22,7 +22,7 @@ function varargout = Tuner_GUI(varargin)
 
 % Edit the above text to modify the response to help Tuner_GUI
 
-% Last Modified by GUIDE v2.5 22-Jan-2019 17:53:31
+% Last Modified by GUIDE v2.5 01-Mar-2019 14:34:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -51,7 +51,7 @@ function Tuner_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to Tuner_GUI (see VARARGIN)
-
+cd("/home/amav/amav/Terpcopter3.0/matlab/GUI")
 % Choose default command line output for Tuner_GUI
 handles.output = hObject;
 
@@ -62,6 +62,7 @@ guidata(hObject, handles);
 if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
+
 
 %global tunerNode
 %tunerNode = robotics.ros.Node('/tunerGUI');
@@ -106,10 +107,11 @@ end
 
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
-set(handles.edit1,'String','0.0');
-set(handles.edit2,'String','0.0');
-set(handles.edit3,'String','0.0');
-set(handles.edit4,'String','0.0');
+persistent pidResetPublisher
+pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
+pidResetMsg = rosmessage(pidResetPublisher);
+pidResetMsg.Data = true;
+send(pidResetPublisher,pidResetMsg);
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -261,10 +263,17 @@ end
 
 % --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)
-msg = rosmessage('terpcopter_msgs/ahsCmd');
-msg.AltitudeMeters = str2num(get(handles.edit5, 'String'));
-msg.HeadingRad = str2num(get(handles.edit6, 'String'));
-ahsCmdPublisher = rospublisher('/ahsCmd', msg);
+% msg = rosmessage('terpcopter_msgs/ahsCmd');
+% msg.AltitudeMeters = str2num(get(handles.edit5, 'String'));
+% msg.HeadingRad = str2num(get(handles.edit6, 'String'));
+% ahsCmdPublisher = rospublisher('/ahsCmd', msg);
+
+persistent ahsCmdPublisher
+ahsCmdPublisher = rospublisher('/ahsCmd', 'terpcopter_msgs/ahsCmd');
+ahsCmdMsg = rosmessage(ahsCmdPublisher);
+ahsCmdMsg.AltitudeMeters = str2num(get(handles.edit5, 'String'));;
+ahsCmdMsg.HeadingRad = str2num(get(handles.edit6, 'String'));
+send(ahsCmdPublisher, ahsCmdMsg);
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -272,16 +281,27 @@ ahsCmdPublisher = rospublisher('/ahsCmd', msg);
 
 % --- Executes on button press in pushbutton3.
 function pushbutton3_Callback(hObject, eventdata, handles)
-%global tunerNode
-msg = rosmessage('terpcopter_msgs/ffpidSetting');
-% msg = rosmessage(pidSettingsPublisher);
-msg.Kp = str2num(get(handles.edit1, 'String'));
-msg.Ki = str2num(get(handles.edit2, 'String'));
-msg.Kd = str2num(get(handles.edit3, 'String'));
-msg.Ff = str2num(get(handles.edit4, 'String'));
+% %global tunerNode
+% msg = rosmessage('terpcopter_msgs/ffpidSetting');
+% % msg = rosmessage(pidSettingsPublisher);
+% msg.Kp = str2num(get(handles.edit1, 'String'));
+% msg.Ki = str2num(get(handles.edit2, 'String'));
+% msg.Kd = str2num(get(handles.edit3, 'String'));
+% msg.Ff = str2num(get(handles.edit4, 'String'));
+% 
+% pidSettingPublisher = rospublisher('/pidSetting',msg);
+% pause(0.1)
+% send(pidSettingPublisher,msg);
+persistent pidSettingPublisher
+pidSettingPublisher = rospublisher('/pidAltSetting', 'terpcopter_msgs/ffpidSetting');
+pidSettingMsg = rosmessage(pidSettingPublisher);
+pidSettingMsg.Kp = str2num(get(handles.edit1, 'String'));
+pidSettingMsg.Ki = str2num(get(handles.edit2, 'String'));
+pidSettingMsg.Kd = str2num(get(handles.edit3, 'String'));
+pidSettingMsg.Ff = str2num(get(handles.edit4, 'String'));
+send(pidSettingPublisher, pidSettingMsg);
 
-pidSettingsPublisher = rospublisher('/pidSetting',msg);
-%send(pidSettingsPublisher,msg);
+
 % hObject    handle to pushbutton3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -294,3 +314,15 @@ close();
 % hObject    handle to pushbutton4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbutton5.
+function pushbutton5_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+persistent startMissionPublisher;
+startMissionPublisher = rospublisher('/startMission', 'std_msgs/Bool');
+startMissionMsg = rosmessage(startMissionPublisher);
+startMissionMsg.Data = true;
+send(startMissionPublisher, startMissionMsg);

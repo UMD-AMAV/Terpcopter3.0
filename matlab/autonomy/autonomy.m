@@ -48,10 +48,9 @@
 clear; close all; clc; format compact;
 addpath('../')
 params = loadParams();
-mission = loadMission();
+mission = loadMissionTest();
 
 fprintf('Launching Autonomy Node...\n');
-
 
 global timestamps
 
@@ -62,29 +61,47 @@ end
     
 % Subscribers
 stateEstimateSubscriber = rossubscriber('/stateEstimate');
+startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
+
 
 % Publishers
 ahsCmdPublisher = rospublisher('/ahsCmd', 'terpcopter_msgs/ahsCmd');
-pidSettingPublisher = rospublisher('/pidSetting', 'terpcopter_msgs/ffpidSetting');
+pidAltSettingPublisher = rospublisher('/pidAltSetting', 'terpcopter_msgs/ffpidSetting');
+pidYawSettingPublisher = rospublisher('/pidYawSetting', 'terpcopter_msgs/ffpidSetting');
 
-pause(2)
+pause(0.1)
 ahsCmdMsg = rosmessage(ahsCmdPublisher);
 ahsCmdMsg.AltitudeMeters = 0;
 ahsCmdMsg.HeadingRad = 0;
 ahsCmdMsg.ForwardSpeedMps = 0;
 ahsCmdMsg.CrabSpeedMps = 0;
 
-pidSettingMsg = rosmessage(pidSettingPublisher);
-pidSettingMsg.Kp = params.ctrl.altitudeGains.kp;
-pidSettingMsg.Ki = params.ctrl.altitudeGains.ki;
-pidSettingMsg.Kd = params.ctrl.altitudeGains.kd;
-pidSettingMsg.Ff = params.ctrl.altitudeGains.ffterm;
+pidAltSettingMsg = rosmessage(pidAltSettingPublisher);
+pidAltSettingMsg.Kp = params.ctrl.altitudeGains.kp;
+pidAltSettingMsg.Ki = params.ctrl.altitudeGains.ki;
+pidAltSettingMsg.Kd = params.ctrl.altitudeGains.kd;
+pidAltSettingMsg.Ff = params.ctrl.altitudeGains.ffterm;
+
+pidYawSettingMsg = rosmessage(pidYawSettingPublisher);
+pidYawSettingMsg.Kp = params.ctrl.yawGains.kp;
+pidYawSettingMsg.Ki = params.ctrl.yawGains.ki;
+pidYawSettingMsg.Kd = params.ctrl.yawGains.kd;
+pidYawSettingMsg.Ff = 0;
+
+
+
+r = robotics.Rate(10);
+reset(r);
 
 if ( strcmp(params.auto.mode,'auto'))
-
-    r = robotics.Rate(10);
-    reset(r);
-
+    send(pidAltSettingPublisher, pidAltSettingMsg);
+    send(pidYawSettingPublisher, pidYawSettingMsg);
+    send(ahsCmdPublisher, ahsCmdMsg);
+    
+    startMissionFlag = false;
+    startMissionMsg = receive(startMissionSubscriber);
+    startMissionFlag = startMissionMsg.Data;
+    
     while(1)
         stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 
@@ -109,6 +126,7 @@ if ( strcmp(params.auto.mode,'auto'))
         %timestamps = mission.variables;
         ahs = mission.bhv{currentBehavior}.ahs;
         completion = mission.bhv{currentBehavior}.completion;
+        init = mission.bhv{currentBehavior}.initialize;
         
         totalTime = t - timestamps.initial_event_time;
         bhvTime = t - timestamps.behavior_switched_timestamp;
@@ -128,15 +146,17 @@ if ( strcmp(params.auto.mode,'auto'))
                     [completionFlag] = bhv_takeoff_status(stateEstimateMsg, ahs);
                 case 'bhv_hover'
                     %disp('hover behavior');
-                    [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t);
+                    [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t, init);
                 case 'bhv_point_to_direction'
                     %disp('point to direction behavior')
                     [completionFlag] = bhv_point_to_direction_status(stateEstimateMsg, ahs, completion);
-                case 'landing'
+                case 'bhv_land'
                     %disp('landing behavior');
-                    [completionFlag] = bhv_landing_status(stateEstimateMsg, ahs);
-                otherwise
-                    
+                    [completionFlag, initialize, ahsUpdate] = bhv_landing_status(stateEstimateMsg, ahs, completion, t, init);
+                    display(initialize)
+                    mission.bhv{currentBehavior}.initialize.firstLoop = initialize;
+                    mission.bhv{currentBehavior}.ahs.desiredAltMeters = ahsUpdate;
+                otherwise  
             end
             mission.bhv{currentBehavior}.completion.status = completionFlag;
             z_d = ahs.desiredAltMeters;
@@ -147,12 +167,19 @@ if ( strcmp(params.auto.mode,'auto'))
         ahsCmdMsg.AltitudeMeters = z_d;
         ahsCmdMsg.HeadingRad = yaw_d;       % This is actually in degrees
         send(ahsCmdPublisher, ahsCmdMsg);
-        fprintf('Published Ahs Cmd. Alt : %3.3f \n', z_d );
+        fprintf('Published Ahs Cmd. Alt : %3.3f \n', ahsCmdMsg.AltitudeMeters );
         
         waitfor(r);
     end
 elseif ( strcmp(params.auto.mode, 'manual'))
     fprintf('Autonomy Mode: Manual');
+    send(pidAltSettingPublisher, pidAltSettingMsg);
+    send(pidYawSettingPublisher, pidYawSettingMsg);
     send(ahsCmdPublisher, ahsCmdMsg);
-    send(pidSettingPublisher, pidSettingMsg);
+    
+    while(1)
+        %send(ahsCmdPublisher, ahsCmdMsg);
+        %send(pidSettingPublisher, pidSettingMsg);
+        waitfor(r);
+    end
 end

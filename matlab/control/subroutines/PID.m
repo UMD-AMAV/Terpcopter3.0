@@ -4,8 +4,8 @@ function [u, error] = PID(gains, error, newTime, newErrVal)
 dt = newTime - error.lastTime; % time since last command issued 
 edot = (newErrVal - error.lastVal) / dt; % approximate derivative
 
-u_intermediate = -gains.kp*newErrVal - gains.kd*edot;
-k_intermediate = -gains.ki*error.lastSum;
+u_intermediate = -gains.Kp*newErrVal - gains.Kd*edot;
+k_intermediate = -gains.Ki*error.lastSum;
 disp('u_intermediate')
 disp(u_intermediate)
 if ((u_intermediate + k_intermediate) > -1) && ((u_intermediate + k_intermediate) < 1)
@@ -18,7 +18,7 @@ end
 disp('accumulated error')
 disp(error.lastSum);
 % pid control + feed-forward term
-u = -gains.kp*newErrVal - gains.kd*edot -gains.ki*error.lastSum;
+u = -gains.Kp*newErrVal - gains.Kd*edot -gains.Ki*error.lastSum;
 % update error variables (for use in next iteration)
 error.lastTime = newTime;
 error.lastVal = newErrVal;

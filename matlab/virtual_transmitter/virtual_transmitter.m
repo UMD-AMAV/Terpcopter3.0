@@ -57,12 +57,13 @@ first_run = 1;
 
 
 % initialize first input msg
-global stickCmdMsg;
 stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
 stickCmdMsg.Thrust = -1;
 stickCmdMsg.Yaw = 0;
 stickCmdMsg.Pitch = 0;
 stickCmdMsg.Roll = 0;
+
+u_stick_cmd = [0 0 0 0];
 
 global lastStickCmd_time
 lastStickCmd_time = rostime('now');
@@ -76,7 +77,7 @@ if ( strcmp(params.vtx.mode,'flight') )
     % avialable serial ports
     comlist = seriallist();
     for i = 1:size(comlist,2)
-        if contains(comlist(i),'USB')
+        if contains(comlist(i),'USB0')
             params.env.com_port = comlist(i);
             foundComPort = true;
             disp('Found USB COM port')
@@ -95,35 +96,48 @@ if ( strcmp(params.vtx.mode,'flight') )
     end
 end
 
-simulatorNode = robotics.ros.Node('/simulator');
-stateEstimatePublisher = robotics.ros.Publisher(simulatorNode,'stateEstimate','terpcopter_msgs/stateEstimate');
-stickCmdSubscriber = robotics.ros.Subscriber(simulatorNode,'stickCmd','terpcopter_msgs/stickCmd',@receiveStickCmd);
-vtxStatusPublisher = robotics.ros.Publisher(simulatorNode,'vtxStatus','std_msgs/Bool');
+% simulatorNode = robotics.ros.Node('/simulator1');
+% stateEstimatePublisher = robotics.ros.Publisher(simulatorNode,'stateEstimate','terpcopter_msgs/stateEstimate');
+% stickCmdSubscriber = robotics.ros.Subscriber(simulatorNode,'stickCmd','terpcopter_msgs/stickCmd',@receiveStickCmd);
+% vtxStatusPublisher = robotics.ros.Publisher(simulatorNode,'vtxStatus','std_msgs/Bool');
+stateEstimatePublisher = rospublisher('stateEstimate','terpcopter_msgs/stateEstimate');
+vtxStatusPublisher = rospublisher('vtxStatus','std_msgs/Bool');
+
+stickCmdSubscriber = rossubscriber('stickCmd','terpcopter_msgs/stickCmd');
 
 if ( strcmp(params.vtx.mode,'flight') )
     r = robotics.Rate(20);
     reset(r);
     
     while(1)
+        stickCmdMsg = stickCmdSubscriber.LatestMessage;
+        %fprintf(stickCmdMsg);
+        %waitfor(r);
         % extract u_stick_cmd from the latest stickCmd ROS message
-        u_stick_cmd(1) = stickCmdMsg.Thrust;
-        u_stick_cmd(2) = stickCmdMsg.Roll;
-        u_stick_cmd(3) = stickCmdMsg.Pitch;
-        u_stick_cmd(4) = stickCmdMsg.Yaw;
-        
+        if ~isempty(stickCmdMsg)
+            u_stick_cmd(1) = stickCmdMsg.Thrust;
+            u_stick_cmd(2) = stickCmdMsg.Roll;
+            u_stick_cmd(3) = stickCmdMsg.Pitch;
+            u_stick_cmd(4) = stickCmdMsg.Yaw;
+            disp("transmitting")
+        else
+            disp('Empty AHSCmd!')
+            end
         % if the controller is off for more than 1 second enter emergency
         % decent mode
-        if (rostime('now') > lastStickCmd_time + idleDuration)
-            u_stick_cmd(1) = -0.6;
-            u_stick_cmd(2) = 0;
-            u_stick_cmd(3) = 0;
-            u_stick_cmd(4) = 0;
-            disp('Emergency Decent!')
-        end
-        
+%         if (rostime('now') > lastStickCmd_time + idleDuration)
+%             u_stick_cmd(1) = -0.6;
+%             u_stick_cmd(2) = 0;
+%             u_stick_cmd(3) = 0;
+%             u_stick_cmd(4) = 0;
+%             disp('Emergency Decent!')
+%         end
+
         % transmit to quad
+        
         transmitCmd( trainerBox, u_stick_cmd, params.vtx.trim_val, params.vtx.stick_lim, params.vtx.trim_lim );
-        if (first_run), send(vtxStatusPublisher,rosmessage('std_msgs/Bool')), first_run=0; end
+        %if (first_run), send(vtxStatusPublisher,rosmessage(vtxStatusPublisher)), first_run=0; end
+        send(vtxStatusPublisher,rosmessage(vtxStatusPublisher))
         waitfor(r);
     end
     
