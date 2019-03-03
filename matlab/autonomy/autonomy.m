@@ -103,10 +103,6 @@ if ( strcmp(params.auto.mode,'auto'))
     startMissionFlag = startMissionMsg.Data;
     
     while(1)
-%         if(w~=1)
-%             disp('not pressed')
-%             continue;
-%         end
         stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 
         % unpack statestimate
@@ -130,6 +126,7 @@ if ( strcmp(params.auto.mode,'auto'))
         %timestamps = mission.variables;
         ahs = mission.bhv{currentBehavior}.ahs;
         completion = mission.bhv{currentBehavior}.completion;
+        init = mission.bhv{currentBehavior}.initialize;
         
         totalTime = t - timestamps.initial_event_time;
         bhvTime = t - timestamps.behavior_switched_timestamp;
@@ -149,21 +146,23 @@ if ( strcmp(params.auto.mode,'auto'))
                     [completionFlag] = bhv_takeoff_status(stateEstimateMsg, ahs);
                 case 'bhv_hover'
                     %disp('hover behavior');
-                    [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t);
-                case 'landing'
+                    [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t, init);
+                case 'bhv_land'
                     %disp('landing behavior');
-                    [completionFlag, ahs] = bhv_landing_status(stateEstimateMsg, completion, t);
-                otherwise
-                    
+                    [completionFlag, initialize, ahsUpdate] = bhv_landing_status(stateEstimateMsg, ahs, completion, t, init);
+                    display(initialize)
+                    mission.bhv{currentBehavior}.initialize.firstLoop = initialize;
+                    mission.bhv{currentBehavior}.ahs.desiredAltMeters = ahsUpdate;
+                otherwise  
             end
             mission.bhv{currentBehavior}.completion.status = completionFlag;
-            z_d = ahs.desiredAltMeters;
+            % z_d = ahs.desiredAltMeters;
         end
 
         % publish
-        ahsCmdMsg.AltitudeMeters = z_d;
+        ahsCmdMsg.AltitudeMeters = mission.bhv{currentBehavior}.ahs.desiredAltMeters;
         send(ahsCmdPublisher, ahsCmdMsg);
-        fprintf('Published Ahs Cmd. Alt : %3.3f \n', z_d );
+        fprintf('Published Ahs Cmd. Alt : %3.3f \n', ahsCmdMsg.AltitudeMeters );
         
         waitfor(r);
     end
