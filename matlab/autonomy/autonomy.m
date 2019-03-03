@@ -152,6 +152,9 @@ if ( strcmp(params.auto.mode,'auto'))
                     pidAltSettingMsg.Ki = mission.bhv{currentBehavior}.pid.alt.Ki;
                     pidAltSettingMsg.Kd = mission.bhv{currentBehavior}.pid.alt.Kd ;
                     pidAltSettingMsg.Ff = mission.bhv{currentBehavior}.pid.alt.Ff;
+                case 'bhv_point_to_direction'
+                    %disp('point to direction behavior')
+                    [completionFlag] = bhv_point_to_direction_status(stateEstimateMsg, ahs, completion);
                 case 'bhv_land'
                     %disp('landing behavior');
                     [completionFlag, initialize, ahsUpdate] = bhv_landing_status(stateEstimateMsg, ahs, completion, t, init);
@@ -162,13 +165,16 @@ if ( strcmp(params.auto.mode,'auto'))
             end
             mission.bhv{currentBehavior}.completion.status = completionFlag;
             % z_d = ahs.desiredAltMeters;
+            % yaw_d = ahs.desiredYawDegrees;
         end
 
         % publish
         ahsCmdMsg.AltitudeMeters = mission.bhv{currentBehavior}.ahs.desiredAltMeters;
+        ahsCmdMsg.HeadingRad = mission.bhv{currentBehavior}.ahs.desiredYawDegrees;       % This is actually in degrees
         send(pidAltSettingPublisher, pidAltSettingMsg);
+        send(pidYawSettingPublisher, pidYawSettingMsg);
         send(ahsCmdPublisher, ahsCmdMsg);
-        fprintf('Published Ahs Cmd. Alt : %3.3f \n', ahsCmdMsg.AltitudeMeters );
+        fprintf('Published Ahs Cmd. Alt : %3.3f \t Yaw: %3.3f\n', ahsCmdMsg.AltitudeMeters, ahsCmdMsg.HeadingRad);
         
         waitfor(r);
     end

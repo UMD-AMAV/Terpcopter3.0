@@ -32,10 +32,10 @@ global altitudeErrorHistory;
 altitudeErrorHistory.lastVal = 0;
 altitudeErrorHistory.lastSum = 0;
 altitudeErrorHistory.lastTime = 0;
-
-yawError.lastVal = 0;
-yawError.lastSum = 0;
-yawError.lastTime = 0;
+% 
+% yawError.lastVal = 0;
+% yawError.lastSum = 0;
+% yawError.lastTime = 0;
 
 
 % initialize ROS
@@ -97,9 +97,9 @@ u_t_alt = controlParams.altitudeGains.ffterm;
 
 % absoluteYaw = stateEstimateMsg.Yaw;
 % ahsCmdMsg.HeadingRad = absoluteYaw;
-yawError.lastTime = stateEstimateMsg.Time;
-yawError.lastVal = 0; %ahsCmdMsg.HeadingRad;
-yawError.lastSum = 0;
+% yawError.lastTime = stateEstimateMsg.Time;
+% yawError.lastVal = 0; %ahsCmdMsg.HeadingRad;
+% yawError.lastSum = 0;
 u_t_yaw = 0; 
 
 disp('initialize loop');
@@ -155,28 +155,31 @@ while(1)
     % compute controls
     % FF_PID(gains, error, newTime, newErrVal)
     [u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
-    %disp('pid loop');
-    %disp(pidSettingMsg)
+    disp('pid loop');
+    disp(pidAltSettingMsg)
     
     %New Yaw Controller
     yaw_d = deg2rad(yaw_d);
     yaw = deg2rad(yaw);
-    yaw_error = (yaw_d - yaw);
-    yaw_error = (atan2(sin(yaw_error),cos(yaw_error)));
+    yawError = (yaw_d - yaw);
+    yawError = (atan2(sin(yawError),cos(yawError)));
     
       disp('yawSetpoint')
       disp(yaw_d)
       disp('yawCurrent')
       disp(yaw)
-      disp('yawSetpointError')
-      disp(yaw_error)
+      disp('yawError')
+      disp(yawError)
+%       disp('yawSetpointError')
+%       disp(yaw_error)
     
+    u_t_yaw = -pidYawSettingMsg.Kp*yawError;
     % compute controls
-     [u_t_yaw, yawError] = PID(pidYawSettingMsg, yawError, t, yaw_error);
-     disp('yaw control gains');
-     disp(controlParams.yawGains)
-     disp('yaw control signal');
-     disp(u_t_yaw)
+%      [u_t_yaw, yawError] = PID(pidYawSettingMsg, yawError, t, yaw_error);
+%      disp('yaw control gains');
+%      disp(controlParams.yawGains)
+%      disp('yaw control signal');
+%      disp(u_t_yaw)
     
 
     % publish
