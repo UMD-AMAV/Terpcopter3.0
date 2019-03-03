@@ -54,6 +54,7 @@ fprintf('Launching Autonomy Node...\n');
 
 global timestamps
 
+
 % initialize ROS
 if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
@@ -147,6 +148,10 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover'
                     %disp('hover behavior');
                     [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t, init);
+                    pidAltSettingMsg.Kp = mission.bhv{currentBehavior}.pid.alt.Kp;
+                    pidAltSettingMsg.Ki = mission.bhv{currentBehavior}.pid.alt.Ki;
+                    pidAltSettingMsg.Kd = mission.bhv{currentBehavior}.pid.alt.Kd ;
+                    pidAltSettingMsg.Ff = mission.bhv{currentBehavior}.pid.alt.Ff;
                 case 'bhv_land'
                     %disp('landing behavior');
                     [completionFlag, initialize, ahsUpdate] = bhv_landing_status(stateEstimateMsg, ahs, completion, t, init);
@@ -161,6 +166,7 @@ if ( strcmp(params.auto.mode,'auto'))
 
         % publish
         ahsCmdMsg.AltitudeMeters = mission.bhv{currentBehavior}.ahs.desiredAltMeters;
+        send(pidAltSettingPublisher, pidAltSettingMsg);
         send(ahsCmdPublisher, ahsCmdMsg);
         fprintf('Published Ahs Cmd. Alt : %3.3f \n', ahsCmdMsg.AltitudeMeters );
         

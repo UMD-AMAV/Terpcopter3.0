@@ -30,7 +30,7 @@ function [completionFlag, initialize, ahsUpdate] = bhv_landing_status(stateEstim
 
        fprintf('Desired Altitude: %f meters\tCurrent Altitude %f meters\nDesired Time: %f\tElapsed time: %f\n', ahs.desiredAltMeters, stateEstimateMsg.Up, completion.durationSec,elapsed_satisfied_time);
        if elapsed_satisfied_time >= completion.durationSec
-            ahsUpdate = stateEstimateMsg.Up - completion.altitudeIncrementMeters;
+            ahsUpdate = ahs.desiredAltMeters - completion.altitudeIncrementMeters;
        end  
    end
    completionFlag = 0;
