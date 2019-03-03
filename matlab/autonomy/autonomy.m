@@ -129,6 +129,9 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover'
                     %disp('hover behavior');
                     [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t);
+                case 'bhv_point_to_direction'
+                    %disp('point to direction behavior')
+                    [completionFlag] = bhv_point_to_direction_status(stateEstimateMsg, ahs, completion);
                 case 'landing'
                     %disp('landing behavior');
                     [completionFlag] = bhv_landing_status(stateEstimateMsg, ahs);
@@ -137,10 +140,12 @@ if ( strcmp(params.auto.mode,'auto'))
             end
             mission.bhv{currentBehavior}.completion.status = completionFlag;
             z_d = ahs.desiredAltMeters;
+            yaw_d = ahs.desiredYawDegrees;
         end
 
         % publish
         ahsCmdMsg.AltitudeMeters = z_d;
+        ahsCmdMsg.HeadingRad = yaw_d;       % This is actually in degrees
         send(ahsCmdPublisher, ahsCmdMsg);
         fprintf('Published Ahs Cmd. Alt : %3.3f \n', z_d );
         

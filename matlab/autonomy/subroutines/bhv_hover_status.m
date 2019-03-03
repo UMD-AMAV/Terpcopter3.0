@@ -4,7 +4,7 @@ function completionFlag = bhv_hover_status(stateEstimateMsg, ahs, completion, t)
     
     hoverAltComplete = abs(ahs.desiredAltMeters - stateEstimateMsg.Up) < toleranceMeters;
     
-    fprintf('Task: Hover at %f meters for %f seconds\n', ahs.desiredAltMeters, completion.durationSec);
+    % fprintf('Task: Hover at %f meters for %f seconds\n', ahs.desiredAltMeters, completion.durationSec);
     
     if hoverAltComplete
         disp('hover alt satisfied');
