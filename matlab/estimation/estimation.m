@@ -110,7 +110,7 @@ while(1)
     
     %get relative yaw = - inertial yaw_intial - inertial yaw 
     if isempty(inertial_yaw_initial), inertial_yaw_initial = state.psi_inertial; end
-    state.psi_relative = state.psi_inertial - inertial_yaw_initial;
+    state.psi_relative = -state.psi_inertial + inertial_yaw_initial;
     disp('intial yaw');
     disp(inertial_yaw_initial);
     disp('relative yaw');
