@@ -4,7 +4,7 @@ function completionFlag = bhv_point_to_direction_status(stateEstimateMsg, ahs, c
     
     yawDesiredRadians = deg2rad(ahs.desiredYawDegrees);
     
-    pointToDirectionComplete = abs(yawDesiredRadians - stateEstimateMsg.Yaw) < tolerance;
+    pointToDirectionComplete = abs(yawDesiredRadians - stateEstimateMsg.Yaw) < toleranceRadians;
     
     if pointToDirectionComplete
         disp('point to direction satisfied')
