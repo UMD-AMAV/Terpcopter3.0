@@ -127,7 +127,6 @@ if ( strcmp(params.auto.mode,'auto'))
         %timestamps = mission.variables;
         ahs = mission.bhv{currentBehavior}.ahs;
         completion = mission.bhv{currentBehavior}.completion;
-        init = mission.bhv{currentBehavior}.initialize;
         
         totalTime = t - timestamps.initial_event_time;
         bhvTime = t - timestamps.behavior_switched_timestamp;
@@ -147,16 +146,17 @@ if ( strcmp(params.auto.mode,'auto'))
                     [completionFlag] = bhv_takeoff_status(stateEstimateMsg, ahs);
                 case 'bhv_hover'
                     %disp('hover behavior');
-                    [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t, init);
+                    [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t);
                     pidAltSettingMsg.Kp = mission.bhv{currentBehavior}.pid.alt.Kp;
                     pidAltSettingMsg.Ki = mission.bhv{currentBehavior}.pid.alt.Ki;
                     pidAltSettingMsg.Kd = mission.bhv{currentBehavior}.pid.alt.Kd ;
                     pidAltSettingMsg.Ff = mission.bhv{currentBehavior}.pid.alt.Ff;
                 case 'bhv_point_to_direction'
                     %disp('point to direction behavior')
-                    [completionFlag] = bhv_point_to_direction_status(stateEstimateMsg, ahs, completion);
+                    [completionFlag] = bhv_point_to_direction_status(stateEstimateMsg, ahs, completion, t);
                 case 'bhv_land'
                     %disp('landing behavior');
+                    init = mission.bhv{currentBehavior}.initialize;
                     [completionFlag, initialize, ahsUpdate] = bhv_landing_status(stateEstimateMsg, ahs, completion, t, init);
                     display(initialize)
                     mission.bhv{currentBehavior}.initialize.firstLoop = initialize;
