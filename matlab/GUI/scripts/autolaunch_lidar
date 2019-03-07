@@ -1,8 +1,13 @@
 #!/usr/bin/expect
 
-spawn ssh odroid@192.168.1.88
+spawn ssh linaro@192.168.0.22
 expect "password"
-send "odroid\r"
-expect "odroid"
-send "roslaunch terpcopter_driver terpcopter_teraranger_node.launch\r"
+send "linaro\r"
+expect "linaro"
+send "sudo su\r"
+expect "password"
+send "linaro\r"
+expect "root"
+send "roslaunch mavros px4.launch fcu_url:="udp://:14550@192.168.0.22:14556\r"
 interact
+

@@ -111,7 +111,7 @@ function pushbutton2_Callback(hObject, eventdata, handles)
  while( error_flag==1 || first_run == 1 )
      pause(0.1);
     try
-        sub = rossubscriber('/terarangerone');
+        sub = rossubscriber('/mavros/distance_sensor/hrlv_ez4_pub');
         first_run = 0;
         error_flag = 0;
     catch error

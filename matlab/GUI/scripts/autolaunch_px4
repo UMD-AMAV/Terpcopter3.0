@@ -1,8 +1,12 @@
 #!/usr/bin/expect
 
-spawn ssh odroid@192.168.1.88
+spawn ssh linaro@192.168.0.22
 expect "password"
-send "odroid\r"
-expect "odroid"
-send "roslaunch mavros px4.launch\r"
+send "linaro\r"
+expect "linaro"
+send "sudo su\r"
+expect "password"
+send "linaro\r"
+expect "root"
+send "./px4 mainconfig.app\r"
 interact
