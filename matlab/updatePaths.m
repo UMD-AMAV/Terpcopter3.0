@@ -17,6 +17,13 @@ addpath('./utils')
 addpath('./utils/geometry')
 addpath('./GUI')
 addpath('./GUI/scripts')
+addpath('./plots')
+addpath('./plots/plotpidSetting')
+addpath('./plots/plotpidSetting/subroutines')
+addpath('./plots/plotStateEstimate')
+addpath('./plots/plotStateEstimate/subroutines')
+addpath('./plots/plotStickCmd')
+addpath('./plots/plotStickCmd/subroutines')
 savepath;
 %savepath([params.env.matlabHome '/pathdef.m']);
 end
