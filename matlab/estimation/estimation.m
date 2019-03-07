@@ -35,7 +35,7 @@ end
 
 % Subscribers
 imuDataSubscriber = rossubscriber('/mavros/imu/data');
-lidarDataSubscriber = rossubscriber('/terarangerone');
+lidarDataSubscriber = rossubscriber('/mavros/distance_sensor/hrlv_ez4_pub'); % changed the distance topic 
 
 % Publishers
 stateEstimatePublisher = rospublisher('/stateEstimate', 'terpcopter_msgs/stateEstimate');
