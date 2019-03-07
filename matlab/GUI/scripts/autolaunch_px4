@@ -1,12 +1,10 @@
 #!/usr/bin/expect
 
-spawn ssh linaro@192.168.0.22
+spawn ssh linaro@192.168.1.22
 expect "password"
 send "linaro\r"
 expect "linaro"
 send "sudo su\r"
-expect "password"
-send "linaro\r"
 expect "root"
-send "./px4 mainconfig.app\r"
+send "./px4 mainapp.config\r"
 interact
