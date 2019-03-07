@@ -8,6 +8,12 @@
 #include "ros/ros.h"
 #include "std_msgs/Float32.h"
 
+// TODO :  
+// - Add serial port close command at end
+// - Add check in while loop if port is open, 
+//   if not cycle through other ACM ports
+// - fix mavros serial port issue (mostly change this serial port to ACM1)
+// - Comment code
 
 int main(int argc, char** argv)
 {
@@ -24,7 +30,7 @@ ros::init(argc, argv, "terpcopter_flow_probe_node");
 ros::NodeHandle nh("~");
 
 std::string portStr;
-nh.param("serial_port", portStr, std::string("/dev/ttyACM0"));
+nh.param("serial_port", portStr, std::string("/dev/ttyACM1"));
 
 int baudrate;
 nh.param("baudrate", baudrate, 9600);

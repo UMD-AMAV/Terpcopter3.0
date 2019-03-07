@@ -28,17 +28,21 @@ fprintf('Control Node Launching...\n');
 
 % declare global variables
 % Determine usage in other scripts - change to local if no other usage
-global altitudeErrorHistory;
+global altitudeErrorHistory forwardErrorHistory;
 altitudeErrorHistory.lastVal = 0;
 altitudeErrorHistory.lastSum = 0;
 altitudeErrorHistory.lastTime = 0;
+
+forwardErrorHistory.lastVal = 0;
+forwardErrorHistory.lastSum = 0;
+forwardErrorHistory.lastTime = 0;
 
 yawError.lastVal = 0;
 yawError.lastSum = 0;
 yawError.lastTime = 0;
 
 global ahsCmdMsg;
-ahsCmdMsg = rosmessage('terpcopter_msgs/ahsCmd');
+% ahsCmdMsg = rosmessage('terpcopter_msgs/ahsCmd');
 ahsCmdMsg.AltitudeMeters = 0;
 ahsCmdMsg.HeadingRad = 0;
 ahsCmdMsg.ForwardSpeedMps = 0;
@@ -53,21 +57,43 @@ if(~robotics.ros.internal.Global.isNodeActive)
 end
 
 controlNode = robotics.ros.Node('/control');
-stickCmdPublisher = robotics.ros.Publisher(controlNode,'stickCmd','terpcopter_msgs/stickCmd');
-stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
+
+% Subscribers
+stateEstimateSubscriber = rossubscriber('/stateEstimate');
+
+% ahsCmdSubscriber = rossubscriber('/ahsCmd');
+
+% pidAltSettingSubscriber = rossubscriber('/pidAltSetting');
+pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
+pidResetSubscriber = rossubscriber('/pidReset');
+
+% pidYawSettingSubscriber = rossubscriber('/pidYawSetting', 'terpcopter_msgs/ffpidSetting');
+
+
+
+% Publishers
+stickCmdPublisher = rospublisher('/stickCmd', 'terpcopter_msgs/stickCmd');
+
+pause(2)
+stickCmdMsg = rosmessage(stickCmdPublisher);
 stickCmdMsg.Thrust = 0;
 stickCmdMsg.Yaw = 0;
+stickCmdMsg.Pitch = 0;
 
-stateEstimateSubscriber = robotics.ros.Subscriber(controlNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
-ahsCmdSubscriber = robotics.ros.Subscriber(controlNode,'ahsCmd','terpcopter_msgs/ahsCmd',{@ahsCmdCallback});
-pidSettingSubscriber = robotics.ros.Subscriber(controlNode,'pidSetting','terpcopter_msgs/ffpidSetting',{@ffpidSettingCallback});
-obPidEnableSubscriber = robotics.ros.Subscriber(controlNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
+stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 
+% ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
 
-stateEstimateMsg = receive(stateEstimateSubscriber,5);
+% pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
+% pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
 
-% timestamp
-t0 = []; timeMatrix=[];
+% test = rossubscriber('terpcopter_msgs/stateEstimate');
+% pause(1);
+stateEstimateMsg = receive(stateEstimateSubscriber,10);
+
+% timestamp'terpcopter_msgs/stateEstimate'
+t0 = []; 
+timeMatrix=[];
 ti= rostime('now');
 %abs_t = eval([int2str(ti.Sec) '.' ...
     %int2str(ti.Nsec)]);
@@ -78,14 +104,24 @@ if isempty(t0), t0 = abs_t; end
 
 
 altitudeErrorHistory.lastTime = 0; %stateEstimateMsg.Time;
+display("alt meters")
+display(ahsCmdMsg.AltitudeMeters)
+%display("alt meters")
+%display(altitudeErrorHistory.lastVal)
 altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
 altitudeErrorHistory.lastSum = 0;
-u_t_alt = controlParams.altitudeGains.ffterm;
+altitudeErrorHistory.lastError = 0;
+u_t_alt = controlParams.altitudeGains.Ff;
 
 yawError.lastTime = stateEstimateMsg.Time;
 yawError.lastVal = ahsCmdMsg.HeadingRad;
 yawError.lastSum = 0;
 u_t_yaw = 0; 
+
+forwardErrorHistory.lastTime = 0; %stateEstimateMsg.Time;
+forwardErrorHistory.lastVal = ahsCmdMsg.ForwardSpeedMps;
+forwardErrorHistory.lastSum = 0;
+u_t_forward = 0;
 
 disp('initialize loop');
 
@@ -95,6 +131,11 @@ reset(r);
 send(stickCmdPublisher, stickCmdMsg);
 
 while(1)
+    
+    stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
+%     ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
+%     pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
+%     pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
     
      % timestamp
     ti= rostime('now');
@@ -106,24 +147,53 @@ while(1)
     fprintf("t %6.4f",t);
 
     % unpack statestimate
-    %t = stateEstimateMsg.Time;
+%     t = stateEstimateMsg.Time;
     z = stateEstimateMsg.Range;
     yaw = stateEstimateMsg.Yaw;
-    fprintf('Current Quad Alttiude is : %3.3f m\n', z );
+%     fprintf('Current Quad Alttiude is : %3.3f m\n', z );
+
+    u = stateEstimateMsg.ForwardVelocity;
 
     % get setpoint
     z_d = ahsCmdMsg.AltitudeMeters;
     yaw_d = ahsCmdMsg.HeadingRad;
+    u_d = (-1)*ahsCmdMsg.ForwardSpeedMps;
     
    
     % update errors
     altError = z_d - z;
+    forwardError = u_d - u;
 
     % compute controls
     % FF_PID(gains, error, newTime, newErrVal)
     [u_t_alt, altitudeErrorHistory] = FF_PID(controlParams.altitudeGains, altitudeErrorHistory, t, altError);
-    disp('pid loop');
-    disp(controlParams.altitudeGains)
+    %[u_t_crab, altitudeErrorHistory] = FF_PID(controlParams.altitudeGains, altitudeErrorHistory, t, altError);
+    % [u_t_crab, u_t_forward, crabErrorHistory, forwardErrorHistory] = crabforwardcontroller_PID(controlParams.crabGains,controlParams.forwardGains , crabErrorHistory, forwardErrorHistory, t, crabError, forwardError);
+    [u_t_forward, forwardErrorHistory] = forwardcontroller_PID(controlParams.forwardGains , forwardErrorHistory, t, forwardError);
+%     disp('pid loop');
+%     disp(controlParams.altitudeGains)
+
+    u_t_alt = 2*max(min(1,u_t_alt),0)-1;
+
+    %calculate net throttle input
+    thr_trim = 0;
+    u_stick_thr_net = (u_t_alt*controlParams.stick_lim(1) + thr_trim*controlParams.trim_lim(1))...
+                            /(controlParams.stick_lim(1)+controlParams.trim_lim(1));
+    %get slope                    
+    slope = controlParams.m_net * controlParams.g/( u_stick_thr_net+1);
+    
+    %get max allowed thrust in horizontal plane
+    T_XY_max = slope * sqrt(4 - (u_stick_thr_net+1)*(u_stick_thr_net+1)) -1;
+    T_XY_max_tilt = slope*(u_stick_thr_net+1)*cos(stateEstimateMsg.Roll)*cos(stateEstimateMsg.Pitch)*tan(controlParams.tilt_max);
+    T_XY_max = min(T_XY_max,T_XY_max_tilt);
+    
+    %saturateg horizontal thrust setpoints
+    mag = sqrt(u_t_forward*u_t_forward );%+ thr_sp_crab*thr_sp_crab);
+    if mag > T_XY_max
+        u_t_forward = u_t_forward * T_XY_max/mag;
+    end
+    
+    u_t_pitch = u_t_forward;
     
       if (abs(yaw-yaw_d) >= abs(yaw_d-yaw))
         yawSetpointError = yaw - yaw_d;
@@ -139,13 +209,13 @@ while(1)
 
     % publish
     stickCmdMsg = rosmessage('terpcopter_msgs/stickCmd');
-    stickCmdMsg.Thrust = 2*max(min(1,u_t_alt),0)-1;
-    stickCmdMsg.Yaw = u_t_yaw;
+    stickCmdMsg.Thrust = u_t_alt;
+    stickCmdMsg.Pitch = max(min(1,u_t_pitch),-1);
     send(stickCmdPublisher, stickCmdMsg);
-    fprintf('Published Stick Cmd., Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ) );
-
+%     fprintf('Published Stick Cmd., Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ) );
+     fprintf('control = %3.3f, pitch cmd = %3.3f\n',u_t_pitch,stickCmdMsg.Pitch)
     time = r.TotalElapsedTime;
-	fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
+% 	fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
 	waitfor(r);
- end
-
+end
+ 
