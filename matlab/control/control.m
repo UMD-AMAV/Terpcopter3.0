@@ -48,6 +48,8 @@ stateEstimateSubscriber = rossubscriber('/stateEstimate');
 
 ahsCmdSubscriber = rossubscriber('/ahsCmd');
 
+yawSetpointSubscriber = rossubscriber('/yawSetpoint');
+
 pidAltSettingSubscriber = rossubscriber('/pidAltSetting');
 pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
 pidResetSubscriber = rossubscriber('/pidReset');
@@ -71,6 +73,7 @@ ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
 pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
 pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
 
+yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
 
 % timestamp
 t0 = []; timeMatrix=[];
@@ -114,6 +117,9 @@ while(1)
     ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
     pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
     pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
+    
+    yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
+
 
     % timestamp
     ti= rostime('now');
@@ -132,7 +138,9 @@ while(1)
 
     % get setpoint
     z_d = ahsCmdMsg.AltitudeMeters;
-    yaw_d = ahsCmdMsg.HeadingRad;
+    
+    %%%% CAHNGING YAW FROM GUI TO VISION %%%%%
+    yaw_d = yawSetpointMsg.Data; % ahsCmdMsg.HeadingRad;
     
    
     % update errors
@@ -157,19 +165,20 @@ while(1)
     [u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
     disp('pid loop');
     disp(pidAltSettingMsg)
+    disp('yawSetpoint')
+    disp(yaw_d)
+    disp('yawCurrent')
+      disp(yaw)
+      
     
     %New Yaw Controller
     yaw_d = deg2rad(yaw_d);
     yaw = deg2rad(yaw);
-    yawError = (yaw_d - yaw);
+    yawError = yaw_d;%(yaw_d - yaw);
     yawError = (atan2(sin(yawError),cos(yawError)));
-    
-      disp('yawSetpoint')
-      disp(yaw_d)
-      disp('yawCurrent')
-      disp(yaw)
-      disp('yawError')
+    disp('yawError')
       disp(yawError)
+      
 %       disp('yawSetpointError')
 %       disp(yaw_error)
     

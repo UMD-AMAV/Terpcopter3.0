@@ -14,8 +14,9 @@ function completionFlag = bhv_point_to_direction_status(stateEstimateMsg, ahs, c
         current_event_time = t;
         timestamps.behavior_satisfied_timestamp = t;
     end
+    yaw_current = rad2deg(stateEstimateMsg.Yaw);
     elapsed_satisfied_time = current_event_time - timestamps.behavior_satisfied_timestamp;
-    fprintf('Desired Yaw: %f Degrees\tCurrent Yaw %f Degrees\nDesired Time: %f\tElapsed time: %f\n', ahs.desiredYawDegrees, rad2deg(stateEstimateMsg.Yaw), completion.durationSec,elapsed_satisfied_time);
+    fprintf('Desired Yaw: %f Degrees\tCurrent Yaw %f Degrees\nDesired Time: %f\tElapsed time: %f\n', ahs.desiredYawDegrees, yaw_current, completion.durationSec, elapsed_satisfied_time);
     
     if elapsed_satisfied_time >= completion.durationSec
         completionFlag = 1;
