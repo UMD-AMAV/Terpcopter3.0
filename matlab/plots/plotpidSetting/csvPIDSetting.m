@@ -17,6 +17,7 @@
 
 clear all; close all; clc;
 % addpath('./results');
+directory = '/home/kapil/Desktop/ROSTerpcopterModule/Terpcopter3.0/matlab/results';
 
 % pidSetting
 % float32 kp
@@ -37,7 +38,8 @@ pidSettingSub = robotics.ros.Subscriber(plotpidSettingNode,'pidSetting','terpcop
 msg = receive(pidSettingSub,20);
 
 fname = sprintf('plotPIDSetting_%s.csv', datestr(now,'mm-dd-yyyy_HH:MM'));
-fid=fopen(fname,'a');
+fileDest  = fullfile(directory,fname);
+fid=fopen(fileDest,'a');
 
 % Add loop to check if the command is received
   while(1)
