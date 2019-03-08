@@ -6,7 +6,7 @@
 % Output - displays the live plots.
 % 
 % Note :1) Before running this file check if the /stateEstimate,
-%          /Terarangerone, /pidSetting, /plotStickCmd, /livePlotAhsCmd.
+%          /Terarangerone, /pidSetting, /plotStickCmd, /AhsCmd, /terpcopter_flow_probe_node/flowProbe.
 %       2) If you want to run the selected live plots comment out otherplot.
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % %
 
@@ -22,5 +22,8 @@ livePlotPIDSetting;
 addpath('./plots/plotStickCmd')
 livePlotStickCmd;
 
-% addpath('./plots/plotahsCmd')
-% livePlotAhsCmd;
+addpath('./plots/plotahsCmd')
+livePlotAhsCmd;
+
+addpath('./plots/plotflowProbe')
+liveplotflowProbe;
