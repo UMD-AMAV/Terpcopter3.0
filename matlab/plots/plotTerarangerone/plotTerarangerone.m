@@ -20,7 +20,7 @@ clear all; clc;
 % float32 range
 
 % Reading the csv file data
-    data = csvread('plotTerarangerone_01-24-2019_17:10.csv');
+    data = csvread('plotTerarangerone_02-21-2019_18:01.csv');
     prfield_of_view = data(:,1);
     prmin_range = data(:,2);
     prmax_range = data(:,3);
