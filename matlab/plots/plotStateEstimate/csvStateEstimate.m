@@ -17,7 +17,7 @@
 
 clear all; close all; clc;
 % addpath('./results and plots');
-
+directory = '/home/kapil/Desktop/ROSTerpcopterModule/Terpcopter3.0/matlab/results';
 % stateEstimate
 % float32 time
 % float32 north
@@ -44,7 +44,8 @@ pStateEstimateSub = robotics.ros.Subscriber(plotStateEstimateNode,'stateEstimate
 msg = receive(pStateEstimateSub,20);
 
 fname = sprintf('plotStateEstimate_%s.csv', datestr(now,'mm-dd-yyyy_HH:MM'));
-fid=fopen(fname,'a');
+fileDest  = fullfile(directory,fname);
+fid=fopen(fileDest,'a');
 
 % Add loop to check if the command is received
   while(1)
