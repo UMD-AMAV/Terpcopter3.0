@@ -17,7 +17,8 @@
 % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
 
 clear all; close all; clc;
-%addpath('./results');
+% savepath('./matlab/results');
+directory = '/home/kapil/Desktop/ROSTerpcopterModule/Terpcopter3.0/matlab/results';
 
 %  ahsCmd
 %  altitudeMeters
@@ -36,7 +37,7 @@ ahsCmdMsg.CrabSpeedMps = 0;
 % stateEstimateMsg = rosmessage('terpcopter_msgs/stateEstimate');
 % stateEstimateMsg.Time = 0 ;
 
-plotahsCmdNode = robotics.ros.Node('/plotahsCmd');
+plotahsCmdNode = robotics.ros.Node('/plotahsCmd1');
 pahsCmdMsg = robotics.ros.Subscriber(plotahsCmdNode,'ahsCmd','terpcopter_msgs/ahsCmd',{@ahsCmdCallback});
 % pStateEstimateSub = robotics.ros.Subscriber(plotahsCmdNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@stateEstimateCallback});
 
@@ -44,8 +45,9 @@ pahsCmdMsg = robotics.ros.Subscriber(plotahsCmdNode,'ahsCmd','terpcopter_msgs/ah
 msg = receive(pahsCmdMsg,20);
 % msgTime = receive(pStateEstimateSub,20);
 
-fname = sprintf('plotahsCmd_%s.csv', datestr(now,'mm-dd-yyyy_HH:MM:'));
-fid=fopen(fname,'a');
+fname = sprintf('plotahsCmd_%s.csv', datestr(now,'mm-dd-yyyy_HH:MM'));
+fileDest  = fullfile(directory,fname);
+fid=fopen(fileDest,'a');
 
 % Creating the csv file for the ahs Command data.
 %     if isempty(t1), t1 = state.dt; else, t1 = t1+state.dt; end 
