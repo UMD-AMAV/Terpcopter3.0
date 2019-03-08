@@ -15,7 +15,7 @@
 clear all; clc
 
  % Reading the csv file data
-    data = csvread('plotStickCmd_01-17-2019_01:28.csv');
+    data = csvread('plotStickCmd_03-08-2019_14:54.csv'); %old 17:24 % 0.1kd old 17:42,17:53 
     prThrust = data(:,1);
     prYaw = data(:,2);
     prPitch = data(:,3);
@@ -23,7 +23,7 @@ clear all; clc
 
 % Printing the figures
     figure()
-    a1 = subplot(4,1,1);
+    a1 = subplot(2,1,1);
     plot(prThrust, 'r','LineWidth',3);
     xlabel('Time');
     ylabel('Thrust');
@@ -32,7 +32,7 @@ clear all; clc
     set(gca,'FontSize',16)
     grid on;
 
-    a2 = subplot(4,1,2);
+    a2 = subplot(2,1,2);
     plot(prYaw, 'g','LineWidth',3);
     xlabel('Time');
     ylabel('Yaw');
@@ -41,26 +41,26 @@ clear all; clc
     set(gca,'FontSize',16)
     grid on;
     
-    a3 = subplot(4,1,3);
-    plot( prPitch , 'b','LineWidth',3);
-    xlabel('Time');
-    ylabel('Pitch');
-    set(gca,'FontSize',25)
-    legend('Pitch')
-    set(gca,'FontSize',16)
-    grid on;
-    
-    a4 = subplot(4,1,4);
-    plot(prRoll, 'k','LineWidth',3);
-    xlabel('Time');
-    ylabel('Roll');
-    set(gca,'FontSize',25)
-    legend('Roll')
-    set(gca,'FontSize',16)
-    grid on;
+%     a3 = subplot(4,1,3);
+%     plot( prPitch , 'b','LineWidth',3);
+%     xlabel('Time');
+%     ylabel('Pitch');
+%     set(gca,'FontSize',25)
+%     legend('Pitch')
+%     set(gca,'FontSize',16)
+%     grid on;
+%     
+%     a4 = subplot(4,1,4);
+%     plot(prRoll, 'k','LineWidth',3);
+%     xlabel('Time');
+%     ylabel('Roll');
+%     set(gca,'FontSize',25)
+%     legend('Roll')
+%     set(gca,'FontSize',16)
+%     grid on;
         
     %     Title for subplots
     sgt = sgtitle('Stick Cmd '); %raw data
     sgt.FontSize = 25;
     
-    linkaxes([a1,a2,a3,a4],'x')
+%     linkaxes([a1,a2,a3,a4],'x')

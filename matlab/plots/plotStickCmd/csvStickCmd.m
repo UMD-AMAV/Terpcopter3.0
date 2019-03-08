@@ -3,7 +3,7 @@
 % 
 % About -Subscribes to stick commands and state estimation topic and 
 %        creates a csv file of the incoming data. The generated csv file 
-%        is used by plotStateEstimate.m file to plot the graphs.
+%        ispic  used by plotStateEstimate.m file to plot the graphs.
 % 
 % Input -  'terpcopter_msgs/stickCmd'
 %          'terpcopter_msgs/stateEstimate'
@@ -18,7 +18,7 @@
 
 clear all; close all; clc;
 % addpath('./results');
-
+directory = '/home/kapil/Desktop/ROSTerpcopterModule/Terpcopter3.0/matlab/results';
 % stickCmd
 % float32 thrust
 % float32 yaw
@@ -44,7 +44,8 @@ msg = receive(plotStickCmdSub,20);
 % msgTime = receive(pStateEstimateSub,20);
 
 fname = sprintf('plotStickCmd_%s.csv', datestr(now,'mm-dd-yyyy_HH:MM'));
-fid=fopen(fname,'a');
+fileDest  = fullfile(directory,fname);
+fid=fopen(fileDest,'a');
  
 % if isempty(t1), t1 = state.dt; else, t1 = t1+state.dt; end
 while(1) 

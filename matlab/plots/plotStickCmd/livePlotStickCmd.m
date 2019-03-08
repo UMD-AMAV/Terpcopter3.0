@@ -80,7 +80,7 @@ legend('Pitch')
 set(gca,'FontSize',16)
 grid on;
 
-subplot(4,1,1)
+subplot(4,1,4)
 Roll = animatedline('Color','b','LineWidth',3);
 xRoll = gca;
 xRoll.XGrid = 'on';
