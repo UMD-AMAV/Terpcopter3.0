@@ -28,3 +28,15 @@ When launching launch files one might get "... is not a launch file". If this is
 ```
 source ./devel/setup.bash 
 ```
+
+# Terpcopter-Vision
+- Start the drone and ssh into odroid `ssh odroid@192.168.1.88` and password `odroid`
+- Launch the camera node from the odroid 
+```
+roslaunch terpcopter_driver terpcopter_camera_node.launch
+```
+- To run vision algorithms download the Terpcopter-vision folder and extract the src file in a catkin workspace and make using `catkin_make`
+- Then run the perception using 
+```
+rosrun camera_package cameraSub.py
+```
