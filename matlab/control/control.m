@@ -21,27 +21,176 @@
 clear; close all; clc; format compact;
 addpath('../')
 params = loadParams();
+
+global controlParams
 controlParams = params.ctrl;
 fprintf('Control Node Launching...\n');
 
 % declare global variables
-global altitudeError;
-altitudeError.lastVal = 0;
-altitudeError.lastSum = 0;
-altitudeError.lastTime = 0;
+% Determine usage in other scripts - change to local if no other usage
+global altitudeErrorHistory;
+altitudeErrorHistory.lastVal = 0;
+altitudeErrorHistory.lastSum = 0;
+altitudeErrorHistory.lastTime = 0;
+% 
+% yawError.lastVal = 0;
+% yawError.lastSum = 0;
+% yawError.lastTime = 0;
 
-global ahsCmdMsg;
-ahsCmdMsg = rosmessage('terpcopter_msgs/ahsCmd');
-ahsCmdMsg.AltitudeMeters = 0;
-ahsCmdMsg.HeadingRad = 0;
-ahsCmdMsg.ForwardSpeedMps = 0;
-ahsCmdMsg.CrabSpeedMps = 0;
 
 % initialize ROS
 if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
-controlNode = robotics.ros.Node('/control');
-stickCmdPublisher = robotics.ros.Publisher(controlNode,'stickCmd','terpcopter_msgs/stickCmd');
-stateEstimateSubscriber = robotics.ros.Subscriber(controlNode,'stateEstimate','terpcopter_msgs/stateEstimate',{@sendStickCmd,controlParams,stickCmdPublisher});
-ahsCmdSubscriber = robotics.ros.Subscriber(controlNode,'ahsCmd','terpcopter_msgs/ahsCmd',{@receiveAhsCmd});
+
+% Subscribers
+stateEstimateSubscriber = rossubscriber('/stateEstimate');
+
+ahsCmdSubscriber = rossubscriber('/ahsCmd');
+
+pidAltSettingSubscriber = rossubscriber('/pidAltSetting');
+pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
+pidResetSubscriber = rossubscriber('/pidReset');
+
+pidYawSettingSubscriber = rossubscriber('/pidYawSetting', 'terpcopter_msgs/ffpidSetting');
+
+
+
+% Publishers
+stickCmdPublisher = rospublisher('/stickCmd', 'terpcopter_msgs/stickCmd');
+
+pause(2)
+stickCmdMsg = rosmessage(stickCmdPublisher);
+stickCmdMsg.Thrust = 0;
+stickCmdMsg.Yaw = 0;
+
+stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
+
+ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
+
+pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
+pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
+
+
+% timestamp
+t0 = []; timeMatrix=[];
+ti= rostime('now');
+%abs_t = eval([int2str(ti.Sec) '.' ...
+    %int2str(ti.Nsec)]);
+
+abs_t = double(ti.Sec)+double(ti.Nsec)*10^-9;
+
+if isempty(t0), t0 = abs_t; end
+
+
+altitudeErrorHistory.lastTime = 0; %stateEstimateMsg.Time;
+display("alt meters")
+display(ahsCmdMsg.AltitudeMeters)
+%display("alt meters")
+%display(altitudeErrorHistory.lastVal)
+altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
+altitudeErrorHistory.lastSum = 0;
+altitudeErrorHistory.lastError = 0;
+u_t_alt = controlParams.altitudeGains.ffterm;
+
+
+
+% absoluteYaw = stateEstimateMsg.Yaw;
+% ahsCmdMsg.HeadingRad = absoluteYaw;
+% yawError.lastTime = stateEstimateMsg.Time;
+% yawError.lastVal = 0; %ahsCmdMsg.HeadingRad;
+% yawError.lastSum = 0;
+u_t_yaw = 0; 
+
+disp('initialize loop');
+
+r = robotics.Rate(10);
+reset(r);
+
+send(stickCmdPublisher, stickCmdMsg);
+
+while(1)
+    stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
+    ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
+    pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
+    pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
+
+    % timestamp
+    ti= rostime('now');
+    abs_t = double(ti.Sec)+double(ti.Nsec)*10^-9;
+    t = abs_t-t0;
+    %timeMatrix = [timeMatrix;t];
+    %if isempty(t0), t0 = abs_t; end
+   
+    %fprintf("t %6.4f",t);
+
+    % unpack statestimate
+    %t = stateEstimateMsg.Time;
+    z = stateEstimateMsg.Range;
+    yaw = stateEstimateMsg.Yaw; % - absoluteYaw;
+    %fprintf('Current Quad Alttiude is : %3.3f m\n', z );
+
+    % get setpoint
+    z_d = ahsCmdMsg.AltitudeMeters;
+    yaw_d = ahsCmdMsg.HeadingRad;
+    
+   
+    % update errors
+    altError = z_d - z;
+    
+    % reset Integral
+    pidResetMsg = rosmessage('std_msgs/Bool');
+    pidResetMsg.Data = false;
+    pidResetMsg = pidResetSubscriber.LatestMessage;
+    if ~isempty(pidResetMsg)
+        if pidResetMsg.Data == true 
+            disp("Resetting PID ...")
+            altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
+            altitudeErrorHistory.lastSum = 0;
+            pidResetMsg.Data = false;
+            send(pidResetPublisher, pidResetMsg);
+        end
+    end
+
+    % compute controls
+    % FF_PID(gains, error, newTime, newErrVal)
+    [u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
+    disp('pid loop');
+    disp(pidAltSettingMsg)
+    
+    %New Yaw Controller
+    yaw_d = deg2rad(yaw_d);
+    yaw = deg2rad(yaw);
+    yawError = (yaw_d - yaw);
+    yawError = (atan2(sin(yawError),cos(yawError)));
+    
+      disp('yawSetpoint')
+      disp(yaw_d)
+      disp('yawCurrent')
+      disp(yaw)
+      disp('yawError')
+      disp(yawError)
+%       disp('yawSetpointError')
+%       disp(yaw_error)
+    
+    u_t_yaw = -pidYawSettingMsg.Kp*yawError;
+    % compute controls
+%      [u_t_yaw, yawError] = PID(pidYawSettingMsg, yawError, t, yaw_error);
+%      disp('yaw control gains');
+%      disp(controlParams.yawGains)
+%      disp('yaw control signal');
+%      disp(u_t_yaw)
+    
+
+    % publish
+    stickCmdMsg.Thrust = max(min(2,u_t_alt),0)-1;
+    stickCmdMsg.Yaw = max(-1,min(1,u_t_yaw));
+    send(stickCmdPublisher, stickCmdMsg);
+    fprintf('Stick Cmd.Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f, Yaw : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ), u_t_yaw );
+
+    time = r.TotalElapsedTime;
+	%fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
+disp('Controller');
+	waitfor(r);
+ end
+
