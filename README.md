@@ -39,6 +39,11 @@ Edit the loadParams.m file env variables accordingly.
 
 cd GUI and launch Master_GUI.m 
 
+# Flow Probe Nodes
+
+- The teensy board on which the flow probe is attached might not work (Serial input pauses after a few lines). Follow instructions on this link to install the latest UDEV Rules for the board : https://www.pjrc.com/teensy/49-teensy.rules
+
+- The serial porst need root access to run. Try steps in this link to change : https://askubuntu.com/a/58122
 
 
 # Issues Noticed
