@@ -10,6 +10,21 @@ system.
 - To build the module in your catkin_ws copy and paste all the folders inside
  ROSTerpcopterModule into catkin_ws/src folder and run catkin build 
  
+ ## Choosing Master and Slave 
+Terpcopter team choose Buggy/ snappy drone to be the master and slave to be GNC laptops. To reflect the setup, make the following changes in your Laptop's bashrc:
+```
+nano ~/.bashrc 
+export ROS_MASTER_URI=http://<ip address of the drone>:11311
+export ROS_HOSTNAME= <ip of laptop>
+```
+on snappy/buggy drone 
+```
+nano ~/.bashrc 
+export ROS_MASTER_URI=http://<ip address of the drone>:11311
+export ROS_HOSTNAME= <ip of the drone>
+```
+
+ ## Manual Launch 
  # Launch Following nodes on Odroid
 ```
 roslaunch mavros px4.launch
@@ -17,13 +32,20 @@ roslaunch mavros px4.launch
 In a new terminal [2]
 ```
 cd amav_ws
-```
-```
 roslaunch terpcopter_driver/terpcopter_teraranger_node.launch 
 ```
+## MATLAB GUI Launch 
+Edit the loadParams.m file env variables accordingly.
+
+cd GUI and launch Master_GUI.m 
+
+
+
 # Issues Noticed
 
 When launching launch files one might get "... is not a launch file". If this is the case: 
+
+cd into workspace catkin_ws 
 
 ```
 source ./devel/setup.bash 
