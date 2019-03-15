@@ -28,3 +28,12 @@ When launching launch files one might get "... is not a launch file". If this is
 ```
 source ./devel/setup.bash 
 ```
+
+Odroid Desktop no launch bar fix: source: https://ubuntuforums.org/showthread.php?t=2337119
+```
+1) Open a hard terminal again using [Crtl]+[Alt]+[F1] - and log in if necessary
+2) $ cd ~/.config/dconf
+3) $ rm user
+4) $ cp user.bak user
+5) $ kill -9 -1
+```
