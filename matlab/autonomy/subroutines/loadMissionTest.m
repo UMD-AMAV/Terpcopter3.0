@@ -30,7 +30,7 @@ mission.bhv{i}.name = 'bhv_point_to_direction';
 mission.bhv{i}.initialize.firstLoop = 1;
 mission.bhv{i}.ahs.desiredAltMeters = 1;
 mission.bhv{i}.ahs.desiredYawDegrees = 60;
-mission.bhv{i}.completion.status = false;
+mission.bhv{i}.completion.status = false; 
 mission.bhv{i}.completion.durationSec = 5; 
 
 i = i + 1;
@@ -40,7 +40,7 @@ mission.bhv{i}.name = 'bhv_point_to_direction';
 mission.bhv{i}.initialize.firstLoop = 1;
 mission.bhv{i}.ahs.desiredAltMeters = 1;
 mission.bhv{i}.ahs.desiredYawDegrees = 30;
-mission.bhv{i}.completion.status = false;
+mission.bhv{i}.completion.status = false; 
 mission.bhv{i}.completion.durationSec = 5; 
 
 i = i + 1;
@@ -60,7 +60,7 @@ mission.bhv{i}.name = 'bhv_point_to_direction';
 mission.bhv{i}.initialize.firstLoop = 1;
 mission.bhv{i}.ahs.desiredAltMeters = 1;
 mission.bhv{i}.ahs.desiredYawDegrees = -30;
-mission.bhv{i}.completion.status = false;
+mission.bhv{i}.completion.status = false; 
 mission.bhv{i}.completion.durationSec = 5; 
 
 i = i + 1;
