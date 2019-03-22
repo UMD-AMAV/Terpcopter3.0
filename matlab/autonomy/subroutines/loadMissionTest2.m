@@ -2,7 +2,16 @@ function mission = loadMissionTest2()
 % This test is for Altitude Hover and Point to Target
 mission.config.firstLoop = 1;
 
+
 i = 1;
+% Behavior 1: Takeoff
+mission.bhv{i}.name = 'bhv_takeoff';
+mission.bhv{i}.ahs.desiredAltMeters = 0.5;    %
+% mission.bhv{i}.ahs.forwardSpeed = 0;
+% mission.bhv{i}.ahs.crabSpeed = 0;
+mission.bhv{i}.completion.status = false;
+
+i = i + 1;
 mission.bhv{i}.name = 'bhv_hover';
 mission.bhv{i}.initialize.firstLoop = 1;
 mission.bhv{i}.ahs.desiredAltMeters = 1;

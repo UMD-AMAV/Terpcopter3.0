@@ -182,7 +182,7 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover'
                     %disp('hover behavior');
                     [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t);
-                    ahsCmdMsg.AltitudeMeters = mission.bhv{currentBehavior}.ahs.desiredAltMeters;
+                    ahsCmdMsg.AltitudeMeters = mission.bhv{currentBehavior}.ahs.desiredAltMeters
                     openLoopIsActiveMsg.Data = false;      % true: openloop control
                     closedLoopIsActiveMsg.Data = true;
                 case 'bhv_point_to_direction'

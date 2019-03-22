@@ -125,12 +125,12 @@ while(1)
 %     yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
 
 
-    if (openLoopIsActiveMsg.Data == true) & (closedLoopIsActiveMsg.Data == false)
+    if (openLoopIsActiveMsg == true) & (closedLoopIsActiveMsg == false)
         stickCmdMsg.Thrust = openLoopStickCmdMsg.Thrust;
         stickCmdMsg.Yaw = openLoopStickCmdMsg.Yaw;
         stickCmdMsg.Pitch = openLoopStickCmdMsg.Pitch;
         stickCmdMsg.Roll = openLoopStickCmdMsg.Roll;
-    elseif (openLoopIsActiveMsg.Data == false) && (closedLoopIsActiveMsg.Data == true)
+    elseif openLoopIsActiveMsg == false && closedLoopIsActiveMsg == true
         
         % timestamp
         ti= rostime('now');
