@@ -125,7 +125,7 @@ if ( strcmp(params.auto.mode,'auto'))
             mission.config.firstLoop = false; % ends the first loop
         end
 
-        % Logic for the Target Detection
+        % Logic for the Target Detection 
         %%%%%%%%%%%%%%
 %         if (targetDetectionFlagMsg.Data && behavior.bhv{1}.initialDetection == true)
 %             fprintf(' Detected Target Flag');
@@ -133,6 +133,7 @@ if ( strcmp(params.auto.mode,'auto'))
 %             behavior.bhv{1}.initialDetection = false;
 %         end
         %%%%%%%%%%%%%%
+        
         name = mission.bhv{currentBehavior}.name;
         flag = mission.bhv{currentBehavior}.completion.status;
         ahs = mission.bhv{currentBehavior}.ahs;
@@ -158,10 +159,6 @@ if ( strcmp(params.auto.mode,'auto'))
                     %disp('hover behavior');
                     [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t);
                     ahsCmdMsg.AltitudeMeters = mission.bhv{currentBehavior}.ahs.desiredAltMeters
-%                     pidAltSettingMsg.Kp = mission.bhv{currentBehavior}.pid.alt.Kp;
-%                     pidAltSettingMsg.Ki = mission.bhv{currentBehavior}.pid.alt.Ki;
-%                     pidAltSettingMsg.Kd = mission.bhv{currentBehavior}.pid.alt.Kd ;
-%                     pidAltSettingMsg.Ff = mission.bhv{currentBehavior}.pid.alt.Ff;
                 case 'bhv_point_to_direction'
                     %disp('point to direction behavior')
                     [completionFlag] = bhv_point_to_direction_status(stateEstimateMsg, ahs, completion, t);
