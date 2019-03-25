@@ -58,6 +58,7 @@ openLoopStickCmdSubscriber = rossubscriber('/openLoopStickCmd', 'terpcopter_msgs
 % Publishers
 pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
 stickCmdPublisher = rospublisher('/stickCmd', 'terpcopter_msgs/stickCmd');
+altControlDegbugPublisher = rospublisher('/altControlDebug','terpcopter_msgs/altControlDebug');
 
 pause(2)
 
@@ -68,19 +69,19 @@ stickCmdMsg.Yaw = 0;
 
 % % grab latest messages
 % stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
-% ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
+ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
 % pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
 % pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
 % % yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
 
 % manage timestamps
 % timeMatrix=[];
-% ti = rostime('now');
+ti = rostime('now');
 %abs_t = eval([int2str(ti.Sec) '.' ...
 %int2str(ti.Nsec)]);
-% t0 = [];
-% abs_t = double(ti.Sec)+double(ti.Nsec)*10^-9;
-% if isempty(t0), t0 = abs_t; end
+t0 = [];
+abs_t = double(ti.Sec)+double(ti.Nsec)*10^-9;
+if isempty(t0), t0 = abs_t; end
 
 % initialize error variables
 % altitudeErrorHistory.lastTime = 0; %stateEstimateMsg.Time;
@@ -176,12 +177,12 @@ while(1)
         %[u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
         
         % hardcode for now
-        gains.outerLoopKp = 0.4; % 
-        gains.saturationLimits = 0.2; 
-        gains.Kp = 0.3;
-        gains.Ki = 0.125;
-        gains.Kd = 0.0180;
-        [u_t_alt, altErrorHistory] = altitudeController(gains, altErrorHistory, curTime, z, zd);
+        gains.outerLoopKp = 0.4*10; % 
+        gains.saturationLimit = 0.2; 
+        gains.Kp = 0.3*10;
+        gains.Ki = 0.125*10;
+        gains.Kd = 0.0180*10;
+        [u_t_alt, altErrorHistory] = altitudeController(gains, altErrorHistory, t, z, z_d, altControlDegbugPublisher);
         
         %New Yaw Controller
         %     yaw_d = deg2rad(yaw_d);
@@ -220,8 +221,8 @@ while(1)
         %fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
         %time = r.TotalElapsedTime;        
         
-    elseif startMissionMsg.Data == false
-        fprintf('Mission has not started. Press Start Mission button in Tuner GUI.\n');
+    %elseif startMissionMsg.Data == false
+    %    fprintf('Mission has not started. Press Start Mission button in Tuner GUI.\n');
     else
         fprintf('Error: both open loop and closed loop control are either running or not running\n');
     end
