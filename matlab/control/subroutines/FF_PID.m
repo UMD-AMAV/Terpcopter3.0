@@ -1,56 +1,56 @@
 function [u, errorHistory] = FF_PID(gains, errorHistory, curTime, error)
 
 % unpack variables for convenience
-feedForwardValue = gains.Ff;
+outerLoopPgain = gains.Ff;
 saturationLimit = gains.saturationLimit;
 
+% time elapsed since last control
+dt = curTime - errorHistory.lastTime;
+
 %% Outer Loop:
-% desired error rate
-vDes = feedForwardValue*error;
+% desired error rate (v)
+vDes = outerLoopPgain*error;
 
 % saturate
 vDes = max(min(vDes,saturationLimit),-saturationLimit);
 
-% time elapsed since last control
-dt = curTime - errorHistory.lastTime;
-%fprintf("e: %6.2f \n",e);
-
-% derivative of error
-eDot = (error - errorHistory.lastVal) / dt;
-%fprintf("eDot: %6.2f",eDot);
+%% Inner Loop:
 
 % actual error rate 
+eDot = (error - errorHistory.lastVal) / dt;
 v = -eDot;
 
-% 
+% actual error rate derivative
 eDotDot = (eDot - errorHistory.lastError) / dt;
 vDot = -eDotDot;
 
-% 
-vDesDot = feedForwardValue*eDot;
+% specify setpoint for inner-loop as 
+% vDesDot = outerLoopPgain*eDot;
 
 
-%% Inner Loop:
 eVel = vDes - v;
 %fprintf("eVel: %6.2f",eVel);
 
-eDotVel = vDesDot - vDot;
+eVelDot = vDesDot - vDot;
 %fprintf("eDotVel: %6.2f",eDotVel);
 
 % This error is for eVel, NOT e (last sum of velocity errors)
 errorHistory.lastSum = errorHistory.lastSum + (eVel * dt);
 
-% compute PID control
-u = gains.Kp *eVel + gains.Kd * eDotVel + ...
-    gains.Ki * errorHistory.lastSum;
+% compute PID control (inner loop)
+u = gains.Kp *eVel + gains.Kd * eVelDot +  gains.Ki * errorHistory.lastSum;
 
 %fprintf("u: %6.3f",u);
 
-% update persistent variable
+% update error history
 errorHistory.lastError = eDot;
 errorHistory.lastTime = curTime;
 errorHistory.lastVal = error;
 
+%% Debug/plot
+
+%figure(100);
+%subplot(2,2,1);
 
 
 

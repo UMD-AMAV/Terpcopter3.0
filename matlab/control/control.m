@@ -83,11 +83,19 @@ stickCmdMsg.Yaw = 0;
 % if isempty(t0), t0 = abs_t; end
 
 % initialize error variables
-altitudeErrorHistory.lastTime = 0; %stateEstimateMsg.Time;
-altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
-altitudeErrorHistory.lastSum = 0;
-altitudeErrorHistory.lastError = 0;
-u_t_alt = controlParams.altitudeGains.ffterm;
+% altitudeErrorHistory.lastTime = 0; %stateEstimateMsg.Time;
+% altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
+% altitudeErrorHistory.lastSum = 0;
+% altitudeErrorHistory.lastError = 0;
+% u_t_alt = controlParams.altitudeGains.ffterm;
+
+
+% 
+altErrorHistory.lastTime = 0;
+altErrorHistory.altDes = ahsCmdMsg.AltitudeMeters;
+altErrorHistory.alt = ahsCmdMsg.AltitudeMeters;
+altErrorHistory.altRateError = 0;
+altErrorHistory.altRateErrorIntegral = 0;
 
 
 % yaw controller
@@ -165,8 +173,16 @@ while(1)
         
         % compute controls
         % FF_PID(gains, error, newTime, newErrVal)
-        [u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
-                        
+        %[u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
+        
+        % hardcode for now
+        gains.outerLoopKp = 0.4; % 
+        gains.saturationLimits = 0.2; 
+        gains.Kp = 0.3;
+        gains.Ki = 0.125;
+        gains.Kd = 0.0180;
+        [u_t_alt, altErrorHistory] = altitudeController(gains, altErrorHistory, curTime, z, zd);
+        
         %New Yaw Controller
         %     yaw_d = deg2rad(yaw_d);
         %     yaw = deg2rad(yaw);
@@ -188,7 +204,7 @@ while(1)
         
         
         % publish
-        stickCmdMsg.Thrust = max(min(2,u_t_alt),0)-1;
+        stickCmdMsg.Thrust = u_t_alt; 
         stickCmdMsg.Yaw = max(-1,min(1,u_t_yaw));
         
         % debug/display
