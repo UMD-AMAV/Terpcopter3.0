@@ -1,0 +1,50 @@
+22-March-2019
+
+Preparing Environment
+----------------------------------------------------------
+- Check bashrc file for correct IP/WiFi (ROS_MASTER_URI)
+- Connect ethernet cable from ASUS router to laptop
+- Check IP (using ifconfig on laptop) of ethernet connection to router
+- Verify that this IP is set as ROS_HOSTNAME in bashrc file
+- Source bash
+
+Updating Repository
+----------------------------------------------------------
+Navigate to Terpcopter 3.0 
+    $ cd ~/amav/Terpcopter3.0
+Check for any updates
+    $ git pull
+If there are updates: use your own username/pass
+If you have any commits to make, 
+    $ git add (files)
+    $ git commit -m "type your message"
+To update the local list of remote branches
+    $ git remote update origin --prune
+
+Powering Drone and Setup
+----------------------------------------------------------
+- Check battery capacity (above 50%)
+- Plug in to drone
+- check connectivity: ping from terminal (use ROS_MASTER_URI)
+    $ ping 192.168.1.93 
+- check ros is running on drone: (doesn't required any roscore launched on laptop)
+    $ rostopic list 
+- start matlab: $ matlab &
+- Navigate to /home/amav/amav/Terpcopte3.0/matlab/GUI
+- Start Master_GUI.m
+    - Run Estimation (wait to load "ACTIVE" on master gui)
+- If MATLAB cannot connect to ROS network, to resolve close MATLAB, open new terminal, source bashrc, restart MATLAB from this terminal
+
+
+Troubleshooting
+----------------------------------------------------------
+
+Check if drone is connected to router:
+- Go to http://router.asus.com/ in Firefox
+- username/pass : admin/(13 char)
+- Network Map -> clients -> see list of devices connected (terpcopter, odroid)
+- this also shows IP addresses
+
+When starting Esimation node "No imu data"
+- may be low battery
+- check /mavros/imu/data topic on both drone and laptop

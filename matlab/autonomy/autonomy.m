@@ -195,6 +195,11 @@ if ( strcmp(params.auto.mode,'auto'))
                     display(initialize)
                     mission.bhv{currentBehavior}.initialize.firstLoop = initialize;
                     ahsCmdMsg.AltitudeMeters = ahsUpdate;
+                case 'bhv_land_open'
+                    [completionFlag, stick_thrust_land] = bhv_landing_open_status(stateEstimateMsg, ahs, completion);
+                    openLoopIsActiveMsg.Data = true;      % true: openloop control
+                    closedLoopIsActiveMsg.Data = false;
+                    openLoopStickCmdMsg.Thrust = stick_thrust_land;
                 case 'bhv_point_to_target'
                     [completionFlag] = bhv_point_to_target_status(stateEstimateMsg, yawErrorCameraMsg, ahs, completion, t);
                     ahsCmdMsg.HeadingRad = yawErrorCameraMsg.Data;

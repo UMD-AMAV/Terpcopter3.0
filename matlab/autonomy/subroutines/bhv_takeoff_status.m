@@ -15,5 +15,6 @@ function [completionFlag, stick_thrust] = bhv_takeoff_status(stateEstimateMsg, a
         stick_thrust = stick_thrust + 0.01
    else 
       stick_thrust = maxTakeoffThrust
+   end
 end
 
