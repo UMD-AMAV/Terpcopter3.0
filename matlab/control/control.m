@@ -212,8 +212,8 @@ while(1)
         
         time = r.TotalElapsedTime;
         %fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
-    elseif startMissionMsg.Data == false
-        fprintf('Mission has not started. Press Start Mission button in Tuner GUI.\n');
+    %elseif startMissionMsg.Data == false
+    %    fprintf('Mission has not started. Press Start Mission button in Tuner GUI.\n');
     else
         fprintf('Error: both open loop and closed loop control are either running or not running\n');
     end

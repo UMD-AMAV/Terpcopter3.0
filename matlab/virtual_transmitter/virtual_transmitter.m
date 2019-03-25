@@ -119,6 +119,7 @@ if ( strcmp(params.vtx.mode,'flight') )
             u_stick_cmd(2) = stickCmdMsg.Roll;
             u_stick_cmd(3) = stickCmdMsg.Pitch;
             u_stick_cmd(4) = stickCmdMsg.Yaw;
+            u_stick_cmd(5) = stickCmdMsg.Thrust; %-1;
             disp("transmitting")
         else
             disp('Empty AHSCmd!')

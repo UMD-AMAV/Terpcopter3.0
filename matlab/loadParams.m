@@ -14,9 +14,9 @@ params.env.terpcopterMatlabMsgs = [params.env.catkinSrcDir '/matlab_gen/msggen']
 params.vtx.mode = 'flight'; % 'sim' or 'flight' 
 
 % transmitter 
-params.vtx.stick_lim = [100; 100; 100; 100];
-params.vtx.trim_lim = [29; 29; 29; 29];
-params.vtx.trim_val = [0 -0.10345 0.13793 0];
+params.vtx.stick_lim = [100; 100; 100; 100; 100];
+params.vtx.trim_lim = [29; 29; 29; 29; 29];
+params.vtx.trim_val = [0 -0.10345 0.13793 0 0];
 
 % simulator
 params.vtx.T = 30; % simulation time

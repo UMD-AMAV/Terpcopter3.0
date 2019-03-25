@@ -1,16 +1,16 @@
 function transmitCmd( trainerBox, u_stick_cmd, trim, stick_lim, trim_lim )
 
 % default command is all zeros
-u_stick_net = zeros(4,1);
+u_stick_net = zeros(5,1);
 
 % if u_stick_cmd element is Inf then we use the default zero command 
-for i = 1:4
+for i = 1:5
     if (u_stick_cmd(i) ~=inf)
         u_stick(i,1) = u_stick_cmd(i);
     end
 end
 
-for i = 1:4    
+for i = 1:5    
     if (trim(i) ~=inf)
         trim1(i,1) = trim(i);
     end 
@@ -25,6 +25,7 @@ channel1Command = 5000+ 4000*u_stick_net(1);  % throttle (up)
 channel2Command = 5000+ 4000*u_stick_net(2);  % roll     (right)
 channel3Command = 5000+ 4000*u_stick_net(3);  % pitch    (forward)
 channel4Command = 5000+ 4000*u_stick_net(4);  % yaw
+channel5Command = 5000+ 4000*u_stick_net(5);  % paylaod
 
 % transmit to trainer box 
 % change sign to reverse
@@ -33,6 +34,7 @@ fprintf(trainerBox,int2str(channel1Command)); %channel1Command
 fprintf(trainerBox,int2str(channel2Command));
 fprintf(trainerBox,int2str(channel3Command));
 fprintf(trainerBox,int2str(channel4Command));
+fprintf(trainerBox,int2str(channel5Command));
 fprintf(trainerBox,'z');
 end
 
