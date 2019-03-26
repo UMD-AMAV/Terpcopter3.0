@@ -10,6 +10,21 @@ system.
 - To build the module in your catkin_ws copy and paste all the folders inside
  ROSTerpcopterModule into catkin_ws/src folder and run catkin build 
  
+ ## Choosing Master and Slave 
+Terpcopter team choose Buggy/ snappy drone to be the master and slave to be GNC laptops. To reflect the setup, make the following changes in your Laptop's bashrc:
+```
+nano ~/.bashrc 
+export ROS_MASTER_URI=http://<ip address of the drone>:11311
+export ROS_HOSTNAME= <ip of laptop>
+```
+on snappy/buggy drone 
+```
+nano ~/.bashrc 
+export ROS_MASTER_URI=http://<ip address of the drone>:11311
+export ROS_HOSTNAME= <ip of the drone>
+```
+
+ ## Manual Launch 
  # Launch Following nodes on Odroid
 ```
 roslaunch mavros px4.launch
@@ -17,13 +32,25 @@ roslaunch mavros px4.launch
 In a new terminal [2]
 ```
 cd amav_ws
-```
-```
 roslaunch terpcopter_driver/terpcopter_teraranger_node.launch 
 ```
+## MATLAB GUI Launch 
+Edit the loadParams.m file env variables accordingly.
+
+cd GUI and launch Master_GUI.m 
+
+# Flow Probe Nodes
+
+- The teensy board on which the flow probe is attached might not work (Serial input pauses after a few lines). Follow instructions on this link to install the latest UDEV Rules for the board : https://www.pjrc.com/teensy/49-teensy.rules
+
+- The serial porst need root access to run. Try steps in this link to change : https://askubuntu.com/a/58122
+
+
 # Issues Noticed
 
 When launching launch files one might get "... is not a launch file". If this is the case: 
+
+cd into workspace catkin_ws 
 
 ```
 source ./devel/setup.bash 
@@ -34,3 +61,13 @@ source ./devel/setup.bash
 - The teensy board on which the flow probe is attached might not work (Serial input pauses after a few lines). Follow instructions on this link to install the latest UDEV Rules for the board : https://www.pjrc.com/teensy/49-teensy.rules
 
 - The serial porst need root access to run. Try steps in this link to change : https://askubuntu.com/a/58122
+
+
+Odroid Desktop no launch bar fix: source: https://ubuntuforums.org/showthread.php?t=2337119
+```
+1) Open a hard terminal again using [Crtl]+[Alt]+[F1] - and log in if necessary
+2) $ cd ~/.config/dconf
+3) $ rm user
+4) $ cp user.bak user
+5) $ kill -9 -1
+```

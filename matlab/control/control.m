@@ -51,13 +51,35 @@ stateEstimateSubscriber = rossubscriber('/stateEstimate');
 
 ahsCmdSubscriber = rossubscriber('/ahsCmd');
 
+% yawSetpointSubscriber = rossubscriber('/yawSetpoint');
+
 pidAltSettingSubscriber = rossubscriber('/pidAltSetting');
 pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
 pidResetSubscriber = rossubscriber('/pidReset');
 
 pidYawSettingSubscriber = rossubscriber('/pidYawSetting', 'terpcopter_msgs/ffpidSetting');
 
-
+% % smoothing filter
+% a = 0;
+% b = 0;
+% c = 0;
+% d = 0;
+% e = 0;
+% f = 0;
+% g = 0;
+% h = 0;
+% i = 0;
+% j = 0;
+% 
+% k = 0;
+% l = 0;
+% m = 0;
+% n = 0;
+% o = 0;
+% p =0;
+% q=0;
+% AA=0;
+% s=0;
 
 % Publishers
 stickCmdPublisher = rospublisher('/stickCmd', 'terpcopter_msgs/stickCmd');
@@ -75,6 +97,7 @@ ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
 pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
 pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
 
+% yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
 
 % timestamp
 t0 = []; timeMatrix=[];
@@ -124,6 +147,9 @@ while(1)
     ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
     pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
     pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
+    
+%     yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
+
 
     % timestamp
     ti= rostime('now');
@@ -144,10 +170,11 @@ while(1)
 
     % get setpoint
     z_d = ahsCmdMsg.AltitudeMeters;
-    yaw_d = ahsCmdMsg.HeadingRad;
-    u_d = 0.5; %ahsCmdMsg.ForwardSpeedMps;
     
+    %%%% CAHNGING YAW FROM GUI TO VISION %%%%%
+%     yaw_d = yawSetpointMsg.Data; % ahsCmdMsg.HeadingRad;
    
+u_d = 0.5; %ahsCmdMsg.ForwardSpeedMps;   
     % update errors
     altError = z_d - z;
     forwardError = u_d - u;
@@ -169,8 +196,13 @@ while(1)
     % compute controls
     % FF_PID(gains, error, newTime, newErrVal)
     [u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
-%     disp('pid loop');
-%     disp(pidAltSettingMsg)
+    disp('pid loop');
+    disp(pidAltSettingMsg)
+%     disp('yawSetpoint')
+%     disp(yaw_d)
+    disp('yawCurrent')
+      disp(yaw)
+      
     
 %     %New Yaw Controller
 %     yaw_d = deg2rad(yaw_d);
@@ -222,11 +254,44 @@ while(1)
 %     end
     
     u_t_pitch = u_t_forward;
+
     % publish
     
     stickCmdMsg.Thrust = u_t_alt;
     stickCmdMsg.Yaw = max(-1,min(1,u_t_yaw));
     stickCmdMsg.Pitch = max(-1,min(1,u_t_pitch));
+    
+%     fprintf('Thrust Before: %3.3f\n', stickCmdMsg.Thrust);
+%     % moving average filter
+%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     AA = s;
+%     q = AA;
+%     p = q;
+%     o = p;
+%     n = o;
+%     m = n;
+%     l = m;
+%     k = l;
+%     j = k;
+%     
+%     i = j;
+%     h = i;
+%     g = h;
+%     f = g;
+%     e = f;
+%     d = e;
+%     c = d;
+%     b = c;
+%     a = b;
+%     s = stickCmdMsg.Thrust;
+%     stickCmdThrustAvg = (a+b+c+d+e+f+g+h+i+j+k+l+m+n+o+p+q+AA+s)/18;      
+%     
+%     if (stickCmdMsg.Thrust > stickCmdThrustAvg + 0.3) || (stickCmdMsg.Thrust < stickCmdThrustAvg - 0.3)
+%         stickCmdMsg.Thrust = stickCmdThrustAvg;
+%     end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+%     fprintf('Moving Avg: %3.3f \n', stickCmdThrustAvg); 
     send(stickCmdPublisher, stickCmdMsg);
 %     fprintf('Stick Cmd.Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f, Yaw : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ), u_t_yaw );
     fprintf('control = %3.3f, pitch cmd = %3.3f\n',u_t_pitch,stickCmdMsg.Pitch)
@@ -234,5 +299,5 @@ while(1)
 	%fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
 disp('Controller');
 	waitfor(r);
- end
+end
 

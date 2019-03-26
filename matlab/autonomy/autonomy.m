@@ -48,12 +48,11 @@
 clear; close all; clc; format compact;
 addpath('../')
 params = loadParams();
-mission = loadMissionTest();
-
+mission = loadMissionTest2(); %hover test 
+behavior = loadBehavior();
 fprintf('Launching Autonomy Node...\n');
 
 global timestamps
-
 
 % initialize ROS
 if(~robotics.ros.internal.Global.isNodeActive)
@@ -63,7 +62,8 @@ end
 % Subscribers
 stateEstimateSubscriber = rossubscriber('/stateEstimate');
 startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
-
+% yawErrorCameraSubscriber = rossubscriber('/yawSetpoint');
+% targetDetectionFlagSubscriber = rossubscriber('/targetFlag', 'std_msgs/Bool');
 
 % Publishers
 ahsCmdPublisher = rospublisher('/ahsCmd', 'terpcopter_msgs/ahsCmd');
@@ -99,12 +99,15 @@ if ( strcmp(params.auto.mode,'auto'))
     send(pidYawSettingPublisher, pidYawSettingMsg);
     send(ahsCmdPublisher, ahsCmdMsg);
     
+    % This enables the capability to start the mission through the TunerGUI
     startMissionFlag = false;
     startMissionMsg = receive(startMissionSubscriber);
     startMissionFlag = startMissionMsg.Data;
     
     while(1)
         stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
+%         yawErrorCameraMsg = yawErrorCameraSubscriber.LatestMessage;
+%         targetDetectionFlagMsg = targetDetectionFlagSubscriber.LatestMessage;
 
         % unpack statestimate
         t = stateEstimateMsg.Time;
@@ -122,9 +125,17 @@ if ( strcmp(params.auto.mode,'auto'))
             mission.config.firstLoop = false; % ends the first loop
         end
 
+        % Logic for the Target Detection 
+        %%%%%%%%%%%%%%
+%         if (targetDetectionFlagMsg.Data && behavior.bhv{1}.initialDetection == true)
+%             fprintf(' Detected Target Flag');
+%             [mission.bhv] = push(mission.bhv, behavior.bhv{1});
+%             behavior.bhv{1}.initialDetection = false;
+%         end
+        %%%%%%%%%%%%%%
+        
         name = mission.bhv{currentBehavior}.name;
         flag = mission.bhv{currentBehavior}.completion.status;
-        %timestamps = mission.variables;
         ahs = mission.bhv{currentBehavior}.ahs;
         completion = mission.bhv{currentBehavior}.completion;
         
@@ -147,10 +158,7 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover'
                     %disp('hover behavior');
                     [completionFlag] = bhv_hover_status(stateEstimateMsg, ahs, completion, t);
-                    pidAltSettingMsg.Kp = mission.bhv{currentBehavior}.pid.alt.Kp;
-                    pidAltSettingMsg.Ki = mission.bhv{currentBehavior}.pid.alt.Ki;
-                    pidAltSettingMsg.Kd = mission.bhv{currentBehavior}.pid.alt.Kd ;
-                    pidAltSettingMsg.Ff = mission.bhv{currentBehavior}.pid.alt.Ff;
+                    ahsCmdMsg.AltitudeMeters = mission.bhv{currentBehavior}.ahs.desiredAltMeters
                 case 'bhv_point_to_direction'
                     %disp('point to direction behavior')
                     [completionFlag] = bhv_point_to_direction_status(stateEstimateMsg, ahs, completion, t);
@@ -160,17 +168,16 @@ if ( strcmp(params.auto.mode,'auto'))
                     [completionFlag, initialize, ahsUpdate] = bhv_landing_status(stateEstimateMsg, ahs, completion, t, init);
                     display(initialize)
                     mission.bhv{currentBehavior}.initialize.firstLoop = initialize;
-                    mission.bhv{currentBehavior}.ahs.desiredAltMeters = ahsUpdate;
+                    ahsCmdMsg.AltitudeMeters = ahsUpdate;
+                case 'bhv_point_to_target'
+                    [completionFlag] = bhv_point_to_target_status(stateEstimateMsg, yawErrorCameraMsg, ahs, completion, t);
+                    ahsCmdMsg.HeadingRad = yawErrorCameraMsg.Data;
                 otherwise  
             end
             mission.bhv{currentBehavior}.completion.status = completionFlag;
-            % z_d = ahs.desiredAltMeters;
-            % yaw_d = ahs.desiredYawDegrees;
         end
 
         % publish
-        ahsCmdMsg.AltitudeMeters = mission.bhv{currentBehavior}.ahs.desiredAltMeters;
-        ahsCmdMsg.HeadingRad = mission.bhv{currentBehavior}.ahs.desiredYawDegrees;       % This is actually in degrees
         send(pidAltSettingPublisher, pidAltSettingMsg);
         send(pidYawSettingPublisher, pidYawSettingMsg);
         send(ahsCmdPublisher, ahsCmdMsg);
@@ -185,8 +192,6 @@ elseif ( strcmp(params.auto.mode, 'manual'))
     send(ahsCmdPublisher, ahsCmdMsg);
     
     while(1)
-        %send(ahsCmdPublisher, ahsCmdMsg);
-        %send(pidSettingPublisher, pidSettingMsg);
         waitfor(r);
     end
 end
