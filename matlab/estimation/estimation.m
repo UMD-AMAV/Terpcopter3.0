@@ -36,7 +36,7 @@ end
 % Subscribers
 imuDataSubscriber = rossubscriber('/mavros/imu/data');
 lidarDataSubscriber = rossubscriber('/terarangerone');
-
+flowProbeDataSubscriber = rossubscriber('/terpcopter_flow_probe_node/flowProbe');
 % Publishers
 stateEstimatePublisher = rospublisher('/stateEstimate', 'terpcopter_msgs/stateEstimate');
 
@@ -64,6 +64,7 @@ j = 0;
     % Receive Latest Imu and Lidar data
     imuMsg = imuDataSubscriber.LatestMessage;
     lidarMsg = lidarDataSubscriber.LatestMessage;
+    fpMsg = flowProbeDataSubscriber.LatestMessage;
     
     if isempty(imuMsg)
         state = NaN;
@@ -89,6 +90,7 @@ while(1)
     % Receive Latest Imu and Lidar data
     imuMsg = imuDataSubscriber.LatestMessage;
     lidarMsg = lidarDataSubscriber.LatestMessage;
+    fpMsg = flowProbeDataSubscriber.LatestMessage;
     
     if isempty(imuMsg)
         state = NaN;
@@ -111,10 +113,10 @@ while(1)
     %get relative yaw = - inertial yaw_intial - inertial yaw 
     if isempty(inertial_yaw_initial), inertial_yaw_initial = state.psi_inertial; end
     state.psi_relative = -state.psi_inertial + inertial_yaw_initial;
-    disp('intial yaw');
-    disp(inertial_yaw_initial);
-    disp('relative yaw');
-    disp(state.psi_relative);
+%     disp('intial yaw');
+%     disp(inertial_yaw_initial);
+%     disp('relative yaw');
+%     disp(state.psi_relative);
 
     %rounding off angles to 1 decimal place
     state.psi_inertial = round(state.psi_inertial,1);
@@ -159,6 +161,9 @@ while(1)
     stateMsg.Yaw = state.psi_relative;
     stateMsg.Roll = state.phi;
     stateMsg.Pitch = state.theta;
+    
+    stateMsg.ForwardVelocity = fpMsg.Data;
+    fprintf('Velocity : %3.3f\n',fpMsg.Data);
     
     % timestamp
     ti= rostime('now');

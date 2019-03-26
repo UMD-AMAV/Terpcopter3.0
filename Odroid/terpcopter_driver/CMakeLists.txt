@@ -81,10 +81,10 @@ find_package(OpenCV 3.1.0 REQUIRED)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+   std_msgs
+ )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -159,6 +159,7 @@ include_directories(
 
 add_executable(terpcopter_camera_node src/terpcopter_camera_node.cpp)
 add_executable( terpcopter_terarangerone_node src/terarangerone.cpp src/serial_port.cpp  )
+add_executable(terpcopter_flow_probe_node src/terpcopter_flow_probe_node.cpp)
 
 
 ## Add cmake target dependencies of the executable
@@ -175,6 +176,7 @@ add_dependencies( terpcopter_terarangerone_node ${PROJECT_NAME}_gencfg)
 # )
 target_link_libraries(terpcopter_camera_node  ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} )
 target_link_libraries( terpcopter_terarangerone_node ${catkin_LIBRARIES} ${Boost_LIBRARIES} )
+target_link_libraries( terpcopter_flow_probe_node ${catkin_LIBRARIES})
 
 
 

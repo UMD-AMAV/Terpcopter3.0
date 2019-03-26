@@ -29,6 +29,7 @@ fprintf('Control Node Launching...\n');
 % declare global variables
 % Determine usage in other scripts - change to local if no other usage
 global altitudeErrorHistory;
+global forwardErrorHistory;
 altitudeErrorHistory.lastVal = 0;
 altitudeErrorHistory.lastSum = 0;
 altitudeErrorHistory.lastTime = 0;
@@ -36,7 +37,9 @@ altitudeErrorHistory.lastTime = 0;
 % yawError.lastVal = 0;
 % yawError.lastSum = 0;
 % yawError.lastTime = 0;
-
+forwardErrorHistory.lastVal = 0;
+forwardErrorHistory.lastSum = 0;
+forwardErrorHistory.lastTime = 0;
 
 % initialize ROS
 if(~robotics.ros.internal.Global.isNodeActive)
@@ -63,6 +66,7 @@ pause(2)
 stickCmdMsg = rosmessage(stickCmdPublisher);
 stickCmdMsg.Thrust = 0;
 stickCmdMsg.Yaw = 0;
+stickCmdMsg.Pitch = 0;
 
 stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 
@@ -102,6 +106,12 @@ u_t_alt = controlParams.altitudeGains.ffterm;
 % yawError.lastSum = 0;
 u_t_yaw = 0; 
 
+forwardErrorHistory.lastTime = 0; %stateEstimateMsg.Time;
+forwardErrorHistory.lastVal = ahsCmdMsg.ForwardSpeedMps;
+forwardErrorHistory.lastSum = 0;
+u_t_forward = 0;
+
+
 disp('initialize loop');
 
 r = robotics.Rate(10);
@@ -128,15 +138,19 @@ while(1)
     %t = stateEstimateMsg.Time;
     z = stateEstimateMsg.Range;
     yaw = stateEstimateMsg.Yaw; % - absoluteYaw;
+    u = stateEstimateMsg.ForwardVelocity;
+    
     %fprintf('Current Quad Alttiude is : %3.3f m\n', z );
 
     % get setpoint
     z_d = ahsCmdMsg.AltitudeMeters;
     yaw_d = ahsCmdMsg.HeadingRad;
+    u_d = 0.5; %ahsCmdMsg.ForwardSpeedMps;
     
    
     % update errors
     altError = z_d - z;
+    forwardError = u_d - u;
     
     % reset Integral
     pidResetMsg = rosmessage('std_msgs/Bool');
@@ -155,39 +169,67 @@ while(1)
     % compute controls
     % FF_PID(gains, error, newTime, newErrVal)
     [u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
-    disp('pid loop');
-    disp(pidAltSettingMsg)
+%     disp('pid loop');
+%     disp(pidAltSettingMsg)
     
-    %New Yaw Controller
-    yaw_d = deg2rad(yaw_d);
-    yaw = deg2rad(yaw);
-    yawError = (yaw_d - yaw);
-    yawError = (atan2(sin(yawError),cos(yawError)));
+%     %New Yaw Controller
+%     yaw_d = deg2rad(yaw_d);
+%     yaw = deg2rad(yaw);
+%     yawError = (yaw_d - yaw);
+%     yawError = (atan2(sin(yawError),cos(yawError)));
+%     
+%       disp('yawSetpoint')
+%       disp(yaw_d)
+%       disp('yawCurrent')
+%       disp(yaw)
+%       disp('yawError')
+%       disp(yawError)
+% %       disp('yawSetpointError')
+% %       disp(yaw_error)
+%     
+%     u_t_yaw = -pidYawSettingMsg.Kp*yawError;
+%     % compute controls
+% %      [u_t_yaw, yawError] = PID(pidYawSettingMsg, yawError, t, yaw_error);
+% %      disp('yaw control gains');
+% %      disp(controlParams.yawGains)
+% %      disp('yaw control signal');
+% %      disp(u_t_yaw)
     
-      disp('yawSetpoint')
-      disp(yaw_d)
-      disp('yawCurrent')
-      disp(yaw)
-      disp('yawError')
-      disp(yawError)
-%       disp('yawSetpointError')
-%       disp(yaw_error)
-    
-    u_t_yaw = -pidYawSettingMsg.Kp*yawError;
-    % compute controls
-%      [u_t_yaw, yawError] = PID(pidYawSettingMsg, yawError, t, yaw_error);
-%      disp('yaw control gains');
-%      disp(controlParams.yawGains)
-%      disp('yaw control signal');
-%      disp(u_t_yaw)
-    
+% FLOW PROBE
 
+    [u_t_forward, forwardErrorHistory] = forwardcontroller_PID(controlParams.forwardGains , forwardErrorHistory, t, forwardError)
+
+    u_t_alt = 2*max(min(1,u_t_alt),0)-1;
+
+%     %calculate net throttle input
+%     thr_trim = 0;
+%     current_alt = 1;%u_t_alt;
+%     % ADD if FOR NO LIDAR DATA OR LOW LIDAR VALUE
+%     u_stick_thr_net = (current_alt*controlParams.stick_lim(1) + thr_trim*controlParams.trim_lim(1))...
+%                             /(controlParams.stick_lim(1)+controlParams.trim_lim(1))
+%     %get slope                    
+%     slope = controlParams.m_net * controlParams.g/(u_stick_thr_net+1)
+%     
+%     %get max allowed thrust in horizontal plane
+%     T_XY_max = slope * sqrt(4 - (u_stick_thr_net+1)*(u_stick_thr_net+1)) -1;
+%     T_XY_max_tilt = slope*(u_stick_thr_net+1)*cos(stateEstimateMsg.Roll)*cos(stateEstimateMsg.Pitch)*tan(controlParams.tilt_max);
+%     T_XY_max = min(T_XY_max,T_XY_max_tilt);
+%     
+%     %saturateg horizontal thrust setpoints
+%     mag = sqrt(u_t_forward*u_t_forward );%+ thr_sp_crab*thr_sp_crab);
+%     if mag > T_XY_max
+%         u_t_forward = u_t_forward * T_XY_max/mag;
+%     end
+    
+    u_t_pitch = u_t_forward;
     % publish
-    stickCmdMsg.Thrust = max(min(2,u_t_alt),0)-1;
+    
+    stickCmdMsg.Thrust = u_t_alt;
     stickCmdMsg.Yaw = max(-1,min(1,u_t_yaw));
+    stickCmdMsg.Pitch = max(-1,min(1,u_t_pitch));
     send(stickCmdPublisher, stickCmdMsg);
-    fprintf('Stick Cmd.Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f, Yaw : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ), u_t_yaw );
-
+%     fprintf('Stick Cmd.Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f, Yaw : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ), u_t_yaw );
+    fprintf('control = %3.3f, pitch cmd = %3.3f\n',u_t_pitch,stickCmdMsg.Pitch)
     time = r.TotalElapsedTime;
 	%fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
 disp('Controller');
