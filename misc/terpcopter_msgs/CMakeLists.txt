@@ -57,6 +57,7 @@ message_generation
    ffpidSetting.msg
    targetDetection.msg
    openLoopStickCmd.msg
+   altControlDebug.msg
  )
 
 ## Generate services in the 'srv' folder

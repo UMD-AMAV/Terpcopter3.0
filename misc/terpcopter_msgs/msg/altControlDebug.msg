@@ -1,0 +1,13 @@
+float32 t
+float32 zd
+float32 zcur
+float32 altRateDes
+float32 altRateActual
+float32 altRateError
+float32 altRateErrorIntegral
+float32 altRateErrorRate
+float32 proportional
+float32 integral
+float32 derivative
+float32 thrustCmdUnsat
+float32 thrustCmd
