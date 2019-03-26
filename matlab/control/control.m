@@ -180,7 +180,7 @@ while(1)
         gains.outerLoopKp = 0.4*10; % 
         gains.saturationLimit = 0.2; 
         gains.Kp = 0.3*10;
-        gains.Ki = 0.125*10;
+        gains.Ki = 0.001*10;
         gains.Kd = 0.0180*10;
         [u_t_alt, altErrorHistory] = altitudeController(gains, altErrorHistory, t, z, z_d, altControlDegbugPublisher);
         

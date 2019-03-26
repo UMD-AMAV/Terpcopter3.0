@@ -60,7 +60,7 @@ ylabel('Error (m/s)');
 set(gca,'FontSize',16)
 grid on;
 
-subplot(2,3,2)
+subplot(2,3,3)
 hold on;
 plot(curTime,altRateErrorRate,'bo','Linewidth',lw,'MarkerSize',ms);
 hold on;
@@ -70,7 +70,7 @@ ylabel('Error Rate (m/s^2)');
 set(gca,'FontSize',16)
 grid on;
 
-subplot(2,3,3)
+subplot(2,3,2)
 plot(curTime,altRateErrorIntegral,'bo','Linewidth',lw,'MarkerSize',ms);
 hold on;
 xlim([tmin,curTime]);
@@ -109,6 +109,6 @@ xlabel('Time (sec)');
 ylabel('Inner Loop D (cmd)');
 set(gca,'FontSize',16)
 grid on;
-set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 1, 0.96]);
+set(gcf, 'Units', 'Normalized', 'OuterPosition', [0, 0.04, 0.6, 0.6]);
 
 end

@@ -40,18 +40,14 @@ altRateErrorIntegral = altErrorHistory.altRateErrorIntegral + (altRateError * dt
 prevAltRateError = altErrorHistory.altRateError; %
 altRateErrorRate = ( altRateError  - prevAltRateError ) / dt;
 
-% Integral term
-integralTerm = Ki * altRateErrorIntegral;
-minIntegralLimit = -0.5; % TODO: add as parameter
-maxIntegralLimit = 0.5;
-
 % Saturate integral term
-integralTerm =  max(min(integralTerm,maxIntegralLimit), minIntegralLimit); % 
+integralTerm = 
+integralTerm =  max(min(integralTerm,maxIntegralLimit),-minIntegralLimit); % 
 
 % PID control
 thrustCmdUnsat =  Kp * altRateError + ...
                   Kd * altRateErrorRate +  ...
-                  integralTerm;
+                  Ki * altRateErrorIntegral;
 
 % saturate so it is between -1 and 1
 thrustCmd =  max(min(2,thrustCmdUnsat),0)-1;
