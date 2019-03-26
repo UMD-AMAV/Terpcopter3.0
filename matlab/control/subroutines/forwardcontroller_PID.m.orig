@@ -33,4 +33,8 @@ function [u_t_forward, forwardErrorHistory] = forwardcontroller_PID(forwardGains
     % crabErrorHistory.lastVal = crabError;
 
 
+<<<<<<< HEAD
 end
+=======
+end
+>>>>>>> exportAutonomy

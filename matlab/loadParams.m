@@ -4,8 +4,8 @@ function params = loadParams()
 %------------------------------------------------
 params.env.com_port = '/dev/ttyUSB0';
 params.env.baud_rate = 57600;
-params.env.ros_master_ip = '192.168.1.4'; %change master to Laptop 
-params.env.catkinSrcDir = '/home/rohan/catkin_ws/src';
+params.env.ros_master_ip = '192.168.1.99'; %change master to Laptop 
+params.env.catkinSrcDir = '/home/amav/catkin_ws/src';
 params.env.terpcopterMatlabMsgs = [params.env.catkinSrcDir '/matlab_gen/msggen'];
 
 % Virtual transmitter (vtx) 
@@ -16,7 +16,7 @@ params.vtx.mode = 'flight'; % 'sim' or 'flight'
 % transmitter 
 params.vtx.stick_lim = [100; 100; 100; 100];
 params.vtx.trim_lim = [29; 29; 29; 29];
-params.vtx.trim_val = [0 -0.10345 0.13793 -0.10345];
+params.vtx.trim_val = [0 -0.10345 -0.15 -0.10345];%[0 -0.10345 0.13793 -0.10345];
 
 % simulator
 params.vtx.T = 30; % simulation time
@@ -64,18 +64,19 @@ params.vtx.kp_theta = 1; % pitch
 %------------------------------------------------
 
 % altitude control 
-params.ctrl.altitudeGains.Kp = 0.000;
-params.ctrl.altitudeGains.Kd = 0.30000;
-params.ctrl.altitudeGains.Ki = 0.00000;
-params.ctrl.altitudeGains.Ff = 0.4; % feed-forward term 
+params.ctrl.altitudeGains.kp = 0.000;
+params.ctrl.altitudeGains.kd = 0.30000;
+params.ctrl.altitudeGains.ki = 0.00000;
+params.ctrl.altitudeGains.ffterm = 0.6; % feed-forward term 
 
 % yaw control 
-params.ctrl.yawGains.Kp = 0.15000;
-params.ctrl.yawGains.Kd = 0.20000;
-params.ctrl.yawGains.Ki = 0.050000;
+params.ctrl.yawGains.kp = 0.35000;
+params.ctrl.yawGains.kd = 0.20000;
+params.ctrl.yawGains.ki = 0.050000;
 
-params.ctrl.forwardGains.kp = 0.15000;
-params.ctrl.forwardGains.kd = 0.00000;
+
+params.ctrl.forwardGains.kp = 0.4000;
+params.ctrl.forwardGains.kd = 0.05000;
 params.ctrl.forwardGains.ki = 0;%0.00500;
 
 params.ctrl.stick_lim = [100; 100; 100; 100];
@@ -89,7 +90,8 @@ params.ctrl.m_battery1 = 0.116;%kg
 params.ctrl.m_net = params.ctrl.m_quad + params.ctrl.m_battery1;
 params.ctrl.g = 9.81;%m/s^2
 params.ctrl.tilt_max = deg2rad(45);%max allowed tilt angle
-                              % tilt angle  = acos{cos(theta)*cos(phi)}
+% tilt angle  = acos{cos(theta)*cos(phi)}
+ 
 
 
 % Estimation (est)
@@ -104,7 +106,7 @@ params.est.altitudeLPFitler.timeConstant = 1.00000; % sec,
 
 % Autonomy (auto)
 %------------------------------------------------
-params.autonomy = 'empty';
+params.auto.mode = 'manual';
 
 
 
