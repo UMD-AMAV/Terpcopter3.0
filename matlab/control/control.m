@@ -51,12 +51,12 @@ ahsCmdSubscriber = rossubscriber('/ahsCmd');
 startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
 % yawSetpointSubscriber = rossubscriber('/yawSetpoint');
 pidAltSettingSubscriber = rossubscriber('/pidAltSetting');
-pidResetSubscriber = rossubscriber('/pidReset');
+%pidResetSubscriber = rossubscriber('/pidReset');
 pidYawSettingSubscriber = rossubscriber('/pidYawSetting', 'terpcopter_msgs/ffpidSetting');
 openLoopStickCmdSubscriber = rossubscriber('/openLoopStickCmd', 'terpcopter_msgs/openLoopStickCmd');
 
 % Publishers
-pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
+%pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
 stickCmdPublisher = rospublisher('/stickCmd', 'terpcopter_msgs/stickCmd');
 altControlDegbugPublisher = rospublisher('/altControlDebug','terpcopter_msgs/altControlDebug');
 
@@ -158,31 +158,31 @@ while(1)
         % update errors
         altError = z_d - z;
         
-        % reset integral term if boolean (pidResetSubscriber) is true 
-        % this comes from the tuner GUI
-        pidResetMsg = rosmessage('std_msgs/Bool');
-        pidResetMsg.Data = false;
-        pidResetMsg = pidResetSubscriber.LatestMessage;
-        if ~isempty(pidResetMsg)
-            if pidResetMsg.Data == true
-                disp("Resetting PID ...")
-                altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
-                altitudeErrorHistory.lastSum = 0;
-                pidResetMsg.Data = false;
-                send(pidResetPublisher, pidResetMsg);
-            end
-        end
+%         % reset integral term if boolean (pidResetSubscriber) is true 
+%         % this comes from the tuner GUI
+%         pidResetMsg = rosmessage('std_msgs/Bool');
+%         pidResetMsg.Data = false;
+%         pidResetMsg = pidResetSubscriber.LatestMessage;
+%         if ~isempty(pidResetMsg)
+%             if pidResetMsg.Data == true
+%                 disp("Resetting PID ...")
+%                 altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
+%                 altitudeErrorHistory.lastSum = 0;
+%                 pidResetMsg.Data = false;
+%                 send(pidResetPublisher, pidResetMsg);
+%             end
+%         end
         
         % compute controls
         % FF_PID(gains, error, newTime, newErrVal)
         %[u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
         
         % hardcode for now
-        gains.outerLoopKp = 0.4*10; % 
+        gains.outerLoopKp = 1; % 
         gains.saturationLimit = 0.2; 
-        gains.Kp = 0.3*10;
-        gains.Ki = 0.001*10;
-        gains.Kd = 0.0180*10;
+        gains.Kp = 1.5;
+        gains.Ki = 0.0;
+        gains.Kd = 0.0;
         [u_t_alt, altErrorHistory] = altitudeController(gains, altErrorHistory, t, z, z_d, altControlDegbugPublisher);
         
         %New Yaw Controller
