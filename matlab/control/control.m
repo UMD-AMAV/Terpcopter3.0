@@ -67,6 +67,7 @@ stickCmdMsg = rosmessage(stickCmdPublisher);
 stickCmdMsg.Thrust = 0;
 stickCmdMsg.Yaw = 0;
 
+
 % % grab latest messages
 % stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 ahsCmdMsg = ahsCmdSubscriber.LatestMessage;

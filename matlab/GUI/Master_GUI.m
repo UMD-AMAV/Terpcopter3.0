@@ -53,8 +53,8 @@ function Master_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to Master_GUI (see VARARGIN)
 
 % Jerrar: Modify this script to loadParams and give pathToGUI if needed
-pathToGUI = '/home/amav/amav/Terpcopter3.0/matlab/GUI';
-%pathToGUI = '/home/wolek/Desktop/Research/Projects/UMD/AMAV/Terpcopter3.0/matlab/GUI';
+%pathToGUI = '/home/amav/amav/Terpcopter3.0/matlab/GUI';
+pathToGUI = '/home/wolek/Desktop/Research/Projects/UMD/AMAV/Terpcopter3.0/matlab/GUI';
 cd(pathToGUI)
 
 % Choose default command line output for Master_GUI

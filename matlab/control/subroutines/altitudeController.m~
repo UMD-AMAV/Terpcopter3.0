@@ -14,8 +14,6 @@ Kd = gains.Kp*dt;
 Ki = gains.Kp*dt;
 
 
-
-
 %% Outer Loop Proportional Control on Altitude (Output Desired Alt Rate)
 
 % control variable, current error in altitude (m)
@@ -40,16 +38,21 @@ altRateErrorIntegral = altErrorHistory.altRateErrorIntegral + (altRateError * dt
 prevAltRateError = altErrorHistory.altRateError; %
 altRateErrorRate = ( altRateError  - prevAltRateError ) / dt;
 
-% Saturate integral term
-integralTerm = 
-integralTerm =  max(min(integralTerm,maxIntegralLimit),-minIntegralLimit); % 
+% Integral term
+integralTerm = Ki * altRateErrorIntegral;
+minIntegralLimit = -0.5; % TODO: add as parameter
+maxIntegralLimit = 0.5;
 
-% PID control
+% Saturate integral term
+integralTerm =  max(min(integralTerm,maxIntegralLimit), minIntegralLimit); % 
+
+% PID control, only keep values between 0 and 2
 thrustCmdUnsat =  Kp * altRateError + ...
                   Kd * altRateErrorRate +  ...
-                  Ki * altRateErrorIntegral;
+                  integralTerm;
 
-% saturate so it is between -1 and 1
+% saturate so it is between 0 and 2, then shift down by 1 
+% output is [-1 (zero thrust), 1 (max thrust)]
 thrustCmd =  max(min(2,thrustCmdUnsat),0)-1;
 
 %% pack up structure

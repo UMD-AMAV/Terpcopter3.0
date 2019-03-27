@@ -14,8 +14,6 @@ Kd = gains.Kp*dt;
 Ki = gains.Kp*dt;
 
 
-
-
 %% Outer Loop Proportional Control on Altitude (Output Desired Alt Rate)
 
 % control variable, current error in altitude (m)
@@ -48,13 +46,14 @@ maxIntegralLimit = 0.5;
 % Saturate integral term
 integralTerm =  max(min(integralTerm,maxIntegralLimit), minIntegralLimit); % 
 
-% PID control
+% PID control, only keep values between 0 and 2
 thrustCmdUnsat =  Kp * altRateError + ...
                   Kd * altRateErrorRate +  ...
                   integralTerm;
 
-% saturate so it is between -1 and 1
-thrustCmd =  max(min(2,thrustCmdUnsat),0)-1;
+% saturate so it is between 0 and 2, then shift down by 1 
+% output is [-1 (zero thrust), 1 (max thrust)]
+thrustCmd =  max(min(1,thrustCmdUnsat),1);
 
 %% pack up structure
 altErrorHistory.lastTime = curTime;
@@ -64,11 +63,6 @@ altErrorHistory.altRateError = altRateError;
 altErrorHistory.altRateErrorIntegral = altRateErrorIntegral;
 
 %% display/debug
-
-
-
-
-
 
 
 fprintf('Controller running at %3.2f Hz\n',1/dt);
@@ -90,7 +84,7 @@ if ( displayFlag )
     
     
     altControlDebugMsg.Proportional = gains.Kp * altRateError;
-    altControlDebugMsg.Integral = gains.Ki * altRateErrorIntegral;
+    altControlDebugMsg.Integral = integralTerm;
     altControlDebugMsg.Derivative = gains.Kd * altRateErrorRate;
 
     altControlDebugMsg.ThrustCmdUnsat = thrustCmdUnsat;

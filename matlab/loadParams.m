@@ -5,8 +5,8 @@ function params = loadParams()
 params.env.com_port = '/dev/ttyUSB0';
 params.env.baud_rate = 57600;
 params.env.ros_master_ip = '192.168.1.93'; %change master to Laptop 
-params.env.catkinSrcDir = '/home/amav/catkin_ws/src';
-%params.env.catkinSrcDir = '/home/wolek/catkin_ws';
+%params.env.catkinSrcDir = '/home/amav/catkin_ws/src';
+params.env.catkinSrcDir = '/home/wolek/catkin_ws/src';
 params.env.terpcopterMatlabMsgs = [params.env.catkinSrcDir '/matlab_gen/msggen'];
 
 % Virtual transmitter (vtx) 
@@ -17,7 +17,10 @@ params.vtx.mode = 'flight'; % 'sim' or 'flight'
 % transmitter 
 params.vtx.stick_lim = [100; 100; 100; 100];
 params.vtx.trim_lim = [29; 29; 29; 29];
-params.vtx.trim_val = [0 -0.10345 0.13793 0];
+
+% trim_val should be in the range [-1, 1]
+% these values are from test (27 May 2019)
+params.vtx.trim_val = [0 0 68 -20]/100; % throttle , roll , pitch , yaw
 
 % simulator
 params.vtx.T = 30; % simulation time
