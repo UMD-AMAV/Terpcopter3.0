@@ -178,11 +178,11 @@ while(1)
         %[u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
         
         % hardcode for now
-        gains.outerLoopKp = 1; % 
+        gains.outerLoopKp = 0.5; % 
         gains.saturationLimit = 0.2; 
-        gains.Kp = 1.5;
+        gains.Kp = 4;
         gains.Ki = 0.0;
-        gains.Kd = 0.0;
+        gains.Kd = 1;
         [u_t_alt, altErrorHistory] = altitudeController(gains, altErrorHistory, t, z, z_d, altControlDegbugPublisher);
         
         %New Yaw Controller

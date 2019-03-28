@@ -47,7 +47,7 @@ maxIntegralLimit = 0.2;
 integralTerm =  max(min(integralTerm,maxIntegralLimit), minIntegralLimit); % 
 
 % small feedforward term to make nominal value (zero error) close to hover
-ffterm = -0.20;
+ffterm = -0.30;
 
 % PID control, only keep values between 0 and 2
 thrustCmdUnsat =  Kp * altRateError + ...
