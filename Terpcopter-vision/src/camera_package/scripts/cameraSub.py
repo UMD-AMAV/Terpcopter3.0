@@ -15,7 +15,7 @@ from cv_bridge import CvBridge, CvBridgeError
 from _feedback import feedback
 from _stateEstimate import stateEstimate
 from _targetPose import targetPose
-import obstacleDetection
+import ObstacleDetection
 import ObstacleAvoidance
 try:
     sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
@@ -32,7 +32,7 @@ except:
 def callbackImage(data):
     np_array = np.fromstring(data.data,np.uint8)   #Loading data in np array
     cv_image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)  #Convert image to openCV format
-    
+
     ###########################################################################
     #Target Detection
     detector_target = cv2.SimpleBlobDetector_create()
@@ -45,7 +45,7 @@ def callbackImage(data):
     params1.blobColor = 255
 
     detector_target = cv2.SimpleBlobDetector_create(params1)
-    
+
     ###########################################################################
     #Obstacle Detection
     detector_obst = cv2.SimpleBlobDetector_create()
@@ -58,7 +58,7 @@ def callbackImage(data):
     params2.blobColor = 255
 
     detector_obst = cv2.SimpleBlobDetector_create(params2)
-    
+
     ###########################################################################
     # Call external libraries to perform Vision tasks
     # Functions: ObstacleAvoidance - Detects the (pink)obstacle blob in the image frame
@@ -81,7 +81,7 @@ def callBackError(data):
     ###########################################################################
     # Publisher used to publish the yawSetpoint data
     pub = rospy.Publisher('yawSetpoint', Float32, queue_size=10)
-    rate = rospy.Rate(10) 
+    rate = rospy.Rate(10)
     pub.publish(hError)
     rate.sleep()
 
@@ -96,7 +96,7 @@ def imageSubscriber():
     # Subscribers
     rospy.Subscriber('/terpcopter/cameras/forward/image/compressed', CompressedImage, callbackImage)
     rospy.Subscriber('targetPose',targetPose,callBackError)
-    
+
     rospy.spin()
 
 # main loop
