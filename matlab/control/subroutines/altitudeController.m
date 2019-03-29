@@ -64,7 +64,7 @@ thrustCmdUnsat = propTerm + ...
 
 % saturate so it is between 0 and 2, then shift down by 1 
 % output is [-1 (zero thrust), 1 (max thrust)]
-thrustCmd =  max(min(1,thrustCmdUnsat),-1);
+thrustCmd =  max(min(0.1,thrustCmdUnsat),-1);
 
 %% pack up structure
 altErrorHistory.lastTime = curTime;

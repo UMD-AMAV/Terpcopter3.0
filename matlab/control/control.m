@@ -181,8 +181,8 @@ while(1)
         % hardcode for now
         gains.outerLoopKp = 0.5; % 
         gains.saturationLimit = 0.2; 
-        gains.Kp = 2;
-        gains.Ki = 0.05;
+        gains.Kp = 0.1;
+        gains.Ki = 0.001;
         gains.Kd = 0; % do not use 
         [u_t_alt, altErrorHistory] = altitudeController(gains, altErrorHistory, t, z, z_d, altControlDegbugPublisher);
         
