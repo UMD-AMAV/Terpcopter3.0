@@ -96,6 +96,7 @@ if isempty(t0), t0 = abs_t; end
 altErrorHistory.lastTime = 0;
 altErrorHistory.altDes = ahsCmdMsg.AltitudeMeters;
 altErrorHistory.alt = ahsCmdMsg.AltitudeMeters;
+altErrorHistory.altRate = 0;
 altErrorHistory.altRateError = 0;
 altErrorHistory.altRateErrorIntegral = 0;
 
@@ -180,9 +181,9 @@ while(1)
         % hardcode for now
         gains.outerLoopKp = 0.5; % 
         gains.saturationLimit = 0.2; 
-        gains.Kp = 4;
-        gains.Ki = 0.0;
-        gains.Kd = 1;
+        gains.Kp = 2;
+        gains.Ki = 0.05;
+        gains.Kd = 0; % do not use 
         [u_t_alt, altErrorHistory] = altitudeController(gains, altErrorHistory, t, z, z_d, altControlDegbugPublisher);
         
         %New Yaw Controller
