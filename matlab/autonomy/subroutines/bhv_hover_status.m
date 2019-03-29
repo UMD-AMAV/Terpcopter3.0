@@ -1,4 +1,4 @@
-function completionFlag = bhv_hover_status(stateEstimateMsg, ahs, completion, t, init)
+function completionFlag = bhv_hover_status(stateEstimateMsg, ahs, completion, t)
     global timestamps
     toleranceMeters = 0.1;
     
