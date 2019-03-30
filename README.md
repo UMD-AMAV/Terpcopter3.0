@@ -1,5 +1,11 @@
 # TerpCopter 3.0
 
+# Clone
+To clone Snapy branch
+```
+git clone -b snapy --single-branch https://github.com/UMD-AMAV/Terpcopter3.0.git
+```
+
 # Overview
 This repository contains work done for AHS micro aerial vehicle challenge 
 
@@ -24,27 +30,29 @@ export ROS_MASTER_URI=http://<ip address of the drone>:11311
 export ROS_HOSTNAME= <ip of the drone>
 ```
 
- ## Manual Launch 
- # Launch Following nodes on Odroid
+## Snapdragon Launch 
+ # SSH into Snapdragon by 
 ```
-roslaunch mavros px4.launch
+ssh linaro@<ip> 
+pwd: linaro
+
+sudo su
+pwd: linaro
 ```
-In a new terminal [2]
+ # Launch px4 
 ```
-cd amav_ws
-roslaunch terpcopter_driver/terpcopter_teraranger_node.launch 
+cd linaro
+./px4 mainapp.config
+```
+In a new terminal [2] launch mavros/ VIO
+```
+cd linaro
+roslaunch vio_ws/src/ros-examples/launch/mavros_vislam.launch
 ```
 ## MATLAB GUI Launch 
 Edit the loadParams.m file env variables accordingly.
 
-cd GUI and launch Master_GUI.m 
-
-# Flow Probe Nodes
-
-- The teensy board on which the flow probe is attached might not work (Serial input pauses after a few lines). Follow instructions on this link to install the latest UDEV Rules for the board : https://www.pjrc.com/teensy/49-teensy.rules
-
-- The serial porst need root access to run. Try steps in this link to change : https://askubuntu.com/a/58122
-
+Run Master_GUI.m script and launch rest of the nodes by pushing the button 
 
 # Issues Noticed
 

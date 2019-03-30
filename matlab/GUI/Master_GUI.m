@@ -51,7 +51,8 @@ function Master_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to Master_GUI (see VARARGIN)
-cd("/home/amav/amav/Terpcopter3.0/matlab/GUI")
+
+%cd("/home/amav/amav/Terpcopter3.0/matlab/GUI")
 % Choose default command line output for Master_GUI
 handles.output = hObject;
 
@@ -78,23 +79,23 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
- set(handles.text2,'String','launching');
- system('./scripts/px4_script.sh &');
- first_run = 1;
- error_flag = 0;
- while( error_flag==1 || first_run == 1 )
-    pause(0.1);
-    try
-        sub = rossubscriber('/mavros/imu/data');
-        first_run = 0;
-        error_flag = 0;
-    catch error
-        disp(error.identifier)
-        error_flag = 1;
-    end
- end
- msg = receive(sub,30);
- set(handles.text2,'String','active');
+%  set(handles.text2,'String','launching');
+%  system('./scripts/px4_script.sh &');
+%  first_run = 1;
+%  error_flag = 0;
+%  while( error_flag==1 || first_run == 1 )
+%     pause(0.1);
+%     try
+%         sub = rossubscriber('/mavros/imu/data');
+%         first_run = 0;
+%         error_flag = 0;
+%     catch error
+%         disp(error.identifier)
+%         error_flag = 1;
+%     end
+%  end
+%  msg = receive(sub,30);
+%  set(handles.text2,'String','active');
 
  
 % hObject    handle to pushbutton1 (see GCBO)
@@ -104,23 +105,23 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)
- set(handles.text3,'String','launching');
- system('./scripts/lidar_script.sh &')
- first_run = 1;
- error_flag = 0;
- while( error_flag==1 || first_run == 1 )
-     pause(0.1);
-    try
-        sub = rossubscriber('/mavros/distance_sensor/hrlv_ez4_pub');
-        first_run = 0;
-        error_flag = 0;
-    catch error
-        disp(error.identifier)
-        error_flag = 1;
-    end
- end
- msg = receive(sub,20);
- set(handles.text3,'String','active');
+%  set(handles.text3,'String','launching');
+%  system('./scripts/lidar_script.sh &')
+%  first_run = 1;
+%  error_flag = 0;
+%  while( error_flag==1 || first_run == 1 )
+%      pause(0.1);
+%     try
+%         sub = rossubscriber('/mavros/distance_sensor/hrlv_ez4_pub');
+%         first_run = 0;
+%         error_flag = 0;
+%     catch error
+%         disp(error.identifier)
+%         error_flag = 1;
+%     end
+%  end
+%  msg = receive(sub,20);
+%  set(handles.text3,'String','active');
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
