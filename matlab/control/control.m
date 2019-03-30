@@ -50,7 +50,7 @@ closedLoopIsActiveSubscriber = rossubscriber('/closedLoopIsActive', 'std_msgs/Bo
 ahsCmdSubscriber = rossubscriber('/ahsCmd');
 startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
 
-% yawSetpointSubscriber = rossubscriber('/yawSetpoint');
+yawSetpointSubscriber = rossubscriber('/yawSetpoint');
 
 pidAltSettingSubscriber = rossubscriber('/pidAltSetting');
 pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
@@ -76,7 +76,7 @@ ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
 pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
 pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
 
-% yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
+yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
 
 % timestamp
 t0 = []; timeMatrix=[];
@@ -102,6 +102,11 @@ u_t_alt = controlParams.altitudeGains.ffterm;
 
 
 % absoluteYaw = stateEstimateMsg.Yaw;
+absolutePitch = stateEstimateMsg.Pitch;
+absoluteRoll = stateEstimateMsg.Roll;
+Pitch_d = 0;
+Roll_d = 0;
+
 % ahsCmdMsg.HeadingRad = absoluteYaw;
 % yawError.lastTime = stateEstimateMsg.Time;
 % yawError.lastVal = 0; %ahsCmdMsg.HeadingRad;
@@ -124,7 +129,7 @@ while(1)
     openLoopIsActiveMsg = openLoopIsActiveSubscriber.LatestMessage;
     startMissionMsg = startMissionSubscriber.LatestMessage;
     closedLoopIsActiveMsg = closedLoopIsActiveSubscriber.LatestMessage;
-    %     yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
+    yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
     
     
     if (openLoopIsActiveMsg.Data == true) & (closedLoopIsActiveMsg.Data == false)
@@ -153,7 +158,7 @@ while(1)
         z_d = ahsCmdMsg.AltitudeMeters;
         
         %%%% CAHNGING YAW FROM GUI TO VISION %%%%%
-        %     yaw_d = yawSetpointMsg.Data; % ahsCmdMsg.HeadingRad;
+        yaw_d = yawSetpointMsg.Data; % ahsCmdMsg.HeadingRad;
         
         
         % update errors
@@ -184,18 +189,28 @@ while(1)
         disp(yaw)
         
         
-        %New Yaw Controller
-        %     yaw_d = deg2rad(yaw_d);
-        %     yaw = deg2rad(yaw);
-        %     yawError = yaw_d;%(yaw_d - yaw);
-        %     yawError = (atan2(sin(yawError),cos(yawError)));
-        %     disp('yawError')
-        %       disp(yawError)
+%         New Yaw Controller
+            %yaw_d = deg2rad(yaw_d);
+            %yaw = deg2rad(yaw);
+            yawError = yaw_d;%(yaw_d - yaw);
+            yawError = (atan2(sin(yawError),cos(yawError)));
+            disp('yawError')
+              disp(yawError)
         
-        %       disp('yawSetpointError')
-        %       disp(yaw_error)
+              disp('yawSetpointError')
+%               disp(yaw_error)
         
-        %     u_t_yaw = -pidYawSettingMsg.Kp*yawError;
+            u_t_yaw = pidYawSettingMsg.Kp*yawError;
+            
+            
+            %Pitch Control
+            PitchError = Pitch_d - absolutePitch;
+            u_t_pitch = -0.3*PitchError;
+            
+            %Roll COntrol
+            RollError = Roll_d - absoluteRoll;
+            u_t_roll = -0.3*RollError;
+            
         % compute controls
         %      [u_t_yaw, yawError] = PID(pidYawSettingMsg, yawError, t, yaw_error);
         %      disp('yaw control gains');
@@ -212,8 +227,8 @@ while(1)
         
         time = r.TotalElapsedTime;
         %fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
-    elseif startMissionMsg.Data == false
-        fprintf('Mission has not started. Press Start Mission button in Tuner GUI.\n');
+%     elseif startMissionMsg.Data == false
+%         fprintf('Mission has not started. Press Start Mission button in Tuner GUI.\n');
     else
         fprintf('Error: both open loop and closed loop control are either running or not running\n');
     end
