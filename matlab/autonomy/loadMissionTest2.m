@@ -24,6 +24,11 @@ mission.bhv{i}.completion.status = false;           % completion flag
 % mission.bhv{i}.pid.alt.Ff = 0.4;
 
 i = i + 1
+mission.bhv{i}.name = 'bhv_drop_package';
+mission.bhv{i}.completion.durationSec = 5;
+mission.bhv{i}.completion.status = false;
+
+i = i + 1
 mission.bhv{i}.name = 'bhv_land_open';
 mission.bhv{i}.ahs.desiredAltMeters = 0.3;
 mission.bhv{i}.completion.status = false;

@@ -71,7 +71,8 @@ openLoopIsActivePublisher = rospublisher('/openLoopIsActive', 'std_msgs/Bool');
 openLoopStickCmdPublisher = rospublisher('/openLoopStickCmd', 'terpcopter_msgs/openLoopStickCmd');
 pidAltSettingPublisher = rospublisher('/pidAltSetting', 'terpcopter_msgs/ffpidSetting');
 pidYawSettingPublisher = rospublisher('/pidYawSetting', 'terpcopter_msgs/ffpidSetting');
-servoSwitchCmdPublisher = rospublisher('/servoSwitch', 'std_msgs/Bool');
+servoSwitchCmdPublisher = rospublisher('/servoSwitch', 'terpcopter_msgs/servoSwitchCmd');
+
 
 pause(0.1)
 
@@ -106,6 +107,9 @@ pidYawSettingMsg.Ki = params.ctrl.yawGains.ki;
 pidYawSettingMsg.Kd = params.ctrl.yawGains.kd;
 pidYawSettingMsg.Ff = 0;
 
+% servo switch 'false' = closed servo
+servoSwitchMsg = rosmessage(servoSwitchCmdPublisher);
+servoSwitchMsg.Servo = -1;                
 
 % initial variables
 stick_thrust = -1;
@@ -120,6 +124,7 @@ if ( strcmp(params.auto.mode,'auto'))
     send(openLoopIsActivePublisher, openLoopIsActiveMsg);
     send(closedLoopIsActivePublisher, closedLoopIsActiveMsg);
     send(openLoopStickCmdPublisher, openLoopStickCmdMsg);
+    send(servoSwitchCmdPublisher, servoSwitchMsg);
     
     % This enables the capability to start the mission through the TunerGUI
     startMissionFlag = false;
@@ -204,6 +209,9 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_point_to_target'
                     [completionFlag] = bhv_point_to_target_status(stateEstimateMsg, yawErrorCameraMsg, ahs, completion, t);
                     ahsCmdMsg.HeadingRad = yawErrorCameraMsg.Data;
+                case 'bhv_drop_package'
+                    [completionFlag, servoCmd] = bhv_drop_package_status(completion, t);
+                    servoSwitchMsg.Servo = servoCmd;
                 otherwise  
             end
             mission.bhv{currentBehavior}.completion.status = completionFlag;
@@ -216,6 +224,7 @@ if ( strcmp(params.auto.mode,'auto'))
         send(openLoopIsActivePublisher, openLoopIsActiveMsg);
         send(closedLoopIsActivePublisher, closedLoopIsActiveMsg);
         send(openLoopStickCmdPublisher, openLoopStickCmdMsg);
+        send(servoSwitchCmdPublisher, servoSwitchMsg);
         fprintf('Published Ahs Cmd. Alt : %3.3f \t Yaw: %3.3f\n', ahsCmdMsg.AltitudeMeters, ahsCmdMsg.HeadingRad);
         
         waitfor(r);

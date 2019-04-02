@@ -57,6 +57,7 @@ message_generation
    ffpidSetting.msg
    targetDetection.msg
    openLoopStickCmd.msg
+   servoSwitchCmd.msg
  )
 
 ## Generate services in the 'srv' folder

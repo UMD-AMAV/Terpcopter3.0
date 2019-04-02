@@ -5,7 +5,7 @@ function params = loadParams()
 params.env.com_port = '/dev/ttyUSB0';
 params.env.baud_rate = 57600;
 params.env.ros_master_ip = '192.168.1.93'; %change master to Laptop 
-params.env.catkinSrcDir = '/home/amav/catkin_ws/src';
+params.env.catkinSrcDir = '/home/zlacey/catkin_ws/src';
 params.env.terpcopterMatlabMsgs = [params.env.catkinSrcDir '/matlab_gen/msggen'];
 
 % Virtual transmitter (vtx) 

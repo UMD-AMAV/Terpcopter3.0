@@ -51,7 +51,7 @@ function Master_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to Master_GUI (see VARARGIN)
-cd("/home/amav/amav/Terpcopter3.0/matlab/GUI")
+%cd("/home/amav/amav/Terpcopter3.0/matlab/GUI")
 % Choose default command line output for Master_GUI
 handles.output = hObject;
 
