@@ -6,7 +6,10 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-cap = cv2.VideoCapture(0)
+def nothing(x):
+    pass
+
+cap = cv2.VideoCapture(1)
 cv2.namedWindow("Trackbars",)
 cv2.createTrackbar("lh","Trackbars",0,179,nothing)
 cv2.createTrackbar("ls","Trackbars",0,255,nothing)
