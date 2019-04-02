@@ -1,61 +1,54 @@
-function [thrustCmd, altErrorHistory] = altitudeController(gains, altErrorHistory, curTime, zcur, zd, altControlDegbugPublisher)
+function [thrustCmd, altErrorHistory] = altitudeControllerPID(gains, altErrorHistory, curTime, zcur, zd, altControlDegbugPublisher)
 
-
-% Note thrustCmd valid range : []
-
-% time elapsed since last control
-dt = curTime - altErrorHistory.lastTime;
 
 % unpack variables for convenience
-outerLoopKp = gains.outerLoopKp*dt;
-altRateSatLimit = gains.saturationLimit;
+prevTime = altErrorHistory.lastTime;
+prevAlt = 
+prevAltRate = 
+prevAltIntegral = 
+prevAltDesired = 
+
+% time elapsed since last control
+dt = curTime - prevTime;
+
+% saturation limits
+integralTermLimit = 0.3; % units of thrust cmd [-1, 1]
+
+% filters
+altTimeConstant = 0.25;
+altDesTimeConstatConstant = 1.0;
+
+% small feedforward term to make nominal value (zero error) close to hover
+ffterm = -0.30;
+
+% gains
 Kp = gains.Kp*dt;
 Kd = gains.Kd*dt;
 Ki = gains.Ki*dt;
 
+%%  Filters
 
-%% Outer Loop Proportional Control on Altitude (Output Desired Alt Rate)
+% low-pass filter desired altitude
+alpha_d = dt / ( altDesTimeConstatConstant + dt);
+altDesFilt = alpha_d*prevAltDesired + (1-alpha_d)*zd;
 
-% control variable, current error in altitude (m)
-altError = zd - zcur;
+% low-pass filter altitude
+alpha_a = dt / ( altTimeConstant + dt);
+altFilt = alpha_a*prevAltDesired + (1-alpha_a)*zcur;
 
-% P error
-altRateDes = outerLoopKp*altError; % positive altError (below target) => increase thrust
-altRateDes = max(min(altRateDes,altRateSatLimit),-altRateSatLimit); % saturate
+%% PID Control + feed forward
 
-%% Inner Loop PID Control on Altitude Rate (Output Thrust Command)
+% errors
+altError = altDesFilt - altFilt;
 
-% control variable
-altRateActualRaw =  (zcur - altErrorHistory.alt) / dt;
 
-% low-pass filter
-RCtimeConstant = 0.5; % sec
-alpha = dt / ( RCtimeConstant + dt);
-altRatePrevious = altErrorHistory.altRate;
-altRateActual = alpha*altRateActualRaw + (1-alpha)*altRatePrevious;
-
-% P error
-altRateError = altRateDes - altRateActual; % positive (going up to slow) => increase thrust
-propTerm =  Kp * altRateError;
-
-% I error
-altRateErrorIntegral = altErrorHistory.altRateErrorIntegral + (altRateError * dt);
-
-% D error
-prevAltRateError = altErrorHistory.altRateError; %
-altRateErrorRate = ( altRateError  - prevAltRateError ) / dt;
-derivTerm = Kd * altRateErrorRate;
-
-% Integral term
+% PID terms
+propTerm =  Kp * altError;
+derivTerm = Kd * altRateError;
 integralTerm = Ki * altRateErrorIntegral;
-minIntegralLimit = -0.2; % TODO: add as parameter
-maxIntegralLimit = 0.2;
 
-% Saturate integral term
-integralTerm =  max(min(integralTerm,maxIntegralLimit), minIntegralLimit); % 
-
-% small feedforward term to make nominal value (zero error) close to hover
-ffterm = -0.30;
+% saturate integral term
+integralTerm =  max(min(integralTerm,integralTermLimit), -integralTermLimit); % 
 
 % PID control, only keep values between 0 and 2
 thrustCmdUnsat = propTerm + ...

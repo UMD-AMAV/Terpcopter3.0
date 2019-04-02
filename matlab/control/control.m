@@ -28,10 +28,7 @@ fprintf('Control Node Launching...\n');
 
 % declare global variables
 % Determine usage in other scripts - change to local if no other usage
-global altitudeErrorHistory;
-altitudeErrorHistory.lastVal = 0;
-altitudeErrorHistory.lastSum = 0;
-altitudeErrorHistory.lastTime = 0;
+
 %
 % yawError.lastVal = 0;
 % yawError.lastSum = 0;
@@ -92,14 +89,13 @@ if isempty(t0), t0 = abs_t; end
 % u_t_alt = controlParams.altitudeGains.ffterm;
 
 
-% 
-altErrorHistory.lastTime = 0;
-altErrorHistory.altDes = ahsCmdMsg.AltitudeMeters;
-altErrorHistory.alt = ahsCmdMsg.AltitudeMeters;
-altErrorHistory.altRate = 0;
-altErrorHistory.altRateError = 0;
-altErrorHistory.altRateErrorIntegral = 0;
-
+% initialize
+%global altControl;
+altControl.time = 0;
+altControl.alt = ahsCmdMsg.AltitudeMeters;
+altControl.altDesired = ahsCmdMsg.AltitudeMeters;
+altControl.altIntegralError = 0;
+altControl.log=[params.env.matlabRoot '/altControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
 
 % yaw controller
 % absoluteYaw = stateEstimateMsg.Yaw;
@@ -179,12 +175,14 @@ while(1)
         %[u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
         
         % hardcode for now
-        gains.outerLoopKp = 0.5; % 
-        gains.saturationLimit = 0.2; 
         gains.Kp = 0.1;
-        gains.Ki = 0.001;
-        gains.Kd = 0; % do not use 
-        [u_t_alt, altErrorHistory] = altitudeController(gains, altErrorHistory, t, z, z_d, altControlDegbugPublisher);
+        gains.Ki = 0.0;
+        gains.ffterm = -0.30;
+        gains.integralTermLimit = 0.3; % units of thrust cmd [-1, 1]
+        gains.altTimeConstant = 0.25;
+        gains.altDesTimeConstatConstant = 1.0;
+
+        [u_t_alt, altControl] = altitudeControllerPID(gains, altControl, t, z, z_d, altControlDegbugPublisher);
         
         %New Yaw Controller
         %     yaw_d = deg2rad(yaw_d);
