@@ -66,11 +66,12 @@ startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
 
 % Publishers
 ahsCmdPublisher = rospublisher('/ahsCmd', 'terpcopter_msgs/ahsCmd');
-openLoopIsActivePublisher = rospublisher('/openLoopIsActive', 'std_msgs/Bool');
 closedLoopIsActivePublisher = rospublisher('/closedLoopIsActive', 'std_msgs/Bool');
+openLoopIsActivePublisher = rospublisher('/openLoopIsActive', 'std_msgs/Bool');
 openLoopStickCmdPublisher = rospublisher('/openLoopStickCmd', 'terpcopter_msgs/openLoopStickCmd');
 pidAltSettingPublisher = rospublisher('/pidAltSetting', 'terpcopter_msgs/ffpidSetting');
 pidYawSettingPublisher = rospublisher('/pidYawSetting', 'terpcopter_msgs/ffpidSetting');
+servoSwitchCmdPublisher = rospublisher('/servoSwitch', 'std_msgs/Bool');
 
 pause(0.1)
 
