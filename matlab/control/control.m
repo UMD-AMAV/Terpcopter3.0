@@ -180,10 +180,11 @@ while(1)
         gains.Kp = pidAltSettingMsg.Kp;
         gains.Ki = pidAltSettingMsg.Ki;
         gains.Kd = pidAltSettingMsg.Kd;
-        gains.Kv = pidAltSettingMsg.Ff;
-        gains.ffterm = -0.25;
+        gains.ffterm = pidAltSettingMsg.Ff;
+
         gains.integralTermLimit = 0.3; % units of thrust cmd [-1, 1]
         gains.saturationLimit = 0.2;
+        
         gains.altTimeConstant = 0.3;
         gains.altRateTimeConstant = 0.15;
         gains.altDesTimeConstant = 3.0;

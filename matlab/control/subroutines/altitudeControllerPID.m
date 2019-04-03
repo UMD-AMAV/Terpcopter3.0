@@ -1,35 +1,35 @@
 function [thrustCmd, altControl] = altitudeControllerPID(gains, altControl, curTime, zcur, zd, altControlDegbugPublisher)
 
 
-% unpack parameters
+% unpack states
 prevTime = altControl.time;
 prevAlt = altControl.alt;
 prevAltRate = altControl.altRate;
 prevAltDesired = altControl.altDesired;
 prevAltIntegralError = altControl.altIntegralError;
-fileName = altControl.log;
-
-% saturation limits
-integralTermLimit = gains.integralTermLimit;%
-altTimeConstant = gains.altTimeConstant;
-altRateTimeConstant = gains.altRateTimeConstant;
-altDesTimeConstant = gains.altDesTimeConstant;
-ffterm = gains.ffterm;
 
 % time elapsed since last control
 dt = curTime - prevTime;
 zdot = (zcur - prevAlt) /dt;
 
-% scale gains
+% saturation limits
+integralTermLimit = gains.integralTermLimit;%
+
+% time constants (filtering)
+altTimeConstant = gains.altTimeConstant;
+altRateTimeConstant = gains.altRateTimeConstant;
+altDesTimeConstant = gains.altDesTimeConstant;
+
+% gains / feed-forward term
 Kp = gains.Kp; %*dt;
 Ki = gains.Ki; %*dt;
+Kd = gains.Kd; %
+ffterm = gains.ffterm;
 
 %% Low-pass filters
 % low-pass filter desired altitude
-zd
-prevAltDesired
-alpha_d = dt / ( altDesTimeConstant + dt)
-altDesFilt = (1-alpha_d)*prevAltDesired + alpha_d*zd
+alpha_d = dt / ( altDesTimeConstant + dt);
+altDesFilt = (1-alpha_d)*prevAltDesired + alpha_d*zd;
 
 % low-pass filter altitude
 alpha_a = dt / ( altTimeConstant + dt);
@@ -38,6 +38,7 @@ altFilt = (1-alpha_a)*prevAlt + alpha_a*zcur;
 % low-pass filter altitude-rate
 alpha_r = dt / ( altRateTimeConstant + dt);
 altRateFilt = (1-alpha_r)*prevAltRate + alpha_r*zdot;
+
 %% PID Control + feed forward
 
 % errors
@@ -47,12 +48,13 @@ altIntegralError =  prevAltIntegralError + altError*dt;
 % PID terms
 propTerm =  Kp * altError;
 integralTerm = Ki * altIntegralError;
+derivTerm  = Kd * altRateFilt;
 
 % saturate integral term
 integralTerm =  max(min(integralTerm,integralTermLimit), -integralTermLimit); % 
 
 % PID control, only keep values between 0 and 2
-thrustCmdUnsat = propTerm + integralTerm + ffterm;
+thrustCmdUnsat = propTerm + derivTerm + integralTerm + ffterm;
 
 % output is [-1 (zero thrust), 1 (max thrust)]
 % we saturate hear to avoid excessive thrust commands
@@ -60,8 +62,8 @@ thrustCmd =  max(min(0.1,thrustCmdUnsat),-1);
 
 %% pack up structure
 altControl.time = curTime;
+altControl.altDesired = altDesFilt; % this is the filtered setpoint
 altControl.alt = altFilt;
-altControl.altDesired = altDesFilt;
 altControl.altRate = altRateFilt;
 altControl.altIntegralError = altIntegralError;
 
@@ -71,8 +73,7 @@ fprintf('Controller running at %3.2f Hz\n',1/dt);
 displayFlag = 1;
 if ( displayFlag )
     
-    pFile = fopen(fileName,'a');
-    fileName
+    pFile = fopen( altControl.log ,'a');
     
     % write csv file
     fprintf(pFile,'%6.6f,',curTime);
@@ -98,8 +99,12 @@ if ( displayFlag )
     fprintf(pFile,'%6.6f,',altTimeConstant);
     fprintf(pFile,'%6.6f,',altDesTimeConstant);
     fprintf(pFile,'%6.6f,',ffterm);
+    
+    
     fprintf(pFile, '%6.6f,',zdot);
     fprintf(pFile, '%6.6f\n',altRateFilt);
+    fprintf(pFile, '%6.6f\n',derivTerm);
+    
     
     fclose(pFile);
     

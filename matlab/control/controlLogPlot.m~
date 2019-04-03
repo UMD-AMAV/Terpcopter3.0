@@ -28,9 +28,17 @@ thrustCmd = data(:,12);
 vel = data(:,19);
 velFilt = data(:,20);
 derivTerm = data(:,21);
-
-
-
+% 
+%zdot = diff(altFilt)./dt(1:end-1);
+figure(3)
+plot(curTime,vel,'o-','linewidth',2);
+hold on
+plot(curTime,velFilt,'b-','linewidth',2);
+grid on;
+xlabel('Time (sec.)')
+ylabel('Alt Rate (m/s)');
+set(gca,'FontSize',16);
+legend('vel','vel-filter');
 
 %
 Kp = data(:,13);
@@ -49,7 +57,7 @@ fprintf('Time constants (alt,alt-des) = (%3.3f, %3.3f) \n',altTimeConstant(1), a
 figure(1);
 title(file);
 
-subplot(2,4,1);
+subplot(2,3,1);
 plot(curTime, zd,'mo-','linewidth',2);
 hold on;
 plot(curTime, altDesFilt,'rx-','linewidth',2);
@@ -63,7 +71,7 @@ ylim([0 1.5]);
 set(gca,'FontSize',16);
 legend('z-des','z-des-filter','z-raw','z-filt');
 
-subplot(2,4,5);
+subplot(2,3,4);
 plot(curTime, thrustCmdUnsat,'bo-','linewidth',2);
 hold on;
 plot(curTime, thrustCmd,'ro-','linewidth',2);
@@ -73,46 +81,28 @@ ylabel('Thrust Command');
 set(gca,'FontSize',16);
 ylim([-0.4 0.2]);
 
-subplot(2,4,2);
+subplot(2,3,2);
 plot(curTime, altError,'ko-','linewidth',2);
 xlabel('Time (sec');
 ylabel('Altitude Error (m)');
 set(gca,'FontSize',16);
 
-subplot(2,4,6);
+subplot(2,3,5);
 plot(curTime, propTerm,'ko-','linewidth',2);
 xlabel('Time (sec');
 ylabel('Proportional Term');
 set(gca,'FontSize',16);
 
-subplot(2,4,3);
+subplot(2,3,3);
 plot(curTime, altIntegralError,'ko-','linewidth',2);
 xlabel('Time (sec');
 ylabel('Altitude Error Integral (m)');
 set(gca,'FontSize',16);
 
-subplot(2,4,7);
+subplot(2,3,6);
 plot(curTime, integralTerm,'ko-','linewidth',2);
 xlabel('Time (sec');
 ylabel('Integral Term');
-set(gca,'FontSize',16);
-
-subplot(2,4,4);
-plot(curTime,vel,'o-','linewidth',2);
-hold on
-plot(curTime,velFilt,'b-','linewidth',2);
-grid on;
-xlabel('Time (sec.)')
-ylabel('Alt Rate (m/s)');
-set(gca,'FontSize',16);
-legend('vel','vel-filter');
-
-subplot(2,4,8);
-plot(curTime,derivTerm,'o-','linewidth',2);
-hold on
-grid on;
-xlabel('Time (sec.)')
-ylabel('Derivative Term');
 set(gca,'FontSize',16);
 
 % figure(2);
