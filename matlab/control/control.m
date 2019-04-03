@@ -222,7 +222,8 @@ while(1)
         % publish
         stickCmdMsg.Thrust = max(min(2,u_t_alt),0)-1;
         stickCmdMsg.Yaw = max(-1,min(1,u_t_yaw));
-        
+        stickCmdMsg.Pitch = max(-1,min(1,u_t_pitch));
+        stickCmdMsg.Roll = max(-1,min(1,u_t_roll));
         fprintf('Stick Cmd.Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f, Yaw : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ), u_t_yaw );
         
         time = r.TotalElapsedTime;

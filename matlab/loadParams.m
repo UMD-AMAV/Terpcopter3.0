@@ -16,7 +16,7 @@ params.vtx.mode = 'flight'; % 'sim' or 'flight'
 % transmitter 
 params.vtx.stick_lim = [100; 100; 100; 100];
 params.vtx.trim_lim = [29; 29; 29; 29];
-params.vtx.trim_val = [0.137931 0.137931 0.137931 0.137931];   
+params.vtx.trim_val = [0 -1.00344 -3.31137931 0.137931];   
 
 % simulator
 params.vtx.T = 30; % simulation time
