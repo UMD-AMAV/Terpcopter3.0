@@ -32,5 +32,41 @@ function [u_t_forward, forwardErrorHistory] = forwardcontroller_PID(forwardGains
     forwardErrorHistory.lastVal = forwardError;
     % crabErrorHistory.lastVal = crabError;
 
+displayFlag = 1;
+if ( displayFlag )    
+    pFile = fopen( forwardErrorHistory.log ,'a');
+    
+    % write csv file
+    fprintf(pFile,'%6.6f,',currTime);
+    fprintf(pFile,'%6.6f,',dt);    
+    fprintf(pFile,'%6.6f,',zd);
+    fprintf(pFile,'%6.6f,',altDesFilt);    
+    fprintf(pFile,'%6.6f,',zcur);
+    fprintf(pFile,'%6.6f,',altFilt);
+    
+    fprintf(pFile,'%6.6f,',altError);
+    fprintf(pFile,'%6.6f,',altIntegralError); 
+    
+    fprintf(pFile,'%6.6f,',propTerm);
+    fprintf(pFile,'%6.6f,',integralTerm);
+
+    fprintf(pFile,'%6.6f,',thrustCmdUnsat);
+    fprintf(pFile,'%6.6f,',thrustCmd);
+    
+    % constant parameters
+    fprintf(pFile,'%6.6f,',gains.Kp);
+    fprintf(pFile,'%6.6f,',gains.Ki);
+    fprintf(pFile,'%6.6f,',integralTermLimit);
+    fprintf(pFile,'%6.6f,',altTimeConstant);
+    fprintf(pFile,'%6.6f,',altDesTimeConstant);
+    fprintf(pFile,'%6.6f,',ffterm);
+    
+    
+    fprintf(pFile, '%6.6f,',zdot);
+    fprintf(pFile, '%6.6f\n',altRateFilt);
+    fprintf(pFile, '%6.6f\n',derivTerm);
+        
+    fclose(pFile);
+end
 
 end

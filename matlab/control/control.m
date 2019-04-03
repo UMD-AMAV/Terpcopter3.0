@@ -132,6 +132,8 @@ u_t_yaw = 0;
 forwardErrorHistory.lastTime = 0; %stateEstimateMsg.Time;
 forwardErrorHistory.lastVal = ahsCmdMsg.ForwardSpeedMps;
 forwardErrorHistory.lastSum = 0;
+forwardErrorHistory.log=[params.env.matlabRoot '/forwardSpeedControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
+
 u_t_forward = 0;
 
 
