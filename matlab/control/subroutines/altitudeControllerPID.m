@@ -4,35 +4,40 @@ function [thrustCmd, altControl] = altitudeControllerPID(gains, altControl, curT
 % unpack parameters
 prevTime = altControl.time;
 prevAlt = altControl.alt;
+prevAltRate = altControl.altRate;
 prevAltDesired = altControl.altDesired;
 prevAltIntegralError = altControl.altIntegralError;
-fileName = [params.env.matlabRoot altControl.];
-
-
+fileName = altControl.log;
 
 % saturation limits
 integralTermLimit = gains.integralTermLimit;%
 altTimeConstant = gains.altTimeConstant;
-altDesTimeConstant = gains.altDesTimeConstatConstant;
+altRateTimeConstant = gains.altRateTimeConstant;
+altDesTimeConstant = gains.altDesTimeConstant;
 ffterm = gains.ffterm;
 
 % time elapsed since last control
 dt = curTime - prevTime;
+zdot = (zcur - prevAlt) /dt;
 
 % scale gains
-Kp = gains.Kp*dt;
-Ki = gains.Ki*dt;
+Kp = gains.Kp; %*dt;
+Ki = gains.Ki; %*dt;
 
 %% Low-pass filters
-
 % low-pass filter desired altitude
-alpha_d = dt / ( altDesTimeConstant + dt);
-altDesFilt = alpha_d*prevAltDesired + (1-alpha_d)*zd;
+zd
+prevAltDesired
+alpha_d = dt / ( altDesTimeConstant + dt)
+altDesFilt = (1-alpha_d)*prevAltDesired + alpha_d*zd
 
 % low-pass filter altitude
 alpha_a = dt / ( altTimeConstant + dt);
-altFilt = alpha_a*prevAlt + (1-alpha_a)*zcur;
+altFilt = (1-alpha_a)*prevAlt + alpha_a*zcur;
 
+% low-pass filter altitude-rate
+alpha_r = dt / ( altRateTimeConstant + dt);
+altRateFilt = (1-alpha_r)*prevAltRate + alpha_r*zdot;
 %% PID Control + feed forward
 
 % errors
@@ -47,17 +52,18 @@ integralTerm = Ki * altIntegralError;
 integralTerm =  max(min(integralTerm,integralTermLimit), -integralTermLimit); % 
 
 % PID control, only keep values between 0 and 2
-thrustCmdUnsat = propTerm + derivTerm + integralTerm + ffterm;
+thrustCmdUnsat = propTerm + integralTerm + ffterm;
 
 % output is [-1 (zero thrust), 1 (max thrust)]
 % we saturate hear to avoid excessive thrust commands
 thrustCmd =  max(min(0.1,thrustCmdUnsat),-1);
 
 %% pack up structure
-altControl.time = prevTime;
-altControl.alt = prevAlt;
-altControl.altDesired = prevAltDesired;
-altControl.altIntegralError = prevAltIntegralError;
+altControl.time = curTime;
+altControl.alt = altFilt;
+altControl.altDesired = altDesFilt;
+altControl.altRate = altRateFilt;
+altControl.altIntegralError = altIntegralError;
 
 %% display/debug
 fprintf('Controller running at %3.2f Hz\n',1/dt);
@@ -66,6 +72,7 @@ displayFlag = 1;
 if ( displayFlag )
     
     pFile = fopen(fileName,'a');
+    fileName
     
     % write csv file
     fprintf(pFile,'%6.6f,',curTime);
@@ -90,7 +97,9 @@ if ( displayFlag )
     fprintf(pFile,'%6.6f,',integralTermLimit);
     fprintf(pFile,'%6.6f,',altTimeConstant);
     fprintf(pFile,'%6.6f,',altDesTimeConstant);
-    fprintf(pFile,'%6.6f\n',ffterm);
+    fprintf(pFile,'%6.6f,',ffterm);
+    fprintf(pFile, '%6.6f,',zdot);
+    fprintf(pFile, '%6.6f\n',altRateFilt);
     
     fclose(pFile);
     

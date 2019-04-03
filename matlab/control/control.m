@@ -68,7 +68,7 @@ stickCmdMsg.Yaw = 0;
 % % grab latest messages
 % stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
-% pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
+pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
 % pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
 % % yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
 
@@ -91,9 +91,11 @@ if isempty(t0), t0 = abs_t; end
 
 % initialize
 %global altControl;
+stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 altControl.time = 0;
-altControl.alt = ahsCmdMsg.AltitudeMeters;
-altControl.altDesired = ahsCmdMsg.AltitudeMeters;
+altControl.alt = stateEstimateMsg.Range;
+altControl.altRate = 0;
+altControl.altDesired = stateEstimateMsg.Range;
 altControl.altIntegralError = 0;
 altControl.log=[params.env.matlabRoot '/altControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
 
@@ -107,7 +109,7 @@ u_t_yaw = 0;
 
 
 disp('initialize loop');
-r = robotics.Rate(10);
+r = robotics.Rate(90);
 reset(r);
 send(stickCmdPublisher, stickCmdMsg); % send initial stick command.
 
@@ -175,12 +177,16 @@ while(1)
         %[u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
         
         % hardcode for now
-        gains.Kp = 0.1;
-        gains.Ki = 0.0;
-        gains.ffterm = -0.30;
+        gains.Kp = pidAltSettingMsg.Kp;
+        gains.Ki = pidAltSettingMsg.Ki;
+        gains.Kd = pidAltSettingMsg.Kd;
+        gains.Kv = pidAltSettingMsg.Ff;
+        gains.ffterm = -0.25;
         gains.integralTermLimit = 0.3; % units of thrust cmd [-1, 1]
-        gains.altTimeConstant = 0.25;
-        gains.altDesTimeConstatConstant = 1.0;
+        gains.saturationLimit = 0.2;
+        gains.altTimeConstant = 0.3;
+        gains.altRateTimeConstant = 0.15;
+        gains.altDesTimeConstant = 3.0;
 
         [u_t_alt, altControl] = altitudeControllerPID(gains, altControl, t, z, z_d, altControlDegbugPublisher);
         

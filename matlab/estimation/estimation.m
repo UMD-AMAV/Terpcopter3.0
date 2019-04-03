@@ -45,7 +45,7 @@ stateMsg = rosmessage(stateEstimatePublisher);
 %stateMsg.Range = 0.2;
 t0 = [];
 
-r = rosrate(30);
+r = robotics.Rate(100);
 reset(r);
 
 % smooting filter
@@ -83,9 +83,11 @@ j = 0;
 
     %get relative yaw = - inertial yaw_intial - inertial yaw 
     inertial_yaw_initial = state.psi_inertial;
-
+    tic
 
 while(1)
+    fprintf('LoopRate Hz: %3.3f\n',1/toc)
+    tic
     % Receive Latest Imu and Lidar data
     imuMsg = imuDataSubscriber.LatestMessage;
     lidarMsg = lidarDataSubscriber.LatestMessage;

@@ -8,7 +8,8 @@ params.env.ros_master_ip = '192.168.1.93'; %change master to Laptop
 params.env.catkinSrcDir = '/home/amav/catkin_ws/src';
 %params.env.catkinSrcDir = '/home/wolek/catkin_ws/src';
 params.env.terpcopterMatlabMsgs = [params.env.catkinSrcDir '/matlab_gen/msggen'];
-params.env.matlabRoot = '/home/wolek/Desktop/Research/Projects/UMD/AMAV/Terpcopter3.0/matlab';
+%params.env.matlabRoot = '/home/wolek/Desktop/Research/Projects/UMD/AMAV/Terpcopter3.0/matlab';
+params.env.matlabRoot = '/home/amav/amav/Terpcopter3.0/matlab';
 
 % Virtual transmitter (vtx) 
 %------------------------------------------------
