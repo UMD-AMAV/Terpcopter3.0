@@ -94,7 +94,7 @@ params.est.altitudeLPFitler.timeConstant = 1.00000; % sec,
 
 % Autonomy (auto)
 %------------------------------------------------
-params.auto.mode = 'auto';
+params.auto.mode = 'manual';
 
 
 

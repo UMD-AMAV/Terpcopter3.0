@@ -97,7 +97,10 @@ altControl.alt = stateEstimateMsg.Range;
 altControl.altRate = 0;
 altControl.altDesired = stateEstimateMsg.Range;
 altControl.altIntegralError = 0;
+altControl.altRateError = 0;
+altControl.altRateErrorIntegral = 0;
 altControl.log=[params.env.matlabRoot '/altControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
+
 
 % yaw controller
 % absoluteYaw = stateEstimateMsg.Yaw;
@@ -124,8 +127,6 @@ while(1)
     startMissionMsg = startMissionSubscriber.LatestMessage;
     closedLoopIsActiveMsg = closedLoopIsActiveSubscriber.LatestMessage;
     %     yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
-    
-    
     
     if (openLoopIsActiveMsg.Data == true) && (closedLoopIsActiveMsg.Data == false)
         % set stick command directly based on openLoopStickCmd message
@@ -183,12 +184,12 @@ while(1)
         gains.Kv = pidAltSettingMsg.Ff;
         gains.ffterm = -0.25;
         gains.integralTermLimit = 0.3; % units of thrust cmd [-1, 1]
-        gains.saturationLimit = 0.2;
+        gains.saturationLimit = 1;
         gains.altTimeConstant = 0.3;
-        gains.altRateTimeConstant = 0.15;
+        gains.altRateTimeConstant = 0.25;
         gains.altDesTimeConstant = 3.0;
 
-        [u_t_alt, altControl] = altitudeControllerPID(gains, altControl, t, z, z_d, altControlDegbugPublisher);
+        [u_t_alt, altControl] = altitudeControllerPIDCascaded(gains, altControl, t, z, z_d, altControlDegbugPublisher);
         
         %New Yaw Controller
         %     yaw_d = deg2rad(yaw_d);

@@ -125,6 +125,9 @@ if ( strcmp(params.auto.mode,'auto'))
     startMissionMsg = receive(startMissionSubscriber);
     startMissionFlag = startMissionMsg.Data;
     
+    send(pidAltSettingPublisher, pidAltSettingMsg);
+    send(pidYawSettingPublisher, pidYawSettingMsg);
+    
     while(1)
         stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 %         yawErrorCameraMsg = yawErrorCameraSubscriber.LatestMessage;
@@ -209,8 +212,6 @@ if ( strcmp(params.auto.mode,'auto'))
         end
 
         % publish
-        send(pidAltSettingPublisher, pidAltSettingMsg);
-        send(pidYawSettingPublisher, pidYawSettingMsg);
         send(ahsCmdPublisher, ahsCmdMsg);
         send(openLoopIsActivePublisher, openLoopIsActiveMsg);
         send(closedLoopIsActivePublisher, closedLoopIsActiveMsg);
@@ -221,8 +222,13 @@ if ( strcmp(params.auto.mode,'auto'))
     end
 elseif ( strcmp(params.auto.mode, 'manual'))
     fprintf('Autonomy Mode: Manual');
+    openLoopIsActiveMsg.Data = false;      % true: openloop control
+    closedLoopIsActiveMsg.Data = true;
     send(pidAltSettingPublisher, pidAltSettingMsg);
     send(pidYawSettingPublisher, pidYawSettingMsg);
+    send(openLoopIsActivePublisher, openLoopIsActiveMsg);
+    send(closedLoopIsActivePublisher, closedLoopIsActiveMsg);
+    send(openLoopStickCmdPublisher, openLoopStickCmdMsg);
     send(ahsCmdPublisher, ahsCmdMsg);
     
     while(1)
