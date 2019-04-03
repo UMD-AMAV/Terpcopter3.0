@@ -5,7 +5,7 @@ function [u_t_forward, forwardErrorHistory] = forwardcontroller_PID(forwardGains
     % dt_crab = currTime - crabErrorHistory.lastTime;
 %     global forwardErrorHistory; 
 %     forwardErrorHistory = forwardErrorHist;
-    forwardError = forwardVelocitySetpoint - forwardVelocity;
+    forwardError = forwardVelocitySetpoint - forwardVe
     dt_forward = currTime - forwardErrorHistory.lastTime;
     
 %     fprintf("dt: %6.2f \n",dt_forward);
@@ -32,29 +32,40 @@ function [u_t_forward, forwardErrorHistory] = forwardcontroller_PID(forwardGains
     forwardErrorHistory.lastTime = currTime;
     forwardErrorHistory.lastVal = forwardError;
     % crabErrorHistory.lastVal = crabError;
-    u_stick = max(-1,min(1,u_t_forward));
 
-    displayFlag = 1;
+displayFlag = 1;
 if ( displayFlag )    
     pFile = fopen( forwardErrorHistory.log ,'a');
     
     % write csv file
     fprintf(pFile,'%6.6f,',currTime);
     fprintf(pFile,'%6.6f,',dt_forward);    
-    fprintf(pFile,'%6.6f,',forwardVelocity);
-    fprintf(pFile,'%6.6f,',forwardVelocitySetpoint);    
-    
     fprintf(pFile,'%6.6f,',forwardError);
-    fprintf(pFile,'%6.6f,',forwardErrorHistory.lastSum);
-    fprintf(pFile,'%6.6f,',errorDot_forward);
+    fprintf(pFile,'%6.6f,',altDesFilt);    
+    fprintf(pFile,'%6.6f,',zcur);
+    fprintf(pFile,'%6.6f,',altFilt);
     
-    fprintf(pFile,'%6.6f,',u_t_forward);
-    fprintf(pFile,'%6.6f,',u_t_stick);
+    fprintf(pFile,'%6.6f,',altError);
+    fprintf(pFile,'%6.6f,',altIntegralError); 
+    
+    fprintf(pFile,'%6.6f,',propTerm);
+    fprintf(pFile,'%6.6f,',integralTerm);
+
+    fprintf(pFile,'%6.6f,',thrustCmdUnsat);
+    fprintf(pFile,'%6.6f,',thrustCmd);
     
     % constant parameters
-    fprintf(pFile,'%6.6f,',forwardGains.Kp);
-    fprintf(pFile,'%6.6f,',forwardGains.Ki);
-    fprintf(pFile,'%6.6f,',forwardGains.Kd);
+    fprintf(pFile,'%6.6f,',gains.Kp);
+    fprintf(pFile,'%6.6f,',gains.Ki);
+    fprintf(pFile,'%6.6f,',integralTermLimit);
+    fprintf(pFile,'%6.6f,',altTimeConstant);
+    fprintf(pFile,'%6.6f,',altDesTimeConstant);
+    fprintf(pFile,'%6.6f,',ffterm);
+    
+    
+    fprintf(pFile, '%6.6f,',zdot);
+    fprintf(pFile, '%6.6f\n',altRateFilt);
+    fprintf(pFile, '%6.6f\n',derivTerm);
         
     fclose(pFile);
 end

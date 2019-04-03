@@ -231,7 +231,7 @@ u_d = 0.5; %ahsCmdMsg.ForwardSpeedMps;
     
 % FLOW PROBE
 
-    [u_t_forward, forwardErrorHistory] = forwardcontroller_PID(controlParams.forwardGains , forwardErrorHistory, t, forwardError)
+    [u_t_forward, forwardErrorHistory] = forwardcontroller_PID(controlParams.forwardGains , forwardErrorHistory, t, u, u_d)
 
     u_t_alt = 2*max(min(1,u_t_alt),0)-1;
 
