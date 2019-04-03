@@ -109,8 +109,11 @@ u_t_yaw = 0;
 
 
 disp('initialize loop');
-r = robotics.Rate(90);
+
+% set frequency of ROS update
+r = robotics.Rate(100);
 reset(r);
+
 send(stickCmdPublisher, stickCmdMsg); % send initial stick command.
 
 while(1)
@@ -177,17 +180,17 @@ while(1)
         %[u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
         
         % hardcode for now
-        gains.Kp = pidAltSettingMsg.Kp;
-        gains.Ki = pidAltSettingMsg.Ki;
-        gains.Kd = pidAltSettingMsg.Kd;
-        gains.ffterm = pidAltSettingMsg.Ff;
+        gains.Kp = 0.050;
+        gains.Ki = 0.030;
+        gains.Kd = 0.003;
+        gains.ffterm = -0.15;
 
         gains.integralTermLimit = 0.3; % units of thrust cmd [-1, 1]
         gains.saturationLimit = 0.2;
         
         gains.altTimeConstant = 0.3;
         gains.altRateTimeConstant = 0.15;
-        gains.altDesTimeConstant = 3.0;
+        gains.altDesTimeConstant = 6.0;
 
         [u_t_alt, altControl] = altitudeControllerPID(gains, altControl, t, z, z_d, altControlDegbugPublisher);
         

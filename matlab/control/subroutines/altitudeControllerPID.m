@@ -48,7 +48,7 @@ altIntegralError =  prevAltIntegralError + altError*dt;
 % PID terms
 propTerm =  Kp * altError;
 integralTerm = Ki * altIntegralError;
-derivTerm  = Kd * altRateFilt;
+derivTerm  = -Kd * altRateFilt;
 
 % saturate integral term
 integralTerm =  max(min(integralTerm,integralTermLimit), -integralTermLimit); % 
@@ -58,7 +58,7 @@ thrustCmdUnsat = propTerm + derivTerm + integralTerm + ffterm;
 
 % output is [-1 (zero thrust), 1 (max thrust)]
 % we saturate hear to avoid excessive thrust commands
-thrustCmd =  max(min(0.1,thrustCmdUnsat),-1);
+thrustCmd =  max(min(0.2,thrustCmdUnsat),-1);
 
 %% pack up structure
 altControl.time = curTime;
@@ -102,7 +102,7 @@ if ( displayFlag )
     
     
     fprintf(pFile, '%6.6f,',zdot);
-    fprintf(pFile, '%6.6f\n',altRateFilt);
+    fprintf(pFile, '%6.6f,',altRateFilt);
     fprintf(pFile, '%6.6f\n',derivTerm);
     
     

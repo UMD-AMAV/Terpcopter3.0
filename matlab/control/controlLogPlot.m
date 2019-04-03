@@ -25,13 +25,6 @@ integralTerm = data(:,10);
 thrustCmdUnsat = data(:,11);
 thrustCmd = data(:,12);
 
-vel = data(:,19);
-velFilt = data(:,20);
-derivTerm = data(:,21);
-
-
-
-
 %
 Kp = data(:,13);
 Ki = data(:,14);
@@ -39,6 +32,15 @@ integralTermLimit = data(:,15);
 altTimeConstant = data(:,16);
 altDesTimeConstant = data(:,17);
 ffterm = data(:,18);
+    
+vel = data(:,19);
+velFilt = data(:,20);
+derivTerm = data(:,21);
+
+
+
+
+
 
 %
 fprintf('(Kp,Ki,ffterm) = (%3.3f,%3.3f,%3.3f) \n',Kp(1), Ki(1), ffterm(1));
@@ -53,9 +55,9 @@ subplot(2,4,1);
 plot(curTime, zd,'mo-','linewidth',2);
 hold on;
 plot(curTime, altDesFilt,'rx-','linewidth',2);
-plot(curTime, zcur,'bo-','linewidth',2);
+plot(curTime, zcur,'ko-','linewidth',2);
 hold on;
-plot(curTime, altFilt,'kx-','linewidth',2);
+plot(curTime, altFilt,'bx-','linewidth',2);
 hold on;
 xlabel('Time (sec');
 ylabel('Altitude (m)');
@@ -71,7 +73,7 @@ plot(curTime, ffterm,'k--');
 xlabel('Time (sec');
 ylabel('Thrust Command');
 set(gca,'FontSize',16);
-ylim([-0.4 0.2]);
+%ylim([-0.4 0.2]);
 
 subplot(2,4,2);
 plot(curTime, altError,'ko-','linewidth',2);
@@ -98,9 +100,9 @@ ylabel('Integral Term');
 set(gca,'FontSize',16);
 
 subplot(2,4,4);
-plot(curTime,vel,'o-','linewidth',2);
+plot(curTime,vel,'ko-','linewidth',2);
 hold on
-plot(curTime,velFilt,'b-','linewidth',2);
+plot(curTime,velFilt,'bx-','linewidth',2);
 grid on;
 xlabel('Time (sec.)')
 ylabel('Alt Rate (m/s)');
@@ -108,7 +110,7 @@ set(gca,'FontSize',16);
 legend('vel','vel-filter');
 
 subplot(2,4,8);
-plot(curTime,derivTerm,'o-','linewidth',2);
+plot(curTime,derivTerm,'ko-','linewidth',2);
 hold on
 grid on;
 xlabel('Time (sec.)')
