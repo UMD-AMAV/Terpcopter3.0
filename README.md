@@ -39,12 +39,21 @@ Edit the loadParams.m file env variables accordingly.
 
 cd GUI and launch Master_GUI.m 
 
-# Flow Probe Nodes
+## Flow Probe Node
 
+# Setting up on odroid
 - The teensy board on which the flow probe is attached might not work (Serial input pauses after a few lines). Follow instructions on this link to install the latest UDEV Rules for the board : https://www.pjrc.com/teensy/49-teensy.rules
 
 - The serial porst need root access to run. Try steps in this link to change : https://askubuntu.com/a/58122
 
+# Running
+- Power on odroid and connect pixhawk. Connect flowprobe only after pixhawk powers on (else serial port changes. can change this in code but better than correcting it everytime just follow this order for connection).
+- Run command in terminal : 
+```
+roslaunch terpcopter_driver terpcopter_flow_probe_node.launch
+```
+- Node publishes velocity in standard float32 message. Might print 2 values in terminal. Ignore second value.
+- Note the value of the velocity and corresponding direction of quadrotor. Mount according to marked side on flowprobe pointing to front of the drone. If no mark present adjust for sign in code.
 
 # Issues Noticed
 
