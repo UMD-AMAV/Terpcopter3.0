@@ -7,7 +7,7 @@ disp('')
 
 % initialize ROS
 if(~robotics.ros.internal.Global.isNodeActive)
-    rosinit('192.168.0.29'); %change to master IP 
+    rosinit('192.168.1.22'); %change to master IP 
 end
 
 pose = rossubscriber('/mavros/vision_pose/pose');
