@@ -7,12 +7,14 @@ from std_msgs.msg import String
 from std_msgs.msg import Bool
 from _feedback import feedback
 from _targetPose import targetPose
+import DropOffDetection
 
 #This code is used for object detection
 #This code has some commented areas which might be required later.
 #The changes in this code will depend on the pipeline that we finally decide to implement.
 #Don't change without talking to perception team
 def objectDetect(frame, detector):
+    DropOffDetection.dropOffDetection(frame)
     pubIP = rospy.Publisher('targetPose', targetPose, queue_size=10)
     FlagIP = rospy.Publisher('targetFlag',Bool,queue_size=10)
     h_image,w_image= frame.shape[:2] #here we store width and height of frame
@@ -140,6 +142,7 @@ def objectDetect(frame, detector):
     FlagIP.publish(b)
 
     cv2.imshow("Target", frame )
+    cv2.waitKey(1)
 
 
   

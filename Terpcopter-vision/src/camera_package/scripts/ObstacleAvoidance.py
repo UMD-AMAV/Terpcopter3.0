@@ -12,6 +12,7 @@ def obstacleDetection(frame,detector_obst):
     #Detection Pipeline
     height, width = frame.shape[:2]
     hsv = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV)
+    kernel = np.ones((5,5), np.uint8)
     l_pink_tuned = np.array([123,10,45])    #Tuned Lower HSV values
     u_pink_tuned = np.array([180,255,255])  #Tuned Higher HSV values
     mask = cv2.inRange(hsv, l_pink_tuned, u_pink_tuned)
@@ -33,3 +34,4 @@ def obstacleDetection(frame,detector_obst):
     #Publish the boolean
     FlagIP.publish(obstacleDetected)
     cv2.imshow("Obstacle",frame)
+    cv2.waitKey(1)

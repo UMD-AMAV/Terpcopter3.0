@@ -66,7 +66,7 @@ def callbackImage(data):
     #            ObstacleDetection - Detects the targets and publishes the Herror
     #                   Input Parameters: Image frame in openCV image format, blob detection parameter object
     ObstacleAvoidance.obstacleDetection(cv_image, detector_obst)
-    obstacleDetection.objectDetect(cv_image,detector_target)
+    ObstacleDetection.objectDetect(cv_image,detector_target)
 
 
 ###############################################################################
