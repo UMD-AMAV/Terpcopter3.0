@@ -106,7 +106,7 @@ vtxStatusPublisher = rospublisher('vtxStatus','std_msgs/Bool');
 stickCmdSubscriber = rossubscriber('stickCmd','terpcopter_msgs/stickCmd');
 
 if ( strcmp(params.vtx.mode,'flight') )
-    r = robotics.Rate(20);
+    r = robotics.Rate(100);
     reset(r);
     
     while(1)

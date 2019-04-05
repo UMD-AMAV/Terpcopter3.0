@@ -21,8 +21,8 @@ params.vtx.stick_lim = [100; 100; 100; 100];
 params.vtx.trim_lim = [29; 29; 29; 29];
 
 % trim_val should be in the range [-1, 1]
-% these values are from test (27 May 2019)
-params.vtx.trim_val = [0 0 34 -24]/100; % throttle , roll , pitch , yaw
+% these values are from test (4 April 2019)
+params.vtx.trim_val = [0 0 -7 20]/100; % throttle , roll , pitch , yaw
 
 % simulator
 params.vtx.T = 30; % simulation time

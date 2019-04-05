@@ -180,12 +180,12 @@ while(1)
         %[u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
         
         % hardcode for now
-        gains.Kp = 0.050;
+        gains.Kp = 0.060;
         gains.Ki = 0.030;
-        gains.Kd = 0.003;
+        gains.Kd = 0.010;
         gains.ffterm = -0.15;
 
-        gains.integralTermLimit = 0.3; % units of thrust cmd [-1, 1]
+        gains.integralTermLimit = 0.2; % units of thrust cmd [-1, 1]
         gains.saturationLimit = 0.2;
         
         gains.altTimeConstant = 0.3;
