@@ -14,12 +14,11 @@ data = csvread(filepath);
 curTime = data(:,1);
 dt = data(:,2);
 zd = data(:,3);
-altDesFilt = data(:,4);
-zcur = data(:,5);
-altFilt = data(:,6);
+zcur = data(:,4);
+altFilt = data(:,5);
 
-altError = data(:,7);
-altIntegralError = data(:,8);
+altRateCmd = data(:,7);
+timeSetpointSet = data(:,8);
 propTerm = data(:,9);
 integralTerm = data(:,10);
 thrustCmdUnsat = data(:,11);
@@ -28,17 +27,32 @@ thrustCmd = data(:,12);
 vel = data(:,19);
 velFilt = data(:,20);
 derivTerm = data(:,21);
-% 
-%zdot = diff(altFilt)./dt(1:end-1);
-figure(3)
-plot(curTime,vel,'o-','linewidth',2);
-hold on
-plot(curTime,velFilt,'b-','linewidth',2);
-grid on;
-xlabel('Time (sec.)')
-ylabel('Alt Rate (m/s)');
-set(gca,'FontSize',16);
-legend('vel','vel-filter');
+
+
+    pFile = fopen( altControl.log ,'a');
+    
+    % write csv file
+    fprintf(pFile,'%6.6f,',curTime); % 1
+    fprintf(pFile,'%6.6f,',dt); % 2
+    fprintf(pFile,'%6.6f,',zd); % 3
+    fprintf(pFile,'%6.6f,',zcur); % 4
+    fprintf(pFile,'%6.6f,',altFilt); % 5
+    
+    fprintf(pFile,'%6.6f,',altRateCmd); % 6
+    fprintf(pFile,'%6.6f,',timeSetpointSet); % 7
+    
+    % constant parameters
+    fprintf(pFile,'%6.6f,',altFiltTimeConstant); % 8
+    fprintf(pFile,'%6.6f,',climbRateCmd);
+    fprintf(pFile,'%6.6f,',descentRateCmd);
+    fprintf(pFile,'%6.6f,',altErrorDeadband);
+    fprintf(pFile,'%6.6f,',altDesTimeConstant);
+    fprintf(pFile,'%6.6f,',settlingTime);
+    
+    fclose(pFile);
+    
+
+
 
 %
 Kp = data(:,13);
@@ -57,7 +71,7 @@ fprintf('Time constants (alt,alt-des) = (%3.3f, %3.3f) \n',altTimeConstant(1), a
 figure(1);
 title(file);
 
-subplot(2,3,1);
+subplot(2,4,1);
 plot(curTime, zd,'mo-','linewidth',2);
 hold on;
 plot(curTime, altDesFilt,'rx-','linewidth',2);
@@ -71,7 +85,7 @@ ylim([0 1.5]);
 set(gca,'FontSize',16);
 legend('z-des','z-des-filter','z-raw','z-filt');
 
-subplot(2,3,4);
+subplot(2,4,5);
 plot(curTime, thrustCmdUnsat,'bo-','linewidth',2);
 hold on;
 plot(curTime, thrustCmd,'ro-','linewidth',2);
@@ -81,28 +95,46 @@ ylabel('Thrust Command');
 set(gca,'FontSize',16);
 ylim([-0.4 0.2]);
 
-subplot(2,3,2);
+subplot(2,4,2);
 plot(curTime, altError,'ko-','linewidth',2);
 xlabel('Time (sec');
 ylabel('Altitude Error (m)');
 set(gca,'FontSize',16);
 
-subplot(2,3,5);
+subplot(2,4,6);
 plot(curTime, propTerm,'ko-','linewidth',2);
 xlabel('Time (sec');
 ylabel('Proportional Term');
 set(gca,'FontSize',16);
 
-subplot(2,3,3);
+subplot(2,4,3);
 plot(curTime, altIntegralError,'ko-','linewidth',2);
 xlabel('Time (sec');
 ylabel('Altitude Error Integral (m)');
 set(gca,'FontSize',16);
 
-subplot(2,3,6);
+subplot(2,4,7);
 plot(curTime, integralTerm,'ko-','linewidth',2);
 xlabel('Time (sec');
 ylabel('Integral Term');
+set(gca,'FontSize',16);
+
+subplot(2,4,4);
+plot(curTime,vel,'o-','linewidth',2);
+hold on
+plot(curTime,velFilt,'b-','linewidth',2);
+grid on;
+xlabel('Time (sec.)')
+ylabel('Alt Rate (m/s)');
+set(gca,'FontSize',16);
+legend('vel','vel-filter');
+
+subplot(2,4,8);
+plot(curTime,derivTerm,'o-','linewidth',2);
+hold on
+grid on;
+xlabel('Time (sec.)')
+ylabel('Derivative Term');
 set(gca,'FontSize',16);
 
 % figure(2);

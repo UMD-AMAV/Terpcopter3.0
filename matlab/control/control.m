@@ -92,11 +92,7 @@ if isempty(t0), t0 = abs_t; end
 % initialize
 %global altControl;
 stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
-altControl.time = 0;
-altControl.alt = stateEstimateMsg.Range;
-altControl.altRate = 0;
-altControl.altDesired = stateEstimateMsg.Range;
-altControl.altIntegralError = 0;
+altControl.timeSetpointSet = 0;
 altControl.log=[params.env.matlabRoot '/altControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
 
 % yaw controller
@@ -153,44 +149,40 @@ while(1)
         
         %%%% CAHNGING YAW FROM GUI TO VISION %%%%%
         %     yaw_d = yawSetpointMsg.Data; % ahsCmdMsg.HeadingRad;
-                
+        
         % update errors
         altError = z_d - z;
         
-%         % reset integral term if boolean (pidResetSubscriber) is true 
-%         % this comes from the tuner GUI
-%         pidResetMsg = rosmessage('std_msgs/Bool');
-%         pidResetMsg.Data = false;
-%         pidResetMsg = pidResetSubscriber.LatestMessage;
-%         if ~isempty(pidResetMsg)
-%             if pidResetMsg.Data == true
-%                 disp("Resetting PID ...")
-%                 altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
-%                 altitudeErrorHistory.lastSum = 0;
-%                 pidResetMsg.Data = false;
-%                 send(pidResetPublisher, pidResetMsg);
-%             end
-%         end
+        %         % reset integral term if boolean (pidResetSubscriber) is true
+        %         % this comes from the tuner GUI
+        %         pidResetMsg = rosmessage('std_msgs/Bool');
+        %         pidResetMsg.Data = false;
+        %         pidResetMsg = pidResetSubscriber.LatestMessage;
+        %         if ~isempty(pidResetMsg)
+        %             if pidResetMsg.Data == true
+        %                 disp("Resetting PID ...")
+        %                 altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
+        %                 altitudeErrorHistory.lastSum = 0;
+        %                 pidResetMsg.Data = false;
+        %                 send(pidResetPublisher, pidResetMsg);
+        %             end
+        %         end
         
         % compute controls
         % FF_PID(gains, error, newTime, newErrVal)
         %[u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
         
         % hardcode for now
-        gains.Kp = pidAltSettingMsg.Kp;
-        gains.Ki = pidAltSettingMsg.Ki;
-        gains.Kd = pidAltSettingMsg.Kd;
-        gains.ffterm = pidAltSettingMsg.Ff;
-
-        gains.integralTermLimit = 0.3; % units of thrust cmd [-1, 1]
-        gains.saturationLimit = 0.2;
+        altControl.altFiltTimeConstant = 0.1; % sec, used to filter lidar
+        % deadband 0.1
+        altControl.climbRateCmd = 0.15; % nominal stick position for climb [-1,1]
+        altControl.descentRateCmd = -0.15; % nominal stick position for climb [-1,1]
+        altControl.altErrorDeadband = 0.25; % meters, deadband around desired altitude
+        altControl.settlingTime = 5; % sec, waits this amount of time after setpoint issued to give climb or descent (if deadband excedded)
         
-        gains.altTimeConstant = 0.3;
-        gains.altRateTimeConstant = 0.15;
-        gains.altDesTimeConstant = 3.0;
+        % compute control
+        [u_t_alt, altControl] = altModeController(altControl, t, z, z_d);
 
-        [u_t_alt, altControl] = altitudeControllerPID(gains, altControl, t, z, z_d, altControlDegbugPublisher);
-        
         %New Yaw Controller
         %     yaw_d = deg2rad(yaw_d);
         %     yaw = deg2rad(yaw);
@@ -212,24 +204,24 @@ while(1)
         
         
         % publish
-        stickCmdMsg.Thrust = u_t_alt; 
+        stickCmdMsg.Thrust = u_t_alt;
         stickCmdMsg.Yaw = max(-1,min(1,u_t_yaw));
         
         % debug/display
         fprintf('Altitude meters : %3.3f [m]\n', z);
-        fprintf('Yaw Angle : %3.3f [deg]\n', yaw);        
+        fprintf('Yaw Angle : %3.3f [deg]\n', yaw);
         disp('pid loop');
         disp(pidAltSettingMsg)
         %     disp('yawSetpoint')
         %     disp(yaw_d)
         disp('yawCurrent')
-        disp(yaw)        
+        disp(yaw)
         fprintf('Stick Cmd.Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f, Yaw : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ), u_t_yaw );
         %fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
-        %time = r.TotalElapsedTime;        
+        %time = r.TotalElapsedTime;
         
-    %elseif startMissionMsg.Data == false
-    %    fprintf('Mission has not started. Press Start Mission button in Tuner GUI.\n');
+        %elseif startMissionMsg.Data == false
+        %    fprintf('Mission has not started. Press Start Mission button in Tuner GUI.\n');
     else
         fprintf('Error: both open loop and closed loop control are either running or not running\n');
     end

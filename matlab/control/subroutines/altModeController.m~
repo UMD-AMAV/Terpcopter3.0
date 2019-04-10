@@ -1,0 +1,108 @@
+function [altRateCmd, altControl] = altModeController(gains, altControl, curTime, zcur, zd)
+
+% unpack states
+ = altControl.time;
+ timeSetpoint= altControl.alt;
+
+% unpack tuning parameters (constants)
+altFiltTimeConstant = altControl.altFiltTimeConstant;
+climbRateCmd = altControl.climbRateCmd;
+descentRateCmd = altControl.descentRateCmd;
+altErrorDeadband = altControl.altErrorDeadband;
+settlingTime = altControl.settlingTime;
+
+%%
+% time elapsed since last control
+dt = curTime - prevTime;
+timeSinceSetpoint = curTime - timeSetpoint;
+
+% low-pass filter altitude
+alpha_a = dt / ( altFiltTimeConstant + dt);
+altFilt = (1-alpha_a)*prevAlt + alpha_a*zcur;
+
+% altitude error
+altError = zd - altFilt;
+
+% bang-bang control
+if (altError >= altErrorDeadband && timeSinceSetpoint >= settlingTime )
+    altRateCmd = descentRateCmd;
+elseif ( altError <= -altErrorDeadband && timeSinceSetpoint >= settlingTime )
+    altRateCmd = climbRateCmd;
+else
+    altRateCmd = 0;   
+    timeSetpoint = curTime;
+end
+
+
+%% pack up structure
+altControl.time = curTime;
+altControl.altDesired = altDesFilt; % this is the filtered setpoint
+altControl.alt = altFilt;
+altControl.altRate = altRateFilt;
+altControl.altIntegralError = altIntegralError;
+
+%% display/debug
+fprintf('Controller running at %3.2f Hz\n',1/dt);
+
+displayFlag = 1;
+if ( displayFlag )
+    
+    pFile = fopen( altControl.log ,'a');
+    
+    % write csv file
+    fprintf(pFile,'%6.6f,',curTime);
+    fprintf(pFile,'%6.6f,',dt);
+    fprintf(pFile,'%6.6f,',zd);
+    fprintf(pFile,'%6.6f,',altDesFilt);
+    fprintf(pFile,'%6.6f,',zcur);
+    fprintf(pFile,'%6.6f,',altFilt);
+    
+    fprintf(pFile,'%6.6f,',altError);
+    fprintf(pFile,'%6.6f,',altIntegralError);
+    
+    fprintf(pFile,'%6.6f,',propTerm);
+    fprintf(pFile,'%6.6f,',integralTerm);
+    
+    fprintf(pFile,'%6.6f,',thrustCmdUnsat);
+    fprintf(pFile,'%6.6f,',thrustCmd);
+    
+    % constant parameters
+    fprintf(pFile,'%6.6f,',gains.Kp);
+    fprintf(pFile,'%6.6f,',gains.Ki);
+    fprintf(pFile,'%6.6f,',integralTermLimit);
+    fprintf(pFile,'%6.6f,',altTimeConstant);
+    fprintf(pFile,'%6.6f,',altDesTimeConstant);
+    fprintf(pFile,'%6.6f,',ffterm);
+    
+    
+    fprintf(pFile, '%6.6f,',zdot);
+    fprintf(pFile, '%6.6f\n',altRateFilt);
+    fprintf(pFile, '%6.6f\n',derivTerm);
+    
+    
+    fclose(pFile);
+    
+    %     % initialize message to publish
+    %     altControlDebugMsg = rosmessage(altControlDegbugPublisher);
+    %     altControlDebugMsg.T = curTime;
+    %     altControlDebugMsg.Zd = zd;
+    %     altControlDebugMsg.Zcur = zcur;
+    %     altControlDebugMsg.AltRateDes = altRateDes;
+    %     altControlDebugMsg.AltRateActual = altRateActual;
+    %
+    %     altControlDebugMsg.AltRateError = altRateError;
+    %     altControlDebugMsg.AltRateErrorIntegral = altRateErrorIntegral;
+    %     altControlDebugMsg.AltRateErrorRate = altRateErrorRate;
+    %
+    %
+    %     altControlDebugMsg.Proportional = propTerm;
+    %     altControlDebugMsg.Integral = integralTerm;
+    %     altControlDebugMsg.Derivative = derivTerm;
+    %
+    %     altControlDebugMsg.ThrustCmdUnsat = thrustCmdUnsat;
+    %     altControlDebugMsg.ThrustCmd = thrustCmd;
+    %
+    %     send(altControlDegbugPublisher, altControlDebugMsg);
+end
+
+end
