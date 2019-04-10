@@ -24,7 +24,8 @@ def dropOffDetection(frame):
     whiteCenter= []
     whiteContour = []
     autoEdge_red = cv2.Canny(frame_blur_red, lower, higher)
-    contours_red, hierarchy = cv2.findContours(autoEdge_red,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)     
+    #contours_red, hierarchy = cv2.findContours(autoEdge_red,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+    i,contours_red, hierarchy = cv2.findContours(autoEdge_red,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)     
     contourFoundRed = False
     if len(contours_red) > 0:
           c = max(contours_red,key = cv2.contourArea) #finding maximum from the set of contours in the given frame
@@ -46,7 +47,8 @@ def dropOffDetection(frame):
                             redCenter.append((cX,cY))
                             break
     autoEdge_white = cv2.Canny(frame_blur_white, lower, higher)
-    contours_white, hierarchy = cv2.findContours(autoEdge_white,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)     
+    #contours_white, hierarchy = cv2.findContours(autoEdge_white,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+    i,contours_white, hierarchy = cv2.findContours(autoEdge_white,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)     
     contourFoundWhite = False
     if len(contours_white) > 0:
           c = max(contours_white,key = cv2.contourArea) #finding maximum from the set of contours in the given frame
@@ -80,7 +82,9 @@ def dropOffDetection(frame):
             cv2.putText(frame,'Dropoff Detected Weak Detection', redCenter[0], cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0),2, lineType=cv2.LINE_AA)
     cv2.imshow("Target", frame)
     #cv2.imshow("Blure Frame", frame_blur)
+    cv2.waitKey(1)
 
+'''
 #################################################
 # Use this code when not connected to ros master
 cap = cv2.VideoCapture(1)
@@ -94,3 +98,4 @@ while cap.isOpened():
 ##################################################
 cap.release()
 cv2.destroyAllWindows()
+'''
