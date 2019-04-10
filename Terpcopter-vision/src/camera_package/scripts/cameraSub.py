@@ -17,6 +17,8 @@ from _stateEstimate import stateEstimate
 from _targetPose import targetPose
 import ObstacleDetection
 import ObstacleAvoidance
+import HBaseDetector
+
 try:
     sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 except:
@@ -67,7 +69,7 @@ def callbackImage(data):
     #                   Input Parameters: Image frame in openCV image format, blob detection parameter object
     ObstacleAvoidance.obstacleDetection(cv_image, detector_obst)
     ObstacleDetection.objectDetect(cv_image,detector_target)
-
+    HBaseDetector.HBase(cv_image)
 
 ###############################################################################
 # Horizontal Error callback function

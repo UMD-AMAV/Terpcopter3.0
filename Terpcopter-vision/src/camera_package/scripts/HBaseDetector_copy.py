@@ -1,12 +1,11 @@
+try:
+    sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
+except:
+    pass
+
 import cv2
 import numpy as np
 import math
-import imutils
-from std_msgs.msg import String
-from std_msgs.msg import Bool
-from std_msgs.msg import Float32
-from _feedback import feedback
-from _targetPose import targetPose
 
 def eucdist(x1,y1,x2,y2):
     dist = math.sqrt((x1-x2)**2 + (y1-y2)**2)
@@ -14,9 +13,9 @@ def eucdist(x1,y1,x2,y2):
 
 
 def HBase(frame):
-    pubIP = rospy.Publisher('deltaYawHome', Float32, queue_size=10)
-    FlagIP = rospy.Publisher('HomeFlag',Bool,queue_size=10)
     h_image,w_image= frame.shape[:2] #here we store width and height of frame
+    # clahe = cv2.createCLAHE(clipLimit= 2.0) #Contrast Limited Adaptive Histogram Equilization to remove glares
+    # frame1 = clahe.apply(cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY))
     hsv_frame = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) #convert RGB color scheme to HSV color scheme for better color recognition
     v = np.median(frame)
     lower = int(max(0,(1.0-0.33)*v))
@@ -25,8 +24,9 @@ def HBase(frame):
     lower_black = np.array([0,0,0])
     higher_black = np.array([180,255,30])
     masking_black = cv2.inRange(hsv_frame, lower_black, higher_black) #with both the yellow color limits we detect yellow color from the image
-    masking_black = cv2.morphologyEx(masking_black,cv2.MORPH_CLOSE,kernel)
+
     frame_blur = cv2.bilateralFilter(masking_black, 9, 75, 75)
+
     autoEdge = cv2.Canny(frame_blur, lower, higher)
     im, contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_CCOMP,cv2.CHAIN_APPROX_NONE) #for different version of OpenCV we only have 2 values to unpack from findContour
     #im2, contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE) #finding the contour around the yellow region
@@ -66,8 +66,6 @@ def HBase(frame):
     #We calculate the angle of longest line
     linesP = cv2.HoughLinesP(autoEdge, 1, np.pi / 180, 50, None, 50, 10)
     maxL = 0
-    angle = 0
-    flag = False
     if(len(hbaseContour) > 0):
         if linesP is not None:
             for i in range(0, len(linesP)):
@@ -83,27 +81,21 @@ def HBase(frame):
         x = longestLine[0] - longestLine[2]
         angle = math.atan2(y,x)
         angle = math.degrees(angle)
-        flag = True
         cv2.putText(frame,"Angle = " + str(angle), (20,80), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
-    pubIP.publish(angle)
-    FlagIP.publish(flag)
-
-    cv2.imshow("HomeBase", frame)
-    if cv2.waitKey(1)& 0xff==ord('q'):
-        cv2.destroyAllWindows()
-        # break
+    # cv2.imshow("Canny out",frame1)
 
 
-    # return frame
+    # cv2.waitKey(1)
+    return frame
 
-# def main():
-#     cap = cv2.VideoCapture(1)
-#     while(True):
-#         ret, frame = cap.read()
-#         frame = HBase(frame)
-#         cv2.imshow("HomeBase", frame)
-#         if cv2.waitKey(1)& 0xff==ord('q'):
-#             cv2.destroyAllWindows()
-#             break
-# if __name__ == '__main__':
-#     main()
+def main():
+    cap = cv2.VideoCapture(1)
+    while(True):
+        ret, frame = cap.read()
+        frame = HBase(frame)
+        cv2.imshow("HomeBase", frame)
+        if cv2.waitKey(1)& 0xff==ord('q'):
+            cv2.destroyAllWindows()
+            break
+if __name__ == '__main__':
+    main()
