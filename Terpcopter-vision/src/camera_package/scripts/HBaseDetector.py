@@ -1,6 +1,12 @@
+# import rospy
 import cv2
 import numpy as np
 import math
+# import imutils
+# from std_msgs.msg import String
+# from std_msgs.msg import Bool
+# from _feedback import feedback
+# from _targetPose import targetPose
 
 def eucdist(x1,y1,x2,y2):
     dist = math.sqrt((x1-x2)**2 + (y1-y2)**2)
@@ -8,6 +14,8 @@ def eucdist(x1,y1,x2,y2):
 
 
 def HBase(frame):
+    #height,width= frame.shape[:2]
+    #frame = cv2.resize(frame,(int(0.5*width), int(0.5*height)), interpolation = cv2.INTER_AREA)
     h_image,w_image= frame.shape[:2] #here we store width and height of frame
     hsv_frame = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) #convert RGB color scheme to HSV color scheme for better color recognition
     v = np.median(frame)
@@ -53,8 +61,7 @@ def HBase(frame):
                             cv2.putText(frame,"HError = " + str(hError), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
                             cv2.putText(frame,"VError = " + str(vError), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
           cntNumber += 1
-    #Detects the probable lines within the detected home base. 
-    #We calculate the angle of longest line
+    
     linesP = cv2.HoughLinesP(autoEdge, 1, np.pi / 180, 50, None, 50, 10)
     maxL = 0
     if(len(hbaseContour) > 0):    
@@ -70,12 +77,50 @@ def HBase(frame):
         cv2.line(frame, (longestLine[0], longestLine[1]), (longestLine[2], longestLine[3]), (0,0,255), 3, cv2.LINE_AA)
         y = longestLine[1] - longestLine[3]
         x = longestLine[0] - longestLine[2]
-        angle = math.atan2(y,x)
+        angle = math.atan(y/x)
         angle = math.degrees(angle)
+        if(angle < 0):
+            angle = angle * (-1)
+        else:
+            angle = 180 - angle
         cv2.putText(frame,"Angle = " + str(angle), (20,80), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
     
     
     cv2.imshow("HomeBase", frame)
     cv2.waitKey(1)
     return frame
+    # if cv2.waitKey(1) & 0xFF == ord('q'):
+    #     break
+#cap = cv2.VideoCapture("C:\DesktopExtra\AMAV\Terpcopter3.0\Terpcopter-vision\src\camera_package\scripts\Vid2.mp4")
 
+#while cap.isOpened():
+#while True:
+    #ret, frame = cap.read()
+
+path  = "C:\DesktopExtra\AMAV\Terpcopter3.0\Terpcopter-vision\src\camera_package\scripts\TestData\image"
+pathO  = "C:\DesktopExtra\AMAV\Terpcopter3.0\Terpcopter-vision\src\camera_package\scripts\OutputData\image"
+it = 0
+while True:
+    imgPath = path + str(it) + ".png"
+    imgPathO = pathO + str(it) + ".png" 
+    frame = cv2.imread(imgPath)
+    img = HBase(frame)
+    #cv2.imwrite(imgPathO,img)
+    
+    cv2.imshow("Frames", img)
+    key = cv2.waitKey(33)
+    if key == ord('n'):
+        it += 1
+    if key == ord('p'):
+        it = it - 1
+    if key == ord('q'):
+        break
+    if it == 950:
+        break
+    
+cv2.destroyAllWindows()
+
+'''
+cap.release()
+cv2.destroyAllWindows()
+'''
