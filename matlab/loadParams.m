@@ -2,9 +2,9 @@ function params = loadParams()
 
 % Environment (env) parameters
 %------------------------------------------------
-params.env.com_port = '/dev/ttyUSB0';
+params.env.com_port = '/dev/tty.usbserial-1410';
 params.env.baud_rate = 57600;
-params.env.ros_master_ip = '192.168.0.29'; %change master to Laptop 
+params.env.ros_master_ip = '192.168.1.21'; %change master to Laptop 
 params.env.catkinSrcDir = '/home/amav/catkin_ws/src';
 params.env.terpcopterMatlabMsgs = [params.env.catkinSrcDir '/matlab_gen/msggen'];
 
@@ -74,7 +74,9 @@ params.ctrl.yawGains.kp = 0.3000;
 params.ctrl.yawGains.kd = 0.20000;
 params.ctrl.yawGains.ki = 0.050000;
  
+% crab control
 
+% forward control
 
 % Estimation (est)
 %------------------------------------------------
@@ -88,7 +90,7 @@ params.est.altitudeLPFitler.timeConstant = 1.00000; % sec,
 
 % Autonomy (auto)
 %------------------------------------------------
-params.auto.mode = 'auto';
+params.auto.mode = 'manual';
 
 
 
