@@ -50,7 +50,7 @@ closedLoopIsActiveSubscriber = rossubscriber('/closedLoopIsActive', 'std_msgs/Bo
 ahsCmdSubscriber = rossubscriber('/ahsCmd');
 startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
 
-yawSetpointSubscriber = rossubscriber('/yawSetpoint');
+%yawSetpointSubscriber = rossubscriber('/yawSetpoint');
 
 pidAltSettingSubscriber = rossubscriber('/pidAltSetting');
 pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
@@ -76,7 +76,7 @@ ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
 pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
 pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
 
-yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
+%yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
 
 % timestamp
 t0 = []; timeMatrix=[];
@@ -104,6 +104,7 @@ u_t_alt = controlParams.altitudeGains.ffterm;
 % absoluteYaw = stateEstimateMsg.Yaw;
 absolutePitch = stateEstimateMsg.Pitch;
 absoluteRoll = stateEstimateMsg.Roll;
+% Note: Need to update the AHS mesage for pitch and roll (radians
 Pitch_d = 0;
 Roll_d = 0;
 
@@ -129,7 +130,7 @@ while(1)
     openLoopIsActiveMsg = openLoopIsActiveSubscriber.LatestMessage;
     startMissionMsg = startMissionSubscriber.LatestMessage;
     closedLoopIsActiveMsg = closedLoopIsActiveSubscriber.LatestMessage;
-    yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
+   % yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
     
     
     if (openLoopIsActiveMsg.Data == true) & (closedLoopIsActiveMsg.Data == false)
@@ -158,7 +159,7 @@ while(1)
         z_d = ahsCmdMsg.AltitudeMeters;
         
         %%%% CAHNGING YAW FROM GUI TO VISION %%%%%
-        yaw_d = yawSetpointMsg.Data; % ahsCmdMsg.HeadingRad;
+        yaw_d = ahsCmdMsg.HeadingRad; %yawSetpointMsg.Data; % ;
         
         
         % update errors
