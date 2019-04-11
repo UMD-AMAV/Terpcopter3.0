@@ -187,40 +187,44 @@ while(1)
     
     %% Apply KF here 
     % convert IMU acceleration to world cord [NWU Frame].
-    linaccIMU(1,1) = round(imuMsg.LinearAcceleration.X,3);
-    linaccIMU(2,1) = round(imuMsg.LinearAcceleration.Y,3);
-    linaccIMU(3,1) = round(imuMsg.LinearAcceleration.Z,3);
-    
-    R_imu2inert = (rotationMatrixYPR(state.psi_inertial,stateMsg.Pitch,stateMsg.Roll))';
-    %R_imu2inert = (rotationMatrixYPR(pi,pi+stateMsg.Pitch,stateMsg.Roll))';
-
-    linAcc = R_imu2inert * [linaccIMU(1,1); linaccIMU(2,1); linaccIMU(3,1)];
-    %param.u = [linAcc(1); linAcc(2); linAcc(3) - 9.81];
-    ax = linAcc(1) - biasAx; ay =  linAcc(2) - biasAy; az = linAcc(3) - biasAz;
-    
-    param.u = [linaccIMU(1,1); linaccIMU(2,1)]; %sending IMU frame acceleration
-    
+%     linaccIMU(1,1) = round(imuMsg.LinearAcceleration.X,3);
+%     linaccIMU(2,1) = round(imuMsg.LinearAcceleration.Y,3);
+%     linaccIMU(3,1) = round(imuMsg.LinearAcceleration.Z,3);
+%     
+%     R_imu2inert = (rotationMatrixYPR(state.psi_inertial,stateMsg.Pitch,stateMsg.Roll))';
+%     %R_imu2inert = (rotationMatrixYPR(pi,pi+stateMsg.Pitch,stateMsg.Roll))';
+% 
+%     linAcc = R_imu2inert * [linaccIMU(1,1); linaccIMU(2,1); linaccIMU(3,1)];
+%     %param.u = [linAcc(1); linAcc(2); linAcc(3) - 9.81];
+%     ax = linAcc(1) - biasAx; ay =  linAcc(2) - biasAy; az = linAcc(3) - biasAz;
+%     
+%     param.u = [linaccIMU(1,1); linaccIMU(2,1)]; %sending IMU frame acceleration
+%     
     % Get (WEST) East-> x and North->y from VIO topic 
     stateMsg.East = vioMsg.Pose.Position.X; % TODO: change this to west
     stateMsg.North = vioMsg.Pose.Position.Y;
     
-    [predictX, predictY, stateKF, param, previous_t] = kalmanFilter(stateMsg.Time,stateMsg.East,stateMsg.North, stateKF, param, previous_t);
+    % write a constraint which will detect if VIO drifts 
     
-%     predictX
-%     predictY
-    
+%     
+%     [predictX, predictY, stateKF, param, previous_t] = kalmanFilter(stateMsg.Time,stateMsg.East,stateMsg.North, stateKF, param, previous_t);
+       
     % fixed loop pause
     waitfor(r);
     
     % publish stateEstimate
     send(stateEstimatePublisher, stateMsg);
     
-    % [time ax ay az imuaccx imuaccY imuaccZ VIox VIoY predX predY vx vy]
-    fprintf(fileID,'%5f %5f %5f %5f %5f %5f %5f %5f %5f %5f %5f %5f %5f \n', ...
-        stateMsg.Time,ax,...
-        ay,az,imuMsg.LinearAcceleration.X, ...
-        imuMsg.LinearAcceleration.Y, imuMsg.LinearAcceleration.Z , ...
-        stateMsg.East, stateMsg.North, predictX, predictY, stateKF(3), stateKF(4));
+    % [time VIox VIoY]
+    fprintf(fileID,'%5f %5f %5f\n', ...
+        stateMsg.Time, stateMsg.East, stateMsg.North);
+    
+%     % [time ax ay az imuaccx imuaccY imuaccZ VIox VIoY predX predY vx vy]
+%     fprintf(fileID,'%5f %5f %5f %5f %5f %5f %5f %5f %5f %5f %5f %5f %5f \n', ...
+%         stateMsg.Time,ax,...
+%         ay,az,imuMsg.LinearAcceleration.X, ...
+%         imuMsg.LinearAcceleration.Y, imuMsg.LinearAcceleration.Z , ...
+%         stateMsg.East, stateMsg.North, predictX, predictY, stateKF(3), stateKF(4));
 
 end
 

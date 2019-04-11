@@ -1,7 +1,8 @@
 function [predictX, predictY, state,param, previous_t] = kalmanFilter(t, x, y, state, param, previous_t)
 % State =[px py vx vy]'
 
-sigmaQ = diag([1.317848e-07,2.118806e-07,3.582132e-04,1.823729e-04]); % setting this value large and sigmaR samller the output should be roughly the measurement values 
+sigmaQ = diag([1.317848e-07,2.118806e-07,3.582132e-04,1.823729e-04]); % setting this value large and sigmaR samller
+% the output should be roughly the measurement values
 sigmaR = diag([1.5299e-07,9.3897e-08]); %1.5299e-07 9.3897e-08
 
 % If first time running this funciton 
