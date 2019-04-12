@@ -178,7 +178,7 @@ while(1)
     
     if(velCorrect)
         omega = (pitch - lastPitch)/dt;            % not sure of the sign/direction
-        u = (u + (omega*flowProbeHeight))/cos(pitch);
+        u = u/cos(pitch) + (omega*flowProbeHeight)
     end
         
     
