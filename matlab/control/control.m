@@ -105,8 +105,8 @@ u_t_alt = controlParams.altitudeGains.ffterm;
 absolutePitch = stateEstimateMsg.Pitch;
 absoluteRoll = stateEstimateMsg.Roll;
 % Note: Need to update the AHS mesage for pitch and roll (radians
-Pitch_d = 0;
-Roll_d = 0;
+Pitch_d = 2.7;
+Roll_d = 1.4;
 
 % ahsCmdMsg.HeadingRad = absoluteYaw;
 % yawError.lastTime = stateEstimateMsg.Time;
@@ -206,11 +206,11 @@ while(1)
             
             %Pitch Control
             PitchError = Pitch_d - absolutePitch;
-            u_t_pitch = -0.3*PitchError;
+            u_t_pitch = 1*PitchError;
             
             %Roll COntrol
             RollError = Roll_d - absoluteRoll;
-            u_t_roll = -0.3*RollError;
+            u_t_roll = 1*RollError;
             
         % compute controls
         %      [u_t_yaw, yawError] = PID(pidYawSettingMsg, yawError, t, yaw_error);

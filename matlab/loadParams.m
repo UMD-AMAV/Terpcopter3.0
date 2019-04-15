@@ -13,10 +13,10 @@ params.env.terpcopterMatlabMsgs = [params.env.catkinSrcDir '/matlab_gen/msggen']
 % mode of operation 
 params.vtx.mode = 'flight'; % 'sim' or 'flight' 
 
-% transmitter 
+% transmitter           throttle roll pitch yaw
 params.vtx.stick_lim = [100; 100; 100; 100];
 params.vtx.trim_lim = [29; 29; 29; 29];
-params.vtx.trim_val = [0 -1.00344 -3.31137931 0.137931];   
+params.vtx.trim_val = [0 0 -0.517241379 0.137931]; %-1.00344  0.172413793
 
 % simulator
 params.vtx.T = 30; % simulation time
