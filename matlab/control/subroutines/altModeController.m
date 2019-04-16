@@ -1,7 +1,7 @@
 function [altRateCmd, altControl] = altModeController(altControl, curTime, zcur, zd)
 
 % unpack states
-timeSetpointSet = altControl.timeSetpointSet;
+%timeSetpointSet = altControl.timeSetpointSet;
 
 % unpack tuning parameters (constants)
 altFiltTimeConstant = altControl.altFiltTimeConstant;
@@ -15,7 +15,7 @@ setpointReached = altControl.setpointReached;
 %%
 % time elapsed since last control
 dt = curTime - altControl.lastTime;
-timeSinceSetpoint = curTime - timeSetpointSet;
+%timeSinceSetpoint = curTime - timeSetpointSet;
 
 % low-pass filter altitude
 alpha_a = dt / ( altFiltTimeConstant + dt);
@@ -26,31 +26,55 @@ altFilt = (1-alpha_a)*prevAlt + alpha_a*zcur;
 altError = zd - altFilt;
 
 % bang-bang control
-if (altError >= setpointDeadband && setpointReached == 0 )
-    altRateCmd = climbRateCmd;
-    disp('Climb To Setpoint')    
-elseif (altError >= overshootDeadband  && setpointReached == 1 )
-    altRateCmd = climbRateCmd;
-    disp('Climb To Overcome Overshoot')
-elseif (altError <= -setpointDeadband && setpointReached == 0 )
-    altRateCmd = descentRateCmd;
-    disp('Descend To Setpoint')    
-elseif (altError <= -overshootDeadband  && setpointReached == 1 )
-    altRateCmd = descentRateCmd;
-    disp('Descend To Overcome Overshoot')
-elseif ( abs(altError) <= setpointDeadband )
+if ( abs(altError) <= setpointDeadband ) % triggers the setpointReached
    altRateCmd = 0;
    setpointReached = 1;
    disp('Hold')
-else
+elseif ( abs(altError) <= overshootDeadband  && setpointReached == 1 ) % altRateCmd is to zero if the setpointReached was triggered but the quad is still within the overshoot threshold 
+   if (altError >= setpointDeadband)
+       altRateCmd = 0.05;
+       disp('Precision Climb')
+   else
+       altRateCmd = -0.05;
+       disp('Precision Decent')
+   end
+elseif (altError >= setpointDeadband && setpointReached == 0 ) % if it hasn't reached the setpoint and must climb
+    altRateCmd = climbRateCmd;
+    disp('Climb To Setpoint') 
+elseif (altError <= -setpointDeadband && setpointReached == 0 ) %  if it hasn't reached the setpoint and must decend
+    altRateCmd = descentRateCmd;
+    disp('Descend To Setpoint') 
+else 
    altRateCmd = 0;
    setpointReached = 0;
    disp('Reset Setpoint')   
 end
 
+% if (altError >= setpointDeadband && setpointReached == 0 )
+%     altRateCmd = climbRateCmd;
+%     disp('Climb To Setpoint')    
+% elseif (altError >= overshootDeadband  && setpointReached == 1 )
+%     altRateCmd = climbRateCmd;
+%     disp('Climb To Overcome Overshoot')
+% elseif (altError <= -setpointDeadband && setpointReached == 0 )
+%     altRateCmd = descentRateCmd;
+%     disp('Descend To Setpoint')    
+% elseif (altError <= -overshootDeadband  && setpointReached == 1 )
+%     altRateCmd = descentRateCmd;
+%     disp('Descend To Overcome Overshoot')
+% elseif ( abs(altError) <= setpointDeadband )
+%    altRateCmd = 0;
+%    setpointReached = 1;
+%    disp('Hold')
+% else
+%    altRateCmd = 0;
+%    setpointReached = 0;
+%    disp('Reset Setpoint')   
+% end
+
 
 %% pack up structure
-altControl.timeSetpointSet = timeSetpointSet;
+%altControl.timeSetpointSet = timeSetpointSet;
 altControl.lastTime = curTime;
 altControl.prevAlt = zcur;
 altControl.setpointReached = setpointReached;
@@ -70,13 +94,14 @@ if ( displayFlag )
     fprintf(pFile,'%6.6f,',altFilt);
     
     fprintf(pFile,'%6.6f,',altRateCmd);
-    fprintf(pFile,'%6.6f,',timeSetpointSet);
+%    fprintf(pFile,'%6.6f,',timeSetpointSet);
     
     % constant parameters
     fprintf(pFile,'%6.6f,',altFiltTimeConstant);
     fprintf(pFile,'%6.6f,',climbRateCmd);
     fprintf(pFile,'%6.6f,',descentRateCmd);
     fprintf(pFile,'%6.6f,',setpointDeadband);
+    fprintf(pFile,'%6.6f, \n',overshootDeadband);
     %fprintf(pFile,'%6.6f,\n',settlingTime);
     
     fclose(pFile);

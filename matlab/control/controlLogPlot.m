@@ -18,12 +18,12 @@ zcur = data(:,4);
 altFilt = data(:,5);
 
 altRateCmd = data(:,6);
-timeSetpointSet = data(:,7);
+%timeSetpointSet = data(:,7);
 
-altFiltTimeConstant = data(:,8);
-climbRateCmd = data(:,9);
-descentRateCmd = data(:,10);
-altErrorDeadband = data(:,11);
+altFiltTimeConstant = data(:,7);
+climbRateCmd = data(:,8);
+descentRateCmd = data(:,9);
+altErrorDeadband = data(:,10);
 %settlingTime = data(:,12);
 
 %     % write csv file
