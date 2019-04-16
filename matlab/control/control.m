@@ -93,6 +93,8 @@ if isempty(t0), t0 = abs_t; end
 %global altControl;
 stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 altControl.timeSetpointSet = 0;
+altControl.lastTime = 0;
+altControl.prevAlt = 0;
 altControl.log=[params.env.matlabRoot '/altControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
 
 % yaw controller
@@ -134,7 +136,7 @@ while(1)
         % timestamp
         ti= rostime('now');
         abs_t = double(ti.Sec)+double(ti.Nsec)*10^-9;
-        t = abs_t-t0;
+        t = abs_t-t0
         %timeMatrix = [timeMatrix;t];
         %if isempty(t0), t0 = abs_t; end
         %fprintf("t %6.4f",t);
@@ -183,6 +185,7 @@ while(1)
         % compute control
         [u_t_alt, altControl] = altModeController(altControl, t, z, z_d);
 
+        disp(u_t_alt)
         %New Yaw Controller
         %     yaw_d = deg2rad(yaw_d);
         %     yaw = deg2rad(yaw);

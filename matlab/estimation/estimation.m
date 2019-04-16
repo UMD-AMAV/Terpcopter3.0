@@ -35,7 +35,7 @@ end
 
 % Subscribers
 imuDataSubscriber = rossubscriber('/mavros/imu/data');
-lidarDataSubscriber = rossubscriber('/terarangerone');
+lidarDataSubscriber = rossubscriber('/mavros/distance_sensor/hrlv_ez4_pub');
 
 % Publishers
 stateEstimatePublisher = rospublisher('/stateEstimate', 'terpcopter_msgs/stateEstimate');
@@ -113,10 +113,10 @@ while(1)
     %get relative yaw = - inertial yaw_intial - inertial yaw 
     if isempty(inertial_yaw_initial), inertial_yaw_initial = state.psi_inertial; end
     state.psi_relative = -state.psi_inertial + inertial_yaw_initial;
-    disp('intial yaw');
-    disp(inertial_yaw_initial);
-    disp('relative yaw');
-    disp(state.psi_relative);
+    %disp('intial yaw');
+    d%isp(inertial_yaw_initial);
+    %disp('relative yaw');
+    %disp(state.psi_relative);
 
     %rounding off angles to 1 decimal place
     state.psi_inertial = round(state.psi_inertial,1);
@@ -157,7 +157,7 @@ while(1)
     %change Up to the estimated output from the filter instead of from the
     %range 
     stateMsg.Up = stateMsg.Range;
-    
+    %disp(stateMsg.Up);
     stateMsg.Yaw = state.psi_relative;
     stateMsg.Roll = state.phi;
     stateMsg.Pitch = state.theta;

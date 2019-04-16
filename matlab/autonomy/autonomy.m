@@ -221,9 +221,13 @@ if ( strcmp(params.auto.mode,'auto'))
     end
 elseif ( strcmp(params.auto.mode, 'manual'))
     fprintf('Autonomy Mode: Manual');
+    openLoopIsActiveMsg.Data = false;      % true: openloop control
+    closedLoopIsActiveMsg.Data = true;
     send(pidAltSettingPublisher, pidAltSettingMsg);
     send(pidYawSettingPublisher, pidYawSettingMsg);
     send(ahsCmdPublisher, ahsCmdMsg);
+    send(openLoopIsActivePublisher, openLoopIsActiveMsg);
+    send(closedLoopIsActivePublisher, closedLoopIsActiveMsg);
     
     while(1)
         waitfor(r);

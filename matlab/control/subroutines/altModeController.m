@@ -12,11 +12,12 @@ settlingTime = altControl.settlingTime;
 
 %%
 % time elapsed since last control
-dt = curTime - prevTime;
+dt = curTime - altControl.lastTime;
 timeSinceSetpoint = curTime - timeSetpointSet;
 
 % low-pass filter altitude
 alpha_a = dt / ( altFiltTimeConstant + dt);
+prevAlt = altControl.prevAlt;
 altFilt = (1-alpha_a)*prevAlt + alpha_a*zcur;
 
 % altitude error
@@ -24,18 +25,19 @@ altError = zd - altFilt;
 
 % bang-bang control
 if (altError >= altErrorDeadband && timeSinceSetpoint >= settlingTime )
-    altRateCmd = descentRateCmd;
-elseif ( altError <= -altErrorDeadband && timeSinceSetpoint >= settlingTime )
     altRateCmd = climbRateCmd;
+elseif ( altError <= -altErrorDeadband && timeSinceSetpoint >= settlingTime )
+    altRateCmd = descentRateCmd;
 else
     altRateCmd = 0;
-    timeSetpointSet = curTime;
+%   timeSetpointSet = curTime;
 end
 
 
 %% pack up structure
 altControl.timeSetpointSet = timeSetpointSet;
-
+altControl.lastTime = curTime;
+altControl.prevAlt = zcur;
 %% display/debug
 fprintf('Controller running at %3.2f Hz\n',1/dt);
 
@@ -59,7 +61,7 @@ if ( displayFlag )
     fprintf(pFile,'%6.6f,',climbRateCmd);
     fprintf(pFile,'%6.6f,',descentRateCmd);
     fprintf(pFile,'%6.6f,',altErrorDeadband);
-    fprintf(pFile,'%6.6f,',altDesTimeConstant);
+%    fprintf(pFile,'%6.6f,',altDesTimeConstant);
     fprintf(pFile,'%6.6f,',settlingTime);
     
     fclose(pFile);
