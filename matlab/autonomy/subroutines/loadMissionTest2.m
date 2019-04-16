@@ -25,7 +25,7 @@ mission.bhv{i}.completion.status = false;           % completion flag
 
 i = i + 1
 mission.bhv{i}.name = 'bhv_land_open';
-mission.bhv{i}.ahs.desiredAltMeters = 0.3;
+mission.bhv{i}.ahs.desiredAltMeters = 0.4;
 mission.bhv{i}.completion.status = false;
 
 % i = i + 1;

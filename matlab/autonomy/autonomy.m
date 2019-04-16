@@ -48,7 +48,7 @@
 clear; close all; clc; format compact;
 addpath('../')
 params = loadParams();
-mission = loadMissionTest2(); %hover test 
+mission = loadMissionAltModeTest(); %hover test 
 fprintf('Launching Autonomy Node...\n');
 
 global timestamps

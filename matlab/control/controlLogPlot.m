@@ -24,8 +24,7 @@ altFiltTimeConstant = data(:,8);
 climbRateCmd = data(:,9);
 descentRateCmd = data(:,10);
 altErrorDeadband = data(:,11);
-altDesTimeConstant = data(:,12);
-settlingTime = data(:,13);
+%settlingTime = data(:,12);
 
 %     % write csv file
 %     fprintf(pFile,'%6.6f,',curTime); % 1
@@ -57,26 +56,18 @@ xlabel('Time (sec');
 ylabel('Altitude (m)');
 ylim([0 1.5]);
 set(gca,'FontSize',16);
-plot(curTime, ones*size(curTime)*(zd + altErrorDeadband),'-','linewidth',1);
-plot(curTime, ones*size(curTime)*(zd - altErrorDeadband),'-','linewidth',1);
+plot(curTime, ones(size(curTime)).*(zd + altErrorDeadband),'-','linewidth',1);
+plot(curTime, ones(size(curTime)).*(zd - altErrorDeadband),'-','linewidth',1);
 legend('z-des','z-raw','z-filt','z+db','z-db');
 
 %
 figure(2);
-plot(curTime, ones*size(curTime)*climbRateCmd,'---','linewidth',2);
+plot(curTime, ones(size(curTime)).*climbRateCmd,'--','linewidth',2);
 hold on;
-plot(curTime, ones*size(curTime)*descentRateCmd,'---','linewidth',2);
+plot(curTime, ones(size(curTime)).*descentRateCmd,'--','linewidth',2);
 hold on;
 plot(curTime, altRateCmd,'kx-','linewidth',2);
 hold on;
 xlabel('Time (sec');
 ylabel('Altitud Rate Cmd [-1,1]');
-set(gca,'FontSize',16);
-
-%
-figure(3);
-title(file);
-plot(curTime, curTime - settlingTime,'---','linewidth',2);
-xlabel('Time (sec)');
-ylabel('Time Since Setpoint Set (sec)');
 set(gca,'FontSize',16);

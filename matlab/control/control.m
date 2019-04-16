@@ -61,7 +61,7 @@ pause(2)
 
 % initialize message to publish
 stickCmdMsg = rosmessage(stickCmdPublisher);
-stickCmdMsg.Thrust = 0;
+stickCmdMsg.Thrust = -1;
 stickCmdMsg.Yaw = 0;
 
 
@@ -92,9 +92,10 @@ if isempty(t0), t0 = abs_t; end
 % initialize
 %global altControl;
 stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
-altControl.timeSetpointSet = 0;
+%altControl.timeSetpointSet = -1E3;
 altControl.lastTime = 0;
 altControl.prevAlt = 0;
+altControl.setpointReached = 0;
 altControl.log=[params.env.matlabRoot '/altControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
 
 % yaw controller
@@ -177,10 +178,10 @@ while(1)
         % hardcode for now
         altControl.altFiltTimeConstant = 0.1; % sec, used to filter lidar
         % deadband 0.1
-        altControl.climbRateCmd = 0.15; % nominal stick position for climb [-1,1]
-        altControl.descentRateCmd = -0.15; % nominal stick position for climb [-1,1]
-        altControl.altErrorDeadband = 0.25; % meters, deadband around desired altitude
-        altControl.settlingTime = 5; % sec, waits this amount of time after setpoint issued to give climb or descent (if deadband excedded)
+        altControl.climbRateCmd = 0.35; % nominal stick position for climb [-1,1]
+        altControl.descentRateCmd = -0.35; % nominal stick position for climb [-1,1]
+        altControl.altErrorDeadband = 0.05; % meters, deadband around desired altitude
+        altControl.settlingTime = 1E3; % sec, waits this amount of time after setpoint issued to give climb or descent (if deadband excedded)
         
         % compute control
         [u_t_alt, altControl] = altModeController(altControl, t, z, z_d);

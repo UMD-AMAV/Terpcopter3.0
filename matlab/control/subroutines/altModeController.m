@@ -7,8 +7,10 @@ timeSetpointSet = altControl.timeSetpointSet;
 altFiltTimeConstant = altControl.altFiltTimeConstant;
 climbRateCmd = altControl.climbRateCmd;
 descentRateCmd = altControl.descentRateCmd;
-altErrorDeadband = altControl.altErrorDeadband;
-settlingTime = altControl.settlingTime;
+setpointDeadband = altControl.altErrorDeadband;
+overshootDeadband = 0.5;
+%^settlingTime = altControl.settlingTime;
+setpointReached = altControl.setpointReached;
 
 %%
 % time elapsed since last control
@@ -24,13 +26,26 @@ altFilt = (1-alpha_a)*prevAlt + alpha_a*zcur;
 altError = zd - altFilt;
 
 % bang-bang control
-if (altError >= altErrorDeadband && timeSinceSetpoint >= settlingTime )
+if (altError >= setpointDeadband && setpointReached == 0 )
     altRateCmd = climbRateCmd;
-elseif ( altError <= -altErrorDeadband && timeSinceSetpoint >= settlingTime )
+    disp('Climb To Setpoint')    
+elseif (altError >= overshootDeadband  && setpointReached == 1 )
+    altRateCmd = climbRateCmd;
+    disp('Climb To Overcome Overshoot')
+elseif (altError <= -setpointDeadband && setpointReached == 0 )
     altRateCmd = descentRateCmd;
+    disp('Descend To Setpoint')    
+elseif (altError <= -overshootDeadband  && setpointReached == 1 )
+    altRateCmd = descentRateCmd;
+    disp('Descend To Overcome Overshoot')
+elseif ( abs(altError) <= setpointDeadband )
+   altRateCmd = 0;
+   setpointReached = 1;
+   disp('Hold')
 else
-    altRateCmd = 0;
-%   timeSetpointSet = curTime;
+   altRateCmd = 0;
+   setpointReached = 0;
+   disp('Reset Setpoint')   
 end
 
 
@@ -38,6 +53,7 @@ end
 altControl.timeSetpointSet = timeSetpointSet;
 altControl.lastTime = curTime;
 altControl.prevAlt = zcur;
+altControl.setpointReached = setpointReached;
 %% display/debug
 fprintf('Controller running at %3.2f Hz\n',1/dt);
 
@@ -60,9 +76,8 @@ if ( displayFlag )
     fprintf(pFile,'%6.6f,',altFiltTimeConstant);
     fprintf(pFile,'%6.6f,',climbRateCmd);
     fprintf(pFile,'%6.6f,',descentRateCmd);
-    fprintf(pFile,'%6.6f,',altErrorDeadband);
-%    fprintf(pFile,'%6.6f,',altDesTimeConstant);
-    fprintf(pFile,'%6.6f,',settlingTime);
+    fprintf(pFile,'%6.6f,',setpointDeadband);
+    %fprintf(pFile,'%6.6f,\n',settlingTime);
     
     fclose(pFile);
     
