@@ -64,6 +64,11 @@ openLoopStickCmdSubscriber = rossubscriber('/openLoopStickCmd', 'terpcopter_msgs
 % Publishers
 stickCmdPublisher = rospublisher('/stickCmd', 'terpcopter_msgs/stickCmd');
 
+
+% log file
+pitchRollLogName =[params.env.matlabRoot '/altControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
+
+
 pause(2)
 stickCmdMsg = rosmessage(stickCmdPublisher);
 stickCmdMsg.Thrust = 0;
@@ -130,7 +135,7 @@ while(1)
     openLoopIsActiveMsg = openLoopIsActiveSubscriber.LatestMessage;
     startMissionMsg = startMissionSubscriber.LatestMessage;
     closedLoopIsActiveMsg = closedLoopIsActiveSubscriber.LatestMessage;
-   % yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
+    % yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
     
     
     if (openLoopIsActiveMsg.Data == true) & (closedLoopIsActiveMsg.Data == false)
@@ -190,28 +195,40 @@ while(1)
         disp(yaw)
         
         
-%         New Yaw Controller
-            %yaw_d = deg2rad(yaw_d);
-            %yaw = deg2rad(yaw);
-            yawError = yaw_d;%(yaw_d - yaw);
-            yawError = (atan2(sin(yawError),cos(yawError)));
-            disp('yawError')
-              disp(yawError)
+        %         New Yaw Controller
+        %yaw_d = deg2rad(yaw_d);
+        %yaw = deg2rad(yaw);
+        yawError = yaw_d;%(yaw_d - yaw);
+        yawError = (atan2(sin(yawError),cos(yawError)));
+        disp('yawError')
+        disp(yawError)
         
-              disp('yawSetpointError')
-%               disp(yaw_error)
+        disp('yawSetpointError')
+        %               disp(yaw_error)
         
-            u_t_yaw = pidYawSettingMsg.Kp*yawError;
-            
-            
-            %Pitch Control
-            PitchError = Pitch_d - absolutePitch;
-            u_t_pitch = 1*PitchError;
-            
-            %Roll COntrol
-            RollError = Roll_d - absoluteRoll;
-            u_t_roll = 1*RollError;
-            
+        u_t_yaw = pidYawSettingMsg.Kp*yawError;
+        
+        
+        %Pitch Control
+        PitchError = Pitch_d - absolutePitch;
+        u_t_pitch = 1*PitchError;
+        
+        %Roll COntrol
+        RollError = Roll_d - absoluteRoll;
+        u_t_roll = 1*RollError;
+        
+        
+        pFile = fopen(pitchRollLogName,'a');
+        % write csv file
+        fprintf(pFile,'%3.3f,',t);
+        fprintf(pFile,'%3.3f,',Pitch_d);
+        fprintf(pFile,'%3.3f,',absolutePitch);
+        fprintf(pFile,'%3.3f,',PitchError);
+        fprintf(pFile,'%3.3f,',Roll_d);
+        fprintf(pFile,'%3.3f,',absoluteRoll);
+        fprintf(pFile,'%3.3f\n',RollError);                
+        fclose(pFile);
+        
         % compute controls
         %      [u_t_yaw, yawError] = PID(pidYawSettingMsg, yawError, t, yaw_error);
         %      disp('yaw control gains');
@@ -229,8 +246,8 @@ while(1)
         
         time = r.TotalElapsedTime;
         %fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
-%     elseif startMissionMsg.Data == false
-%         fprintf('Mission has not started. Press Start Mission button in Tuner GUI.\n');
+        %     elseif startMissionMsg.Data == false
+        %         fprintf('Mission has not started. Press Start Mission button in Tuner GUI.\n');
     else
         fprintf('Error: both open loop and closed loop control are either running or not running\n');
     end
