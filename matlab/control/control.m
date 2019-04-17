@@ -97,7 +97,7 @@ altControl.lastTime = 0;
 altControl.prevAlt = 0;
 altControl.setpointReached = 0;
 altControl.log=[params.env.matlabRoot '/altControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
-
+altControl.setpointVal = 0;
 % yaw controller
 % absoluteYaw = stateEstimateMsg.Yaw;
 % ahsCmdMsg.HeadingRad = absoluteYaw;
@@ -178,8 +178,8 @@ while(1)
         % hardcode for now
         altControl.altFiltTimeConstant = 0.1; % sec, used to filter lidar
         % deadband 0.1
-        altControl.climbRateCmd = 0.35; % nominal stick position for climb [-1,1]
-        altControl.descentRateCmd = -0.35; % nominal stick position for climb [-1,1]
+        altControl.climbRateCmd = 0.27; % nominal stick position for climb [-1,1]
+        altControl.descentRateCmd = -0.23; % nominal stick position for climb [-1,1]
         altControl.altErrorDeadband = 0.05; % meters, deadband around desired altitude
         altControl.settlingTime = 1E3; % sec, waits this amount of time after setpoint issued to give climb or descent (if deadband excedded)
         

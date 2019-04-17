@@ -11,6 +11,7 @@ setpointDeadband = altControl.altErrorDeadband;
 overshootDeadband = 0.5;
 %^settlingTime = altControl.settlingTime;
 setpointReached = altControl.setpointReached;
+setpointVal = altControl.setpointVal;
 
 %%
 % time elapsed since last control
@@ -25,52 +26,28 @@ altFilt = (1-alpha_a)*prevAlt + alpha_a*zcur;
 % altitude error
 altError = zd - altFilt;
 
+% reset setpoint
+if ( abs(setpointVal - zd) > setpointDeadband && setpointReached == 1 )
+   setpointReached = 0;   
+   disp('New Setpoint');
+end
+
 % bang-bang control
-if ( abs(altError) <= setpointDeadband ) % triggers the setpointReached
+if ( abs(altError) <= setpointDeadband && setpointReached == 0) % triggers the setpointReached
    altRateCmd = 0;
    setpointReached = 1;
-   disp('Hold')
-elseif ( abs(altError) <= overshootDeadband  && setpointReached == 1 ) % altRateCmd is to zero if the setpointReached was triggered but the quad is still within the overshoot threshold 
-   if (altError >= setpointDeadband)
-       altRateCmd = 0.05;
-       disp('Precision Climb')
-   else
-       altRateCmd = -0.05;
-       disp('Precision Decent')
-   end
-elseif (altError >= setpointDeadband && setpointReached == 0 ) % if it hasn't reached the setpoint and must climb
+   setpointVal = altFilt;
+   disp('Reached Setpoint')
+elseif (altError > setpointDeadband && setpointReached == 0 ) % if it hasn't reached the setpoint and must climb
     altRateCmd = climbRateCmd;
     disp('Climb To Setpoint') 
-elseif (altError <= -setpointDeadband && setpointReached == 0 ) %  if it hasn't reached the setpoint and must decend
+elseif (altError < -setpointDeadband && setpointReached == 0 ) %  if it hasn't reached the setpoint and must decend
     altRateCmd = descentRateCmd;
     disp('Descend To Setpoint') 
 else 
    altRateCmd = 0;
-   setpointReached = 0;
-   disp('Reset Setpoint')   
+   disp('Holding Setpoint')   
 end
-
-% if (altError >= setpointDeadband && setpointReached == 0 )
-%     altRateCmd = climbRateCmd;
-%     disp('Climb To Setpoint')    
-% elseif (altError >= overshootDeadband  && setpointReached == 1 )
-%     altRateCmd = climbRateCmd;
-%     disp('Climb To Overcome Overshoot')
-% elseif (altError <= -setpointDeadband && setpointReached == 0 )
-%     altRateCmd = descentRateCmd;
-%     disp('Descend To Setpoint')    
-% elseif (altError <= -overshootDeadband  && setpointReached == 1 )
-%     altRateCmd = descentRateCmd;
-%     disp('Descend To Overcome Overshoot')
-% elseif ( abs(altError) <= setpointDeadband )
-%    altRateCmd = 0;
-%    setpointReached = 1;
-%    disp('Hold')
-% else
-%    altRateCmd = 0;
-%    setpointReached = 0;
-%    disp('Reset Setpoint')   
-% end
 
 
 %% pack up structure
@@ -78,6 +55,8 @@ end
 altControl.lastTime = curTime;
 altControl.prevAlt = zcur;
 altControl.setpointReached = setpointReached;
+altControl.setpointVal = setpointVal;
+
 %% display/debug
 fprintf('Controller running at %3.2f Hz\n',1/dt);
 
