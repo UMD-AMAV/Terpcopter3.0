@@ -14,10 +14,18 @@ for i = 1:4
     if (trim(i) ~=inf)
         trim1(i,1) = trim(i);
     end 
-    % scale 
+    % u_stick is a value from -1 to +1
+    % stick_lim = 100
+    % trim_lim = 29
+    % after multiplying by stick_lim, trim_lim the value ranges from
+    % [-129,129]
     u_stick_net(i) = u_stick(i)*stick_lim(i) + trim1(i)*trim_lim(i);
+    
+    % divide each value by 129, to give result in -1, +1
     u_stick_net(i) = u_stick_net(i)/(stick_lim(i) + trim_lim(i));
-    u_stick_net(i)= max(-1,min(1,u_stick_net(i)));
+    
+    % saturate from -1 to +1, (AW: this step seems rendundant)
+    % u_stick_net(i)= max(-1,min(1,u_stick_net(i)));
 end
 
 % conver u_stick_net to PWM 

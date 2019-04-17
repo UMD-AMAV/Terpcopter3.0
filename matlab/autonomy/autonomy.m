@@ -49,6 +49,7 @@ clear; close all; clc; format compact;
 addpath('../')
 params = loadParams();
 mission = loadMission(); %hover test
+%mission = loadMissionAltModeTest(); %hover test 
 fprintf('Launching Autonomy Node...\n');
 
 global timestamps
@@ -223,11 +224,15 @@ elseif ( strcmp(params.auto.mode, 'manual'))
     fprintf('Autonomy Mode: Manual');
     openLoopIsActiveMsg.Data = false;      % true: openloop control
     closedLoopIsActiveMsg.Data = true;
+
     send(openLoopIsActivePublisher, openLoopIsActiveMsg);
     send(closedLoopIsActivePublisher, closedLoopIsActiveMsg);
+
     send(pidAltSettingPublisher, pidAltSettingMsg);
     send(pidYawSettingPublisher, pidYawSettingMsg);
     send(ahsCmdPublisher, ahsCmdMsg);
+    send(openLoopIsActivePublisher, openLoopIsActiveMsg);
+    send(closedLoopIsActivePublisher, closedLoopIsActiveMsg);
     
     while(1)
         waitfor(r);

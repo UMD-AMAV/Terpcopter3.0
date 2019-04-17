@@ -9,6 +9,6 @@ function [completionFlag, stick_thrust_land] = bhv_landing_open_status(stateEsti
        return;
    end
    
-   stick_thrust_land = -0.1;
+   stick_thrust_land = -0.35;
    completionFlag = 0;
 end
