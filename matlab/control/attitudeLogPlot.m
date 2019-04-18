@@ -37,7 +37,7 @@ hold on;
 xlabel('Time (sec');
 ylabel('Pitch (deg)');
 set(gca,'FontSize',16);
-subplot(2,1,1)
+subplot(2,1,2)
 plot(t,pitch_err,'k-','linewidth',2);
 hold on;
 xlabel('Time (sec');
@@ -53,7 +53,7 @@ hold on;
 xlabel('Time (sec');
 ylabel('Roll (deg)');
 set(gca,'FontSize',16);
-subplot(2,1,1)
+subplot(2,1,2)
 plot(t,roll_err,'k-','linewidth',2);
 hold on;
 xlabel('Time (sec');

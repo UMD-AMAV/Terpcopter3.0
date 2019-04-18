@@ -59,7 +59,7 @@ altControlDegbugPublisher = rospublisher('/altControlDebug','terpcopter_msgs/alt
 
 
 % log file
-pitchRollLogName =[params.env.matlabRoot '/altControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
+pitchRollLogName =[params.env.matlabRoot '/prControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
 
 
 pause(2)
@@ -128,7 +128,7 @@ send(stickCmdPublisher, stickCmdMsg); % send initial stick command.
 
 while(1)
     % get latest messages
-    stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
+    stateEstimateMsg = stateEstimateSubscriber.LatestMessage
     ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
     pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
     pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
@@ -138,7 +138,8 @@ while(1)
     closedLoopIsActiveMsg = closedLoopIsActiveSubscriber.LatestMessage;
     % yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
     
-    
+    absolutePitch = stateEstimateMsg.Pitch
+    absoluteRoll = stateEstimateMsg.Roll
     
     if (openLoopIsActiveMsg.Data == true) && (closedLoopIsActiveMsg.Data == false)
         % set stick command directly based on openLoopStickCmd message
@@ -217,11 +218,11 @@ while(1)
         
         %Pitch Control
         PitchError = Pitch_d - absolutePitch;
-        u_t_pitch = 1*PitchError;
+        u_t_pitch = 0.1*PitchError;
         
         %Roll COntrol
         RollError = Roll_d - absoluteRoll;
-        u_t_roll = 1*RollError;
+        u_t_roll = 0.1*RollError
         
         
         pFile = fopen(pitchRollLogName,'a');
@@ -244,7 +245,7 @@ while(1)
         
         
         % publish
-        stickCmdMsg.Thrust = u_t_alt;
+        stickCmdMsg.Thrust = 0;
         stickCmdMsg.Yaw = max(-1,min(1,u_t_yaw));
         stickCmdMsg.Pitch = max(-1,min(1,u_t_pitch));
         stickCmdMsg.Roll = max(-1,min(1,u_t_roll));
