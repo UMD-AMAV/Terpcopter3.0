@@ -52,11 +52,28 @@ stickCmdMsg.Pitch = 0;
 stickCmdMsg.Roll = 0;
 
 % initialize altiude controller state  
-altControl.log=[params.env.matlabRoot '/altControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
+dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
+altControl.log=[params.env.matlabRoot '/altControl_' dateString '.log'];
 altControl.lastTime = 0;
-altControl.prevAlt = 0;
+altControl.prevVal = 0;
 altControl.setpointReached = 0;
 altControl.setpointVal = 0;
+
+% initialize yaw controller state  
+yawControl.log=[params.env.matlabRoot '/yawControl_' dateString '.log'];
+yawControl.lastTime = 0;
+yawControl.prevVal = 0;
+
+% initialize yaw controller state  
+pitchControl.log=[params.env.matlabRoot '/pitchControl_' dateString '.log'];
+pitchControl.lastTime = 0;
+pitchControl.prevVal = 0;
+
+% initialize yaw controller state  
+rollControl.log=[params.env.matlabRoot '/rollControl_' dateString '.log'];
+rollControl.lastTime = 0;
+rollControl.prevVal = 0;
+
 
 % set loop rate and initialize
 disp('initialize loop');

@@ -9,7 +9,7 @@ setpointDeadband = 0.05;
 % unpack states
 setpointReached = altControl.setpointReached;
 setpointVal = altControl.setpointVal;
-prevAlt = altControl.prevAlt;
+prevAlt = altControl.prevVal;
 lastTime = altControl.lastTime;
 
 % time elapsed since last control
@@ -47,9 +47,8 @@ end
 
 
 %% pack up structure
-%altControl.timeSetpointSet = timeSetpointSet;
 altControl.lastTime = curTime;
-altControl.prevAlt = zcur;
+altControl.prevVal = zcur;
 altControl.setpointReached = setpointReached;
 altControl.setpointVal = setpointVal;
 
