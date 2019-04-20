@@ -1,26 +1,22 @@
 function [altRateCmd, altControl] = altModeController(altControl, curTime, zcur, zd)
 
-% unpack states
-%timeSetpointSet = altControl.timeSetpointSet;
+% gains/tuning parameters (constants)
+altFiltTimeConstant = 0.1;
+climbRateCmd = 0.27;
+descentRateCmd = -0.23;
+setpointDeadband = 0.05;
 
-% unpack tuning parameters (constants)
-altFiltTimeConstant = altControl.altFiltTimeConstant;
-climbRateCmd = altControl.climbRateCmd;
-descentRateCmd = altControl.descentRateCmd;
-setpointDeadband = altControl.altErrorDeadband;
-overshootDeadband = 0.5;
-%^settlingTime = altControl.settlingTime;
+% unpack states
 setpointReached = altControl.setpointReached;
 setpointVal = altControl.setpointVal;
+prevAlt = altControl.prevAlt;
+lastTime = altControl.lastTime;
 
-%%
 % time elapsed since last control
-dt = curTime - altControl.lastTime;
-%timeSinceSetpoint = curTime - timeSetpointSet;
+dt = curTime - lastTime;
 
 % low-pass filter altitude
 alpha_a = dt / ( altFiltTimeConstant + dt);
-prevAlt = altControl.prevAlt;
 altFilt = (1-alpha_a)*prevAlt + alpha_a*zcur;
 
 % altitude error
@@ -71,18 +67,14 @@ if ( displayFlag )
     fprintf(pFile,'%6.6f,',zd);
     fprintf(pFile,'%6.6f,',zcur);
     fprintf(pFile,'%6.6f,',altFilt);
-    
     fprintf(pFile,'%6.6f,',altRateCmd);
-%    fprintf(pFile,'%6.6f,',timeSetpointSet);
-    
+
     % constant parameters
     fprintf(pFile,'%6.6f,',altFiltTimeConstant);
     fprintf(pFile,'%6.6f,',climbRateCmd);
     fprintf(pFile,'%6.6f,',descentRateCmd);
-    fprintf(pFile,'%6.6f,',setpointDeadband);
-    fprintf(pFile,'%6.6f, \n',overshootDeadband);
-    %fprintf(pFile,'%6.6f,\n',settlingTime);
-    
+    fprintf(pFile,'%6.6f \n,',setpointDeadband);
+
     fclose(pFile);
     
 end

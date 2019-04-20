@@ -26,15 +26,6 @@ global controlParams
 controlParams = params.ctrl;
 fprintf('Control Node Launching...\n');
 
-% declare global variables
-% Determine usage in other scripts - change to local if no other usage
-
-%
-% yawError.lastVal = 0;
-% yawError.lastSum = 0;
-% yawError.lastTime = 0;
-
-
 % initialize ROS
 if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
@@ -42,223 +33,94 @@ end
 
 % Subscribers
 stateEstimateSubscriber = rossubscriber('/stateEstimate');
-openLoopIsActiveSubscriber = rossubscriber('/openLoopIsActive', 'std_msgs/Bool');
-closedLoopIsActiveSubscriber = rossubscriber('/closedLoopIsActive', 'std_msgs/Bool');
-ahsCmdSubscriber = rossubscriber('/ahsCmd');
-startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
-%yawSetpointSubscriber = rossubscriber('/yawSetpoint');
-pidAltSettingSubscriber = rossubscriber('/pidAltSetting');
-%pidResetSubscriber = rossubscriber('/pidReset');
-pidYawSettingSubscriber = rossubscriber('/pidYawSetting', 'terpcopter_msgs/ffpidSetting');
-openLoopStickCmdSubscriber = rossubscriber('/openLoopStickCmd', 'terpcopter_msgs/openLoopStickCmd');
+ayprCmdSubscriber = rossubscriber('/ayprCmd');
 
 % Publishers
-%pidResetPublisher = rospublisher('/pidReset', 'std_msgs/Bool');
 stickCmdPublisher = rospublisher('/stickCmd', 'terpcopter_msgs/stickCmd');
-altControlDegbugPublisher = rospublisher('/altControlDebug','terpcopter_msgs/altControlDebug');
-
-
-% log file
-pitchRollLogName =[params.env.matlabRoot '/prControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
-
-
-pause(2)
-
-% initialize message to publish
-stickCmdMsg = rosmessage(stickCmdPublisher);
-stickCmdMsg.Thrust = -1;
-stickCmdMsg.Yaw = 0;
-
-
-% % grab latest messages
-% stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
-ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
-pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
-% pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
-% % yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
-
 
 % timestamp
-t0 = []; timeMatrix=[];
-% manage timestamps
-% timeMatrix=[];
 ti = rostime('now');
-%abs_t = eval([int2str(ti.Sec) '.' ...
-%int2str(ti.Nsec)]);
 t0 = [];
 abs_t = double(ti.Sec)+double(ti.Nsec)*10^-9;
 if isempty(t0), t0 = abs_t; end
 
-% initialize error variables
-% altitudeErrorHistory.lastTime = 0; %stateEstimateMsg.Time;
-% altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
-% altitudeErrorHistory.lastSum = 0;
-% altitudeErrorHistory.lastError = 0;
-% u_t_alt = controlParams.altitudeGains.ffterm;
+% initialize messages to publish
+stickCmdMsg = rosmessage(stickCmdPublisher);
+stickCmdMsg.Thrust = -1;
+stickCmdMsg.Yaw = 0;
+stickCmdMsg.Pitch = 0;
+stickCmdMsg.Roll = 0;
 
-
-% initialize
-%global altControl;
-stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
-%altControl.timeSetpointSet = -1E3;
+% initialize altiude controller state  
+altControl.log=[params.env.matlabRoot '/altControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
 altControl.lastTime = 0;
 altControl.prevAlt = 0;
 altControl.setpointReached = 0;
-altControl.log=[params.env.matlabRoot '/altControl_' datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF') '.log'];
 altControl.setpointVal = 0;
-% yaw controller
-% absoluteYaw = stateEstimateMsg.Yaw;
-absolutePitch = stateEstimateMsg.Pitch;
-absoluteRoll = stateEstimateMsg.Roll;
-% Note: Need to update the AHS mesage for pitch and roll (radians
-Pitch_d = 2.7;
-Roll_d = 1.4;
 
-% ahsCmdMsg.HeadingRad = absoluteYaw;
-% yawError.lastTime = stateEstimateMsg.Time;
-% yawError.lastVal = 0; %ahsCmdMsg.HeadingRad;
-% yawError.lastSum = 0;
-u_t_yaw = 0;
-
-
+% set loop rate and initialize
 disp('initialize loop');
 r = robotics.Rate(90);
 reset(r);
 send(stickCmdPublisher, stickCmdMsg); % send initial stick command.
 
 while(1)
+    
     % get latest messages
-    stateEstimateMsg = stateEstimateSubscriber.LatestMessage
-    ahsCmdMsg = ahsCmdSubscriber.LatestMessage;
-    pidAltSettingMsg = pidAltSettingSubscriber.LatestMessage;
-    pidYawSettingMsg = pidYawSettingSubscriber.LatestMessage;
-    openLoopStickCmdMsg = openLoopStickCmdSubscriber.LatestMessage;
-    openLoopIsActiveMsg = openLoopIsActiveSubscriber.LatestMessage;
-    startMissionMsg = startMissionSubscriber.LatestMessage;
-    closedLoopIsActiveMsg = closedLoopIsActiveSubscriber.LatestMessage;
-    % yawSetpointMsg = yawSetpointSubscriber.LatestMessage;
+    stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
+    ayprCmdMsg = ayprCmdSubscriber.LatestMessage;
     
-    absolutePitch = stateEstimateMsg.Pitch
-    absoluteRoll = stateEstimateMsg.Roll
+    % unpack state estimate
+    z = stateEstimateMsg.Range;
     
-%     if (openLoopIsActiveMsg.Data == true) && (closedLoopIsActiveMsg.Data == false)
-%         % set stick command directly based on openLoopStickCmd message
-%         stickCmdMsg.Thrust = openLoopStickCmdMsg.Thrust;
-%         stickCmdMsg.Yaw = openLoopStickCmdMsg.Yaw;
-%         stickCmdMsg.Pitch = openLoopStickCmdMsg.Pitch;
-%         stickCmdMsg.Roll = openLoopStickCmdMsg.Roll;
-%     elseif (openLoopIsActiveMsg.Data == false) && (closedLoopIsActiveMsg.Data == true)
-        
-        % timestamp
-        ti= rostime('now');
-        abs_t = double(ti.Sec)+double(ti.Nsec)*10^-9;
-        t = abs_t-t0
-        %timeMatrix = [timeMatrix;t];
-        %if isempty(t0), t0 = abs_t; end
-        %fprintf("t %6.4f",t);
-        
-        % unpack statestimate
-        %t = stateEstimateMsg.Time;
-        z = stateEstimateMsg.Range;
-        yaw = stateEstimateMsg.Yaw; % - absoluteYaw;
-        
-        % get setpoint
-        z_d = ahsCmdMsg.AltitudeMeters;
-        
-        %%%% CAHNGING YAW FROM GUI TO VISION %%%%%
-        yaw_d = ahsCmdMsg.HeadingRad; %yawSetpointMsg.Data; % ;
-        
-        % update errors
-        altError = z_d - z;
-        
-        %         % reset integral term if boolean (pidResetSubscriber) is true
-        %         % this comes from the tuner GUI
-        %         pidResetMsg = rosmessage('std_msgs/Bool');
-        %         pidResetMsg.Data = false;
-        %         pidResetMsg = pidResetSubscriber.LatestMessage;
-        %         if ~isempty(pidResetMsg)
-        %             if pidResetMsg.Data == true
-        %                 disp("Resetting PID ...")
-        %                 altitudeErrorHistory.lastVal = ahsCmdMsg.AltitudeMeters;
-        %                 altitudeErrorHistory.lastSum = 0;
-        %                 pidResetMsg.Data = false;
-        %                 send(pidResetPublisher, pidResetMsg);
-        %             end
-        %         end
-        
-        % compute controls
-        % FF_PID(gains, error, newTime, newErrVal)
-        %[u_t_alt, altitudeErrorHistory] = FF_PID(pidAltSettingMsg, altitudeErrorHistory, t, altError);
-        
-        % hardcode for now
-        altControl.altFiltTimeConstant = 0.1; % sec, used to filter lidar
-        % deadband 0.1
-        altControl.climbRateCmd = 0.27; % nominal stick position for climb [-1,1]
-        altControl.descentRateCmd = -0.23; % nominal stick position for climb [-1,1]
-        altControl.altErrorDeadband = 0.05; % meters, deadband around desired altitude
-        altControl.settlingTime = 1E3; % sec, waits this amount of time after setpoint issued to give climb or descent (if deadband excedded)
-        
-        %         New Yaw Controller
-        %yaw_d = deg2rad(yaw_d);
-        %yaw = deg2rad(yaw);
-        yawError = yaw_d;%(yaw_d - yaw);
-        yawError = (atan2(sin(yawError),cos(yawError)));
-        disp('yawError')
-        disp(yawError)
-        
-        disp('yawSetpointError')
-        %               disp(yaw_error)
-        
-        u_t_yaw = pidYawSettingMsg.Kp*yawError;
-        % compute control
-%        [u_t_alt, altControl] = altModeController(altControl, t, z, z_d);
-
-%        disp(u_t_alt)
-     
-        
-        %Pitch Control
-        PitchError = Pitch_d - absolutePitch;
-        u_t_pitch = 0.1*PitchError;
-        
-        %Roll COntrol
-        RollError = Roll_d - absoluteRoll;
-        u_t_roll = 0.1*RollError
-        
-        
-        pFile = fopen(pitchRollLogName,'a');
-        % write csv file
-        fprintf(pFile,'%3.3f,',t);
-        fprintf(pFile,'%3.3f,',Pitch_d);
-        fprintf(pFile,'%3.3f,',absolutePitch);
-        fprintf(pFile,'%3.3f,',PitchError);
-        fprintf(pFile,'%3.3f,',u_t_pitch);
-        fprintf(pFile,'%3.3f,',Roll_d);
-        fprintf(pFile,'%3.3f,',absoluteRoll);
-        fprintf(pFile,'%3.3f\n',RollError);
-        fprintf(pFile,'%3.3f,',u_t_roll);
-        fclose(pFile);
-        
-        % compute controls
-        %      [u_t_yaw, yawError] = PID(pidYawSettingMsg, yawError, t, yaw_error);
-        %      disp('yaw control gains');
-        %      disp(controlParams.yawGains)
-        %      disp('yaw control signal');
-        %      disp(u_t_yaw)
-        
-        
-        % publish
-        stickCmdMsg.Thrust = 0;
-        stickCmdMsg.Yaw = max(-1,min(1,u_t_yaw));
-        stickCmdMsg.Pitch = max(-1,min(1,u_t_pitch))*0.5;
-        stickCmdMsg.Roll = max(-1,min(1,u_t_roll))*0.5;
-        
-        fprintf('Stick Cmd.Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f, Yaw : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ), u_t_yaw );
-        %fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
-%     else
-%         fprintf('Error: both open loop and closed loop control are either running or not running\n');
-%     end
+    % unpack command
+    z_d = ayprCmdMsg.AltDesiredMeters;
+    yaw_d = ayprCmdMsg.YawDesiredDeg;
+    pitch_d = ayprCmdMsg.PitchDesiredDeg;
+    roll_d = ayprCmdMsg.RollDesiredDeg;
+    
+    % timestamp
+    ti = rostime('now');
+    abs_t = double(ti.Sec)+double(ti.Nsec)*10^-9;
+    t = abs_t-t0;
+    
+    % altitude control
+    if ( ayprCmdMsg.AltSwitch==1 )
+        [u_alt, altControl] = altModeController(altControl, t, z, z_d);
+    else
+        u_alt = 0;
+    end
+    
+    % yaw control
+    if ( ayprCmdMsg.YawSwitch==1 )
+        [u_yaw, yawControl] = yawController(yawControl, t, yaw, yaw_d);
+    else
+        u_yaw = 0;
+    end
+    
+    % pitch control
+    if ( ayprCmdMsg.PitchSwitch==1 )
+        [u_pitch, pitchControl] = pitchModeController(pitchControl, t, pitch, pitch_d);
+    else
+        u_pitch = 0;
+    end
+    
+    % roll control
+    if ( ayprCmdMsg.RollSwitch==1 )
+        [u_roll, rollControl] = rollModeController(rollControl, t, roll, roll_d);
+    else
+        u_roll = 0;
+    end
+    
+    % publish
+    stickCmdMsg.Thrust = u_alt;
+    stickCmdMsg.Yaw = u_yaw;
+    stickCmdMsg.Pitch = u_pitch;
+    stickCmdMsg.Roll = u_roll;
+    
+    % send stick commands
+    fprintf('Stick Cmd.Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ) );
     send(stickCmdPublisher, stickCmdMsg);
-    disp('Controller');
     waitfor(r);
 end
 
