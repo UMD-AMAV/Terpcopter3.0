@@ -50,7 +50,12 @@ addpath('../')
 params = loadParams();
 
 % missions
-mission = loadMission(); % hover test
+% mission = loadMission_takeoffHoverLand(); 
+% mission = loadMission_takeoffHoverPointLand(); 
+% mission = loadMission_takeoffHoverFixedOrientLand();
+
+
+
 %mission = loadMissionAltModeTest(); %hover test 
 
 fprintf('Launching Autonomy Node...\n');
@@ -123,10 +128,9 @@ if ( strcmp(params.auto.mode,'auto'))
         %         end
         %%%%%%%%%%%%%%
         
-        % extract 
         name = mission.bhv{currentBehavior}.name;
         flag = mission.bhv{currentBehavior}.completion.status;
-        aypr = mission.bhv{currentBehavior}.aypr;
+        ayprCmd = mission.bhv{currentBehavior}.ayprCmd;
         completion = mission.bhv{currentBehavior}.completion;
         
         totalTime = t - timestamps.initial_event_time;
@@ -141,33 +145,30 @@ if ( strcmp(params.auto.mode,'auto'))
             % check status of remaining behavior
             %Set Handles within each behavior
             switch name
+                % Open loop behaviors
                 case 'bhv_takeoff'
-                    [completionFlag, stick_thrust] = bhv_takeoff_status(stateEstimateMsg, aypr, stick_thrust);
+                    %[completionFlag, stick_thrust] = bhv_takeoff_status(stateEstimateMsg, aypr, stick_thrust);
+                    completionFlag = bhv_takeoff_status( stateEstimateMsg , ayprCmd , mission.bhv{currentBehavior}.thresholdDist );
                 case 'bhv_hover'
-                    [completionFlag] = bhv_hover_status(stateEstimateMsg, aypr, completion, t);
-                    ayprCmdMsg.AltitudeMeters = mission.bhv{currentBehavior}.ahs.desiredAltMeters;
+                    completionFlag = bhv_hover_status(stateEstimateMsg, ayprCmd, completion, t);
+                case 'bhv_hover_fixed_orient'
+                    completionFlag = bhv_hover_status(stateEstimateMsg, ayprCmd, completion, t);                    
                 case 'bhv_point_to_direction'
-                    [completionFlag] = bhv_point_to_direction_status(stateEstimateMsg, aypr, completion, t);
+                     completionFlag = bhv_point_to_direction_status(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_land'
-                    init = mission.bhv{currentBehavior}.initialize;
-                    [completionFlag, initialize, ahsUpdate] = bhv_landing_status(stateEstimateMsg, aypr, completion, t, init);
-                    display(initialize)
-                    mission.bhv{currentBehavior}.initialize.firstLoop = initialize;
-                    ayprCmdMsg.AltitudeMeters = ahsUpdate;
-%                 case 'bhv_land_open'
-%                     [completionFlag, stick_thrust_land] = bhv_landing_open_status(stateEstimateMsg, aypr, completion);
-%                     openLoopIsActiveMsg.Data = true;      % true: openloop control
-%                     closedLoopIsActiveMsg.Data = false;
-%                     openLoopStickCmdMsg.Thrust = stick_thrust_land;
+                    completionFlag = bhv_landing_status(stateEstimateMsg, ayprCmd, completion, t, init);
 %                 case 'bhv_point_to_target'
 %                     [completionFlag] = bhv_point_to_target_status(stateEstimateMsg, yawErrorCameraMsg, aypr, completion, t);
 %                     ayprCmdMsg.HeadingRad = yawErrorCameraMsg.Data;
+
+
                 otherwise
             end
             mission.bhv{currentBehavior}.completion.status = completionFlag;
         end
         
         % publish
+        ayprCmdMsg = mission.bhv{currentBehavior}.ayprCmd;s
         send(ayprCmdPublisher, ayprCmdMsg);
         fprintf('Published Ahs Cmd. Alt : %3.3f \t Yaw: %3.3f\n', ayprCmdMsg.AltitudeMeters, ayprCmdMsg.HeadingRad);        
         waitfor(r);

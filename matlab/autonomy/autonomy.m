@@ -145,28 +145,36 @@ if ( strcmp(params.auto.mode,'auto'))
             % check status of remaining behavior
             %Set Handles within each behavior
             switch name
+                % Open loop behaviors
                 case 'bhv_takeoff'
-                    %[completionFlag, stick_thrust] = bhv_takeoff_status(stateEstimateMsg, aypr, stick_thrust);
                     completionFlag = bhv_takeoff_status( stateEstimateMsg , ayprCmd , mission.bhv{currentBehavior}.thresholdDist );
                 case 'bhv_hover'
                     completionFlag = bhv_hover_status(stateEstimateMsg, ayprCmd, completion, t);
+                case 'bhv_hover_fixed_orient'
+                    completionFlag = bhv_hover_fixed_orient_status(stateEstimateMsg, ayprCmd, completion, t);                    
                 case 'bhv_point_to_direction'
                      completionFlag = bhv_point_to_direction_status(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_land'
-                    init = mission.bhv{currentBehavior}.initialize;
-                    [completionFlag, initialize, ahsUpdate] = bhv_landing_status(stateEstimateMsg, ayprCmd, completion, t, init);
-                    display(initialize)
-                    mission.bhv{currentBehavior}.initialize.firstLoop = initialize;
-                    ayprCmdMsg.AltitudeMeters = ahsUpdate;
+                    completionFlag = bhv_landing_status(stateEstimateMsg, ayprCmd, completion, t, init);
+                % TODO:
+                % 'bhv_hover_openServo'
+                    
+                % Vision-based behaviors
+%                 case 'bhv_hover_over_H'                    
+%                     [completionFlag, ayprCmd] = bhv_hover_over_H_status(stateEstimateMsg, ayprCmd, completion, t);                    
+%                     % update ayprCmd
+%                     mission.bhv{currentBehavior}.ayprCmd = ayprCmd;
 %                 case 'bhv_point_to_target'
 %                     [completionFlag] = bhv_point_to_target_status(stateEstimateMsg, yawErrorCameraMsg, aypr, completion, t);
 %                     ayprCmdMsg.HeadingRad = yawErrorCameraMsg.Data;
+                    
                 otherwise
             end
             mission.bhv{currentBehavior}.completion.status = completionFlag;
         end
         
         % publish
+        ayprCmdMsg = mission.bhv{currentBehavior}.ayprCmd;s
         send(ayprCmdPublisher, ayprCmdMsg);
         fprintf('Published Ahs Cmd. Alt : %3.3f \t Yaw: %3.3f\n', ayprCmdMsg.AltitudeMeters, ayprCmdMsg.HeadingRad);        
         waitfor(r);
