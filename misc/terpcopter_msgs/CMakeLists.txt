@@ -54,6 +54,10 @@ message_generation
    ahsCmd.msg
    stateEstimate.msg
    stickCmd.msg
+   ffpidSetting.msg
+   targetDetection.msg
+   openLoopStickCmd.msg
+   altControlDebug.msg
  )
 
 ## Generate services in the 'srv' folder

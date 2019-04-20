@@ -1,40 +1,56 @@
-function [u, altitudeErrorHistory] = FF_PID(gains, altitudeErrorHistory, currTime, altError)
-% ffterm = Kv
-Kv = gains.Ff;
-e=altError;
+function [u, errorHistory] = FF_PID(gains, errorHistory, curTime, error)
 
+% unpack variables for convenience
+outerLoopPgain = gains.Ff;
+saturationLimit = gains.saturationLimit;
 
-vDes = max(min(Kv*e,0.2),-0.2);
-dt = currTime - altitudeErrorHistory.lastTime;
-%fprintf("e: %6.2f \n",e);
+% time elapsed since last control
+dt = curTime - errorHistory.lastTime;
 
-eDot = (e - altitudeErrorHistory.lastVal) / dt;
-%fprintf("eDot: %6.2f",eDot);
+%% Outer Loop:
+% desired error rate (v)
+vDes = outerLoopPgain*error;
+
+% saturate
+vDes = max(min(vDes,saturationLimit),-saturationLimit);
+
+%% Inner Loop:
+
+% actual error rate 
+eDot = (error - errorHistory.lastVal) / dt;
 v = -eDot;
 
-eDotDot = (eDot - altitudeErrorHistory.lastError) / dt;
+% actual error rate derivative
+eDotDot = (eDot - errorHistory.lastError) / dt;
 vDot = -eDotDot;
-vDesDot = Kv*eDot;
+
+% specify setpoint for inner-loop as 
+% vDesDot = outerLoopPgain*eDot;
+
 
 eVel = vDes - v;
 %fprintf("eVel: %6.2f",eVel);
 
-eDotVel = vDesDot - vDot;
+eVelDot = vDesDot - vDot;
 %fprintf("eDotVel: %6.2f",eDotVel);
 
 % This error is for eVel, NOT e (last sum of velocity errors)
-altitudeErrorHistory.lastSum = altitudeErrorHistory.lastSum + (eVel * dt);
-%
+errorHistory.lastSum = errorHistory.lastSum + (eVel * dt);
 
-u = gains.Kp *eVel + gains.Kd * eDotVel + ...
-    gains.Ki * altitudeErrorHistory.lastSum;
+% compute PID control (inner loop)
+u = gains.Kp *eVel + gains.Kd * eVelDot +  gains.Ki * errorHistory.lastSum;
 
 %fprintf("u: %6.3f",u);
 
-altitudeErrorHistory.lastError = eDot;
-altitudeErrorHistory.lastTime = currTime;
-altitudeErrorHistory.lastVal = e;
+% update error history
+errorHistory.lastError = eDot;
+errorHistory.lastTime = curTime;
+errorHistory.lastVal = error;
 
+%% Debug/plot
+
+%figure(100);
+%subplot(2,2,1);
 
 
 

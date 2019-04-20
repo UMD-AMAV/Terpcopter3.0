@@ -168,6 +168,8 @@ Creating custom AMAV messages
            Type "rosmsg list" and ensure that the output contains the generated
            custom message types. 
 
+- After restarting MATLAB, run updatePaths
+
 Using Git
 --------------------------------------------------------------------------- 
 

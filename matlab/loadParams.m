@@ -4,19 +4,22 @@ function params = loadParams()
 %------------------------------------------------
 params.env.com_port = '/dev/ttyUSB0';
 params.env.baud_rate = 57600;
-params.env.ros_master_ip = '192.168.1.93'; %change master to Laptop 
+params.env.ros_master_ip = '192.168.1.3'; %change master to Laptop 
 params.env.catkinSrcDir = '/home/amav/catkin_ws/src';
+%params.env.catkinSrcDir = '/home/wolek/catkin_ws/src';
 params.env.terpcopterMatlabMsgs = [params.env.catkinSrcDir '/matlab_gen/msggen'];
+%params.env.matlabRoot = '/home/wolek/Desktop/Research/Projects/UMD/AMAV/Terpcopter3.0/matlab';
+params.env.matlabRoot = '/home/amav/amav/Terpcopter3.0/matlab';
 
 % Virtual transmitter (vtx) 
 %------------------------------------------------
 % mode of operation 
 params.vtx.mode = 'flight'; % 'sim' or 'flight' 
 
-% transmitter 
+% transmitter           throttle roll pitch yaw
 params.vtx.stick_lim = [100; 100; 100; 100];
 params.vtx.trim_lim = [29; 29; 29; 29];
-params.vtx.trim_val = [0 -0.10345 0.13793 0];
+params.vtx.trim_val = [0 -2/29 5/29 0]; %-0.517241379 0.137931]; %-1.00344  0.172413793
 
 % simulator
 params.vtx.T = 30; % simulation time
@@ -70,7 +73,7 @@ params.ctrl.altitudeGains.kd = 0.0180000;
 params.ctrl.altitudeGains.ffterm = 0.4; % feed-forward term 
 
 % yaw control 
-params.ctrl.yawGains.kp = 0.3000;
+params.ctrl.yawGains.kp = 0.200;
 params.ctrl.yawGains.kd = 0.20000;
 params.ctrl.yawGains.ki = 0.050000;
  
@@ -88,7 +91,7 @@ params.est.altitudeLPFitler.timeConstant = 1.00000; % sec,
 
 % Autonomy (auto)
 %------------------------------------------------
-params.auto.mode = 'auto';
+params.auto.mode = 'manual'; % 'auto' or 'manual'
 
 
 
