@@ -15,9 +15,11 @@ t = data(:,1);
 pitch_d = data(:,2);
 pitch_abs = data(:,3);
 pitch_err = data(:,4);
-roll_d = data(:,5);
-roll_abs = data(:,6);
-roll_err = data(:,7);
+stick_pitch = data(:,5);
+roll_d = data(:,6);
+roll_abs = data(:,7);
+roll_err = data(:,8);
+stick_roll = data(:,9);
 
 
 %  1        fprintf(,'%3.3f,',t);
@@ -39,6 +41,8 @@ ylabel('Pitch (deg)');
 set(gca,'FontSize',16);
 subplot(2,1,2)
 plot(t,pitch_err,'k-','linewidth',2);
+hold on
+plot(t,stick_pitch,'g-','linewidth',2);
 hold on;
 xlabel('Time (sec');
 ylabel('Pitch Error (deg)');
@@ -55,6 +59,8 @@ ylabel('Roll (deg)');
 set(gca,'FontSize',16);
 subplot(2,1,2)
 plot(t,roll_err,'k-','linewidth',2);
+hold on
+plot(t,stick_roll,'g-','linewidth',2);
 hold on;
 xlabel('Time (sec');
 ylabel('Roll Error (deg)');

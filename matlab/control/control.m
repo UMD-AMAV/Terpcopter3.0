@@ -141,13 +141,13 @@ while(1)
     absolutePitch = stateEstimateMsg.Pitch
     absoluteRoll = stateEstimateMsg.Roll
     
-    if (openLoopIsActiveMsg.Data == true) && (closedLoopIsActiveMsg.Data == false)
-        % set stick command directly based on openLoopStickCmd message
-        stickCmdMsg.Thrust = openLoopStickCmdMsg.Thrust;
-        stickCmdMsg.Yaw = openLoopStickCmdMsg.Yaw;
-        stickCmdMsg.Pitch = openLoopStickCmdMsg.Pitch;
-        stickCmdMsg.Roll = openLoopStickCmdMsg.Roll;
-    elseif (openLoopIsActiveMsg.Data == false) && (closedLoopIsActiveMsg.Data == true)
+%     if (openLoopIsActiveMsg.Data == true) && (closedLoopIsActiveMsg.Data == false)
+%         % set stick command directly based on openLoopStickCmd message
+%         stickCmdMsg.Thrust = openLoopStickCmdMsg.Thrust;
+%         stickCmdMsg.Yaw = openLoopStickCmdMsg.Yaw;
+%         stickCmdMsg.Pitch = openLoopStickCmdMsg.Pitch;
+%         stickCmdMsg.Roll = openLoopStickCmdMsg.Roll;
+%     elseif (openLoopIsActiveMsg.Data == false) && (closedLoopIsActiveMsg.Data == true)
         
         % timestamp
         ti= rostime('now');
@@ -231,9 +231,11 @@ while(1)
         fprintf(pFile,'%3.3f,',Pitch_d);
         fprintf(pFile,'%3.3f,',absolutePitch);
         fprintf(pFile,'%3.3f,',PitchError);
+        fprintf(pFile,'%3.3f,',u_t_pitch);
         fprintf(pFile,'%3.3f,',Roll_d);
         fprintf(pFile,'%3.3f,',absoluteRoll);
-        fprintf(pFile,'%3.3f\n',RollError);                
+        fprintf(pFile,'%3.3f\n',RollError);
+        fprintf(pFile,'%3.3f,',u_t_roll);
         fclose(pFile);
         
         % compute controls
@@ -247,14 +249,14 @@ while(1)
         % publish
         stickCmdMsg.Thrust = 0;
         stickCmdMsg.Yaw = max(-1,min(1,u_t_yaw));
-        stickCmdMsg.Pitch = max(-1,min(1,u_t_pitch));
-        stickCmdMsg.Roll = max(-1,min(1,u_t_roll));
+        stickCmdMsg.Pitch = max(-1,min(1,u_t_pitch))*0.5;
+        stickCmdMsg.Roll = max(-1,min(1,u_t_roll))*0.5;
         
         fprintf('Stick Cmd.Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f, Yaw : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ), u_t_yaw );
         %fprintf('Iteration: %d - Time Elapsed: %f\n',i,time)
-    else
-        fprintf('Error: both open loop and closed loop control are either running or not running\n');
-    end
+%     else
+%         fprintf('Error: both open loop and closed loop control are either running or not running\n');
+%     end
     send(stickCmdPublisher, stickCmdMsg);
     disp('Controller');
     waitfor(r);
