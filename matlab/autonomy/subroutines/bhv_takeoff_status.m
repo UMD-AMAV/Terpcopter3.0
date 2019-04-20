@@ -1,20 +1,16 @@
-function [completionFlag, stick_thrust] = bhv_takeoff_status(stateEstimateMsg, ahs, stick_thrust)
+function [completionFlag] = bhv_takeoff_status( stateEstimateMsg , ayprCmd , thresholdDist )
    disp('bhv_takeoff_status');
-   maxTakeoffThrust = 0.1;
    
-   %if takeOffComplete, switch on altitude control and return
-   takeOffComplete = stateEstimateMsg.Up > ahs.desiredAltMeters;
+   zd = ayprCmd.AltDesiredMeters;
+   z = stateEstimateMsg.Up;
+   thresholdDist = 0.1;
+   maxAltSafety = 5;
    
-   if takeOffComplete
-      completionFlag = 1;
-      return;
+   if ( abs(z-zd) <= thresholdDist || z >= maxAltSafety ) % 5 m max cieling as safety
+       completionFlag = 1;
+   else
+       completionFlag = 0;
    end
-   completionFlag = 0;
-   
-   if stick_thrust <= maxTakeoffThrust
-        stick_thrust = stick_thrust + 0.01
-   else 
-      stick_thrust = maxTakeoffThrust
-   end
+
 end
 

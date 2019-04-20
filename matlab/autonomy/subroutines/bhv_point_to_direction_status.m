@@ -1,10 +1,10 @@
-function completionFlag = bhv_point_to_direction_status(stateEstimateMsg, ahs, completion, t)
+function completionFlag = bhv_point_to_direction_status(stateEstimateMsg, ayprCmd, completion, t)
     global timestamps
     toleranceRadians = 0.35; 
     
     disp(stateEstimateMsg.Yaw);
     
-    yawDesiredRadians = deg2rad(ahs.desiredYawDegrees);
+    yawDesiredRadians = deg2rad(ayprCmd.YawDesiredDeg);
     
     pointToDirectionComplete = abs(yawDesiredRadians - stateEstimateMsg.Yaw) < toleranceRadians;
     
@@ -18,7 +18,7 @@ function completionFlag = bhv_point_to_direction_status(stateEstimateMsg, ahs, c
     end
     yaw_current = rad2deg(stateEstimateMsg.Yaw);
     elapsed_satisfied_time = current_event_time - timestamps.behavior_satisfied_timestamp;
-    fprintf('Desired Yaw: %f Degrees\tCurrent Yaw %f Degrees\nDesired Time: %f\tElapsed time: %f\n', ahs.desiredYawDegrees, yaw_current, completion.durationSec, elapsed_satisfied_time);
+    fprintf('Desired Yaw: %f Degrees\tCurrent Yaw %f Degrees\nDesired Time: %f\tElapsed time: %f\n', ayprCmd.desiredYawDegrees, yaw_current, completion.durationSec, elapsed_satisfied_time);
     
     if elapsed_satisfied_time >= completion.durationSec
         completionFlag = 1;
