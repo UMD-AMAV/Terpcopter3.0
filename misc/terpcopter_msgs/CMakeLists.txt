@@ -51,7 +51,7 @@ message_generation
 # Generate messages in the 'msg' folder
  add_message_files(
    FILES
-   ahsCmd.msg
+   ayprCmd.msg
    stateEstimate.msg
    stickCmd.msg
    ffpidSetting.msg

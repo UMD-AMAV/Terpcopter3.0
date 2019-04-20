@@ -1,0 +1,8 @@
+float32 altDesiredMeters
+float32 yawDesiredDegrees
+float32 pitchDesiredDegrees
+float32 rollDesiredDegrees
+bool altSwitch
+bool yawSwitch
+bool pitchSwitch
+bool rollSwitch
