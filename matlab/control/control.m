@@ -63,6 +63,8 @@ pause(2)
 stickCmdMsg = rosmessage(stickCmdPublisher);
 stickCmdMsg.Thrust = -1;
 stickCmdMsg.Yaw = 0;
+stickCmdMsg.Pitch = 0;
+stickCmdMsg.Roll = 0;
 
 
 % % grab latest messages
@@ -133,7 +135,7 @@ while(1)
         stickCmdMsg.Pitch = openLoopStickCmdMsg.Pitch;
         stickCmdMsg.Roll = openLoopStickCmdMsg.Roll;
     elseif (openLoopIsActiveMsg.Data == false) && (closedLoopIsActiveMsg.Data == true)
-        
+   
         % timestamp
         ti= rostime('now');
         abs_t = double(ti.Sec)+double(ti.Nsec)*10^-9;
@@ -178,7 +180,7 @@ while(1)
         % hardcode for now
         altControl.altFiltTimeConstant = 0.1; % sec, used to filter lidar
         % deadband 0.1
-        altControl.climbRateCmd = 0.27; % nominal stick position for climb [-1,1]
+        altControl.climbRateCmd = 0.38; % nominal stick position for climb [-1,1]
         altControl.descentRateCmd = -0.23; % nominal stick position for climb [-1,1]
         altControl.altErrorDeadband = 0.05; % meters, deadband around desired altitude
         altControl.settlingTime = 1E3; % sec, waits this amount of time after setpoint issued to give climb or descent (if deadband excedded)

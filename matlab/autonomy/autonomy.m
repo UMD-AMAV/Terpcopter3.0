@@ -48,7 +48,8 @@
 clear; close all; clc; format compact;
 addpath('../')
 params = loadParams();
-mission = loadMissionAltModeTest(); %hover test 
+mission = loadMissionAltWithOpenPitch(); %hover test 
+%mission = loadMissionAltModeTest();
 fprintf('Launching Autonomy Node...\n');
 
 global timestamps
@@ -200,6 +201,14 @@ if ( strcmp(params.auto.mode,'auto'))
                     openLoopIsActiveMsg.Data = true;      % true: openloop control
                     closedLoopIsActiveMsg.Data = false;
                     openLoopStickCmdMsg.Thrust = stick_thrust_land;
+                case 'bhv_pitch_open'
+                    [completionFlag, open_stick_cmd] = bhv_pitch_open_status(stateEstimateMsg, ahs, completion,t);
+                    openLoopIsActiveMsg.Data = true;      % true: openloop control
+                    closedLoopIsActiveMsg.Data = false;
+                    openLoopStickCmdMsg.Thrust = open_stick_cmd.thrust;
+                    openLoopStickCmdMsg.Yaw = open_stick_cmd.yaw;
+                    openLoopStickCmdMsg.Pitch = open_stick_cmd.pitch;
+                    openLoopStickCmdMsg.Roll = open_stick_cmd.roll;
                 case 'bhv_point_to_target'
                     [completionFlag] = bhv_point_to_target_status(stateEstimateMsg, yawErrorCameraMsg, ahs, completion, t);
                     ahsCmdMsg.HeadingRad = yawErrorCameraMsg.Data;
