@@ -1,17 +1,17 @@
-function [completionFlag, ayprCmd] = bhv_hover_over_H_status(stateEstimateMsg, ayprCmd, completion, t)
+function completionFlag = bhv_land(stateEstimateMsg, ayprCmd, completion, t)
 
     global timestamps
-    toleranceMeters = 0.25;
+    toleranceMeters = 0.05;
     
     hoverAltComplete = abs(ayprCmd.AltDesiredMeters - stateEstimateMsg.Up) <= toleranceMeters;
     
     % fprintf('Task: Hover at %f meters for %f seconds\n', ahs.desiredAltMeters, completion.durationSec);
     
     if hoverAltComplete
-        disp('hover alt satisfied');
+        disp('landing alt satisfied');
         current_event_time = t; % reset time for which altitude is satisfied
     else
-        disp('hover alt not satisfied');
+        disp('landing alt not satisfied');
         current_event_time = t;
         timestamps.behavior_satisfied_timestamp = t;
     end

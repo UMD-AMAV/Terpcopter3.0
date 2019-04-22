@@ -117,14 +117,14 @@ while(1)
     
     % pitch control
     if ( ayprCmdMsg.PitchSwitch==1 )
-        [u_pitch, pitchControl] = pitchModeController(pitchControl, t, pitch, pitch_d);
+        [u_pitch, pitchControl] = pitchController(pitchControl, t, pitch, pitch_d);
     else
         u_pitch = 0;
     end
     
     % roll control
     if ( ayprCmdMsg.RollSwitch==1 )
-        [u_roll, rollControl] = rollModeController(rollControl, t, roll, roll_d);
+        [u_roll, rollControl] = rollController(rollControl, t, roll, roll_d);
     else
         u_roll = 0;
     end

@@ -1,4 +1,4 @@
-function completionFlag = bhv_point_to_direction_status(stateEstimateMsg, ayprCmd, completion, t)
+function completionFlag = bhv_point_to_direction(stateEstimateMsg, ayprCmd, completion, t)
     global timestamps
     toleranceRadians = 0.35; 
     

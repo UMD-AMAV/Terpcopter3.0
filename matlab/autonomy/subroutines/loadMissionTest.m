@@ -1,6 +1,10 @@
 function mission = loadMissionTest()
 mission.config.firstLoop = 1;
 
+mission.config.H_detector = 0;
+mission.config.target_detector = 0;
+mission.config.flowProbe = 0;
+
 i = 1;
 mission.bhv{i}.name = 'bhv_hover';
 mission.bhv{i}.initialize.firstLoop = 1;

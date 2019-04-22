@@ -1,6 +1,10 @@
 function mission = loadMission_takeoffHoverLand()
 mission.config.firstLoop = 1;
 
+mission.config.H_detector = 0;
+mission.config.target_detector = 0;
+mission.config.flowProbe = 0;
+
 % for reference:
 %
 % ayprCmdMsg = rosmessage(ayprCmdPublisher);
