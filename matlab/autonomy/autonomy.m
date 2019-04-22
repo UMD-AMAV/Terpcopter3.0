@@ -60,7 +60,7 @@ if ( mission.config.target_detector )
     targetDetectionFlagSubscriber = rossubscriber('/targetFlag', 'std_msgs/Bool');
 end
 if ( mission.config.flowProbe )
-    % subscribe to flowprobe
+    flowProbeDataSubscriber = rossubscriber('/terpcopter_flow_probe_node/flowProbe');
 end
 
 % Publishers
@@ -103,7 +103,7 @@ if ( strcmp(params.auto.mode,'auto'))
             targetDetectionFlagMsg = targetDetectionFlagSubscriber.LatestMessage;
         end
         if ( mission.config.flowProbe )
-            % subscribe to flowprobe
+            fpMsg = flowProbeDataSubscriber.LatestMessage;
         end
         
         % unpack statestimate
@@ -194,32 +194,32 @@ if ( strcmp(params.auto.mode,'auto'))
         fprintf('Published Ahs Cmd. Alt : %3.3f \t Yaw: %3.3f\n', ayprCmdMsg.AltitudeMeters, ayprCmdMsg.HeadingRad);
         waitfor(r);
         
-        if ( logFlag )            
+        if ( logFlag )
             pFile = fopen( autonomylog ,'a');
             
             % write csv file
             fprintf(pFile,'%6.6f,',t);
             fprintf(pFile,'%d,',currentBehavior);
             
-            fprintf(pFile,'%6.6f,',ayprCmdMsg.AltDesiredMeters);   
+            fprintf(pFile,'%6.6f,',ayprCmdMsg.AltDesiredMeters);
             fprintf(pFile,'%6.6f,',ayprCmdMsg.YawDesiredDeg);
-            fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchDesiredDeg);  
-            fprintf(pFile,'%6.6f,',ayprCmdMsg.RollDesiredDeg);  
-            fprintf(pFile,'%6.6f,',ayprCmdMsg.AltSwitch);  
-            fprintf(pFile,'%6.6f,',ayprCmdMsg.YawSwitch);  
-            fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchSwitch);  
-            fprintf(pFile,'%6.6f,',ayprCmdMsg.RollSwitch);   
+            fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchDesiredDeg);
+            fprintf(pFile,'%6.6f,',ayprCmdMsg.RollDesiredDeg);
+            fprintf(pFile,'%6.6f,',ayprCmdMsg.AltSwitch);
+            fprintf(pFile,'%6.6f,',ayprCmdMsg.YawSwitch);
+            fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchSwitch);
+            fprintf(pFile,'%6.6f,',ayprCmdMsg.RollSwitch);
             
-            fprintf(pFile,'%6.6f,',stateEstimateMsg.Range);  
-            fprintf(pFile,'%6.6f,',stateEstimateMsg.Time); 
-            fprintf(pFile,'%6.6f,',stateEstimateMsg.North); 
-            fprintf(pFile,'%6.6f,',stateEstimateMsg.East); 
-            fprintf(pFile,'%6.6f,',stateEstimateMsg.Up); 
-            fprintf(pFile,'%6.6f,',stateEstimateMsg.Yaw); 
+            fprintf(pFile,'%6.6f,',stateEstimateMsg.Range);
+            fprintf(pFile,'%6.6f,',stateEstimateMsg.Time);
+            fprintf(pFile,'%6.6f,',stateEstimateMsg.North);
+            fprintf(pFile,'%6.6f,',stateEstimateMsg.East);
+            fprintf(pFile,'%6.6f,',stateEstimateMsg.Up);
+            fprintf(pFile,'%6.6f,',stateEstimateMsg.Yaw);
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Pitch);
-            fprintf(pFile,'%6.6f,\n',stateEstimateMsg.Roll);            
-
-            fclose(pFile);            
+            fprintf(pFile,'%6.6f,\n',stateEstimateMsg.Roll);
+            
+            fclose(pFile);
         end
         
     end
