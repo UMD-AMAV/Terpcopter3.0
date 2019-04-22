@@ -135,7 +135,7 @@ if ( strcmp(params.auto.mode,'auto'))
         % if behavior completes pop behavior
         if flag == true
             [mission.bhv] = pop(mission.bhv, t);
-            currentBehavior = currentBehavior + 1;
+            currentBehavior = 1;
             disp('**** Popped Behavior ****');
         else
             % check status of remaining behavior
@@ -163,7 +163,7 @@ if ( strcmp(params.auto.mode,'auto'))
                     % 'bhv_hover_closeServo'
                     
                     % flow-probe behaviors (Rohan)
-                    % 'bhv_fly_forward_flowprobe'
+                    % 'bhv_forward_in_direction_flowprobe'
                     
                     % vision behaviors (Abhinav, Kay)
                     % 'bhv_hover_over_H'
@@ -172,7 +172,6 @@ if ( strcmp(params.auto.mode,'auto'))
                     % vision behaviors (Krishna)
                     % 'bhv_scan_for_target'
                     % 'bhv_point_to_target'
-                    % 'bhv_move_to_target'
                     
                     
                     %                 case 'bhv_hover_over_H'
@@ -200,7 +199,6 @@ if ( strcmp(params.auto.mode,'auto'))
             % write csv file
             fprintf(pFile,'%6.6f,',t);
             fprintf(pFile,'%d,',currentBehavior);
-            
             fprintf(pFile,'%6.6f,',ayprCmdMsg.AltDesiredMeters);   
             fprintf(pFile,'%6.6f,',ayprCmdMsg.YawDesiredDeg);
             fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchDesiredDeg);  
