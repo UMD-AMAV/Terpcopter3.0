@@ -1,8 +1,8 @@
 function [pitchStickCmd, pitchControl] = pitchController(pitchControl, curTime, pitchDeg, pitchDesDeg)
 
 % gains/parameters
-pitchFiltTimeConstant = 0.2; sec
-kp = 0.1/10; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
+pitchFiltTimeConstant = 0.2; 
+kp = 0.15/5; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
 pitchStickLimit = 0.2;
 
 % unpack states

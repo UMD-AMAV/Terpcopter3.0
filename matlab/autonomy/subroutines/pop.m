@@ -1,6 +1,8 @@
 function missionUpdate = pop(mission, t)
 global timestamps
 timestamps.behavior_switched_timestamp = t;
+timestamps.behavior_satisfied_timestamp = t; 
+
 [numRow numCol] = size(mission);
 
 if numCol == 1

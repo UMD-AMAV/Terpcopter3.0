@@ -1,4 +1,4 @@
-function mission = loadMission_takeoffHoverLand()
+function mission = loadMission_takeoffHoverFlyForwardLand()
 mission.config.firstLoop = 1;
 
 mission.config.H_detector = 0;
@@ -21,8 +21,8 @@ i = 1;
 % Behavior 1: Takeoff
 mission.bhv{i}.name = 'bhv_takeoff';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
-mission.bhv{i}.ayprCmd.AltSwitch = 0.4; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
+mission.bhv{i}.ayprCmd.AltSwitch = 1; 
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.3; 
 mission.bhv{i}.completion.status = false;
 
 i = i + 1;
@@ -30,9 +30,22 @@ i = i + 1;
 mission.bhv{i}.name = 'bhv_hover';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
-mission.bhv{i}.completion.durationSec = 9.95; % 10 seconds
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.75; 
+mission.bhv{i}.completion.durationSec = 2; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
+
+
+i = i + 1;
+% Behavior 2: Hover
+mission.bhv{i}.name = 'bhv_fly_forward';
+mission.bhv{i}.ayprCmd = default_aypr_msg();
+mission.bhv{i}.ayprCmd.AltSwitch = 1; 
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
+mission.bhv{i}.ayprCmd.PitchSwitch = 1; 
+mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 2.5; 
+mission.bhv{i}.completion.durationSec = 1; % 
+mission.bhv{i}.completion.status = false;     % completion flag
+
 
 i = i + 1;
 % Behavior 3: Land

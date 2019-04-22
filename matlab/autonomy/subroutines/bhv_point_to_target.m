@@ -6,7 +6,7 @@ function [completionFlag, ayprCmd] = bhv_point_to_target(stateEstimateMsg, yawEr
     % compute desired yaw angle by adding error to current yaw
     yawCurDeg = stateEstimateMsg.yaw*180/pi;
     yawErrorCameraDegrees = rad2deg(yawErrorCameraMsg.Data);
-    ayprCmd.YawDesiredDeg = yawCurDeg + yawErrorCameraDegrees;
+    ayprCmd.YawDesiredDegrees = yawCurDeg + yawErrorCameraDegrees;
     
     % check if complete
     pointToTargetComplete = abs(yawErrorCameraMsg.Data) < toleranceRadians;   

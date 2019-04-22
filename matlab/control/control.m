@@ -35,6 +35,8 @@ end
 stateEstimateSubscriber = rossubscriber('/stateEstimate');
 ayprCmdSubscriber = rossubscriber('/ayprCmd');
 
+controlStartSubscriber = rossubscriber('/startControl', 'std_msgs/Bool');
+
 % Publishers
 stickCmdPublisher = rospublisher('/stickCmd', 'terpcopter_msgs/stickCmd');
 
@@ -51,7 +53,7 @@ stickCmdMsg.Yaw = 0;
 stickCmdMsg.Pitch = 0;
 stickCmdMsg.Roll = 0;
 
-% initialize altiude controller state  
+% initialize altiude controller state
 dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
 altControl.log=[params.env.matlabRoot '/altControl_' dateString '.log'];
 altControl.lastTime = 0;
@@ -59,17 +61,17 @@ altControl.prevVal = 0;
 altControl.setpointReached = 0;
 altControl.setpointVal = 0;
 
-% initialize yaw controller state  
+% initialize yaw controller state
 yawControl.log=[params.env.matlabRoot '/yawControl_' dateString '.log'];
 yawControl.lastTime = 0;
 yawControl.prevVal = 0;
 
-% initialize yaw controller state  
+% initialize yaw controller state
 pitchControl.log=[params.env.matlabRoot '/pitchControl_' dateString '.log'];
 pitchControl.lastTime = 0;
 pitchControl.prevVal = 0;
 
-% initialize yaw controller state  
+% initialize yaw controller state
 rollControl.log=[params.env.matlabRoot '/rollControl_' dateString '.log'];
 rollControl.lastTime = 0;
 rollControl.prevVal = 0;
@@ -81,6 +83,12 @@ r = robotics.Rate(90);
 reset(r);
 send(stickCmdPublisher, stickCmdMsg); % send initial stick command.
 
+disp('Waiting for Start...')
+controlStartFlag = controlStartSubscriber.LatestMessage;
+while ( ~controlStartFlag.Data )
+    controlStartFlag = controlStartSubscriber.LatestMessage;
+end
+disp('Entering loop...');
 while(1)
     
     % get latest messages
@@ -89,12 +97,15 @@ while(1)
     
     % unpack state estimate
     z = stateEstimateMsg.Range;
+    pitchDeg = stateEstimateMsg.Pitch; 
+    yawDeg = stateEstimateMsg.Yaw;
+    rollDeg = stateEstimateMsg.Roll;
     
     % unpack command
     z_d = ayprCmdMsg.AltDesiredMeters;
-    yaw_d = ayprCmdMsg.YawDesiredDeg;
-    pitch_d = ayprCmdMsg.PitchDesiredDeg;
-    roll_d = ayprCmdMsg.RollDesiredDeg;
+    yaw_d = ayprCmdMsg.YawDesiredDegrees;
+    pitch_d = ayprCmdMsg.PitchDesiredDegrees;
+    roll_d = ayprCmdMsg.RollDesiredDegrees;
     
     % timestamp
     ti = rostime('now');
@@ -110,21 +121,21 @@ while(1)
     
     % yaw control
     if ( ayprCmdMsg.YawSwitch==1 )
-        [u_yaw, yawControl] = yawController(yawControl, t, yaw, yaw_d);
+        [u_yaw, yawControl] = yawController(yawControl, t, yawDeg, yaw_d);
     else
         u_yaw = 0;
     end
     
     % pitch control
     if ( ayprCmdMsg.PitchSwitch==1 )
-        [u_pitch, pitchControl] = pitchController(pitchControl, t, pitch, pitch_d);
+        [u_pitch, pitchControl] = pitchController(pitchControl, t, pitchDeg, pitch_d);
     else
         u_pitch = 0;
     end
     
     % roll control
     if ( ayprCmdMsg.RollSwitch==1 )
-        [u_roll, rollControl] = rollController(rollControl, t, roll, roll_d);
+        [u_roll, rollControl] = rollController(rollControl, t, rollDeg, roll_d);
     else
         u_roll = 0;
     end
@@ -140,4 +151,3 @@ while(1)
     send(stickCmdPublisher, stickCmdMsg);
     waitfor(r);
 end
-

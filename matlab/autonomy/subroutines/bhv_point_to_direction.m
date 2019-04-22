@@ -4,7 +4,7 @@ function completionFlag = bhv_point_to_direction(stateEstimateMsg, ayprCmd, comp
     
     disp(stateEstimateMsg.Yaw);
     
-    yawDesiredRadians = deg2rad(ayprCmd.YawDesiredDeg);
+    yawDesiredRadians = deg2rad(ayprCmd.YawDesiredDegrees);
     
     pointToDirectionComplete = abs(yawDesiredRadians - stateEstimateMsg.Yaw) < toleranceRadians;
     

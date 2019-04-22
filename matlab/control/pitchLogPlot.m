@@ -18,9 +18,9 @@ filtVal = data(:,5);
 errorVal = data(:,6);
 stickCmd = data(:,7);
 
-filtTimeConstant = data(:,5);
-kp = data(:,6);
-stickLimit = data(:,7);
+filtTimeConstant = data(:,8);
+kp = data(:,9);
+stickLimit = data(:,10);
 
 
 %     % write csv file

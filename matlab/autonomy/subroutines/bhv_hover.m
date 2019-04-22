@@ -1,4 +1,4 @@
-function completionFlag = bhv_hover(stateEstimateMsg, ayprCmd, completion, t)
+function completionFlag = bhv_hover(stateEstimateMsg, ayprCmd, completion, t )
 
     global timestamps
     toleranceMeters = 0.25;

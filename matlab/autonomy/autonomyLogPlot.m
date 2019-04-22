@@ -11,6 +11,7 @@ data = csvread(filepath);
 
 % parse out
 t = data(:,1);
+t = t - t(1);
 curBhv = data(:,2);
 
 altDes = data(:,3);
@@ -19,18 +20,18 @@ pitchDes = data(:,5);
 rollDes = data(:,6);
 
 altSwitch = data(:,7);
-yawSwitch = data(:,8);
-pitchSwitch = data(:,9);
-rollSwitch = data(:,10);
+yawSwitch = data(:,8)-0.05;
+pitchSwitch = data(:,9)-0.10;
+rollSwitch = data(:,10)-0.15;
 
-est_Range = data(:,7);
-est_Time = data(:,8);
-est_North = data(:,9);
-est_East = data(:,10);
-est_Up= data(:,9);
-est_Yaw = data(:,10);
-est_Pitch = data(:,9);
-est_Roll = data(:,10);
+est_Range = data(:,11);
+est_Time = data(:,12);
+est_North = data(:,13);
+est_East = data(:,14);
+est_Up= data(:,15);
+est_Yaw = data(:,16);
+est_Pitch = data(:,17);
+est_Roll = data(:,18);
 
 %     % write csv file
 %  1           fprintf(pFile,'%6.6f,',t);
@@ -64,7 +65,7 @@ ylabel('Current Behavior (index)');
 set(gca,'FontSize',16);
 
 % plot switches
-subplot(2,1,1)
+subplot(2,1,2)
 plot(t,altSwitch,'b-','linewidth',2);
 hold on;
 plot(t,yawSwitch,'r-','linewidth',2);
@@ -77,7 +78,7 @@ legend('Alt','Yaw','Pitch','Roll');
 set(gca,'FontSize',16);
 
 % plot switches
-figure;
+figure(2);
 subplot(4,1,1)
 plot(t,altDes,'k--','linewidth',2);
 hold on;

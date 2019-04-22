@@ -14,9 +14,9 @@
 % Reference: ayprCmd.msg
 % ayprCmdMsg = rosmessage(ayprCmdPublisher);
 % ayprCmdMsg.AltDesiredMeters = 0;
-% ayprCmdMsg.YawDesiredDeg = 0;
-% ayprCmdMsg.PitchDesiredDeg = 0;
-% ayprCmdMsg.RollDesiredDeg = 0;
+% ayprCmdMsg.YawDesiredDegrees = 0;
+% ayprCmdMsg.PitchDesiredDegrees = 0;
+% ayprCmdMsg.RollDesiredDegrees = 0;
 % ayprCmdMsg.AltSwitch = 0;
 % ayprCmdMsg.YawSwitch = 0;
 % ayprCmdMsg.PitchSwitch = 0;
@@ -29,7 +29,9 @@ addpath('../')
 params = loadParams();
 
 % missions
-mission = loadMission_takeoffHoverLand(); % yaw pitch roll (manual)
+%mission = loadMission_takeoffHoverLand(); % yaw pitch roll (manual)
+mission = loadMission_takeoffHoverFlyForwardLand(); % yaw pitch roll (manual)
+
 % mission = loadMission_takeoffHoverPointLand();  % pitch, roll (manual)
 % mission = loadMission_takeoffHoverFixedOrientLand(); % autonomous w/drift
 % TODO: mission = loadMission_takeoffHoverOverHLand(); % 1 point
@@ -47,33 +49,54 @@ if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
 
+% Publishers
+fprintf('Setting up ayprsCmd Publisher ...\n');
+ayprCmdPublisher = rospublisher('/ayprCmd', 'terpcopter_msgs/ayprCmd');
+controlStartPublisher = rospublisher('/startControl', 'std_msgs/Bool');
+
+
+% initialize control off
+controlStartMsg = rosmessage('std_msgs/Bool');
+controlStartMsg.Data = 0;
+send(controlStartPublisher , controlStartMsg);
+
+
 % Subscribers
+fprintf('Subscribing to stateEstimate ...\n');
 stateEstimateSubscriber = rossubscriber('/stateEstimate');
+fprintf('Subscribing to startMission ...\n');
 startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
+
+
+
 
 % vision-based subscribers depend on mission
 if ( mission.config.H_detector )
+    fprintf('Subscribing to H detector ...\n');
     % subscribe to H camera node
 end
 if ( mission.config.target_detector )
+    fprintf('Subscribing to target detector ...\n');
     yawErrorCameraSubscriber = rossubscriber('/yawSetpoint');
     targetDetectionFlagSubscriber = rossubscriber('/targetFlag', 'std_msgs/Bool');
 end
 if ( mission.config.flowProbe )
+    fprintf('Subscribing to flowprobe ...\n');
     flowProbeDataSubscriber = rossubscriber('/terpcopter_flow_probe_node/flowProbe');
 end
 
-% Publishers
-ayprCmdPublisher = rospublisher('/ayprCmd', 'terpcopter_msgs/ayprCmd');
+
+
+
 pause(0.1)
 
 % Unpacking Initial ROS Messages
-[ayprCmdMsg] = default_aypr_msg(ayprCmdPublisher);
+[ayprCmdMsg] = default_aypr_msg();
 
 % initial variables
 stick_thrust = -1;
 
-r = robotics.Rate(10);
+r = robotics.Rate(25);
 reset(r);
 
 % for logging
@@ -82,14 +105,17 @@ logFlag = 1;
 dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
 autonomyLog = [params.env.matlabRoot '/autonomy_' dateString '.log'];
 
+
 if ( strcmp(params.auto.mode,'auto'))
     send(ayprCmdPublisher, ayprCmdMsg);
     
     % This enables the capability to start the mission through the TunerGUI
-    startMissionFlag = false;
     startMissionMsg = receive(startMissionSubscriber);
     startMissionFlag = startMissionMsg.Data;
-    
+    fprintf('Entering loop ...\n');
+    % run control once start button is pressed
+    controlStartMsg.Data = 1;
+    send(controlStartPublisher , controlStartMsg);
     while(1)
         
         % get latest messages
@@ -143,15 +169,17 @@ if ( strcmp(params.auto.mode,'auto'))
             switch name
                 % basic behaviors
                 case 'bhv_takeoff'
-                    completionFlag = bhv_takeoff( stateEstimateMsg , ayprCmd , mission.bhv{1}.thresholdDist );
+                    completionFlag = bhv_takeoff( stateEstimateMsg , ayprCmd );
                 case 'bhv_hover'
                     completionFlag = bhv_hover(stateEstimateMsg, ayprCmd, completion, t);
+                case 'bhv_fly_forward'
+                    completionFlag = bhv_fly_forward(stateEstimateMsg, ayprCmd, completion, bhvTime);              
                 case 'bhv_hover_fixed_orient'
                     completionFlag = bhv_hover_fixed_orient(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_point_to_direction'
                     completionFlag = bhv_point_to_direction(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_land'
-                    completionFlag = bhv_land(stateEstimateMsg, ayprCmd, completion, t, init);
+                    completionFlag = bhv_land(stateEstimateMsg, ayprCmd, completion, t);
                     
                     % TODO:
                     
@@ -189,22 +217,22 @@ if ( strcmp(params.auto.mode,'auto'))
         end
         
         % publish
-        ayprCmdMsg = mission.bhv{1}.ayprCmd;s
+        ayprCmdMsg = mission.bhv{1}.ayprCmd;
         send(ayprCmdPublisher, ayprCmdMsg);
-        fprintf('Published Ahs Cmd. Alt : %3.3f \t Yaw: %3.3f\n', ayprCmdMsg.AltitudeMeters, ayprCmdMsg.HeadingRad);
-        waitfor(r);
+        fprintf('Published Ahs Cmd. Alt : %3.3f \t Yaw: %3.3f\n', ayprCmdMsg.AltDesiredMeters, ayprCmdMsg.YawDesiredDegrees);
+        
         
         if ( logFlag )
-            pFile = fopen( autonomylog ,'a');
+            pFile = fopen( autonomyLog ,'a');
             
             % write csv file
             fprintf(pFile,'%6.6f,',t);
             fprintf(pFile,'%d,',currentBehavior);
             
             fprintf(pFile,'%6.6f,',ayprCmdMsg.AltDesiredMeters);
-            fprintf(pFile,'%6.6f,',ayprCmdMsg.YawDesiredDeg);
-            fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchDesiredDeg);
-            fprintf(pFile,'%6.6f,',ayprCmdMsg.RollDesiredDeg);
+            fprintf(pFile,'%6.6f,',ayprCmdMsg.YawDesiredDegrees);
+            fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchDesiredDegrees);
+            fprintf(pFile,'%6.6f,',ayprCmdMsg.RollDesiredDegrees);
             fprintf(pFile,'%6.6f,',ayprCmdMsg.AltSwitch);
             fprintf(pFile,'%6.6f,',ayprCmdMsg.YawSwitch);
             fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchSwitch);
@@ -221,23 +249,24 @@ if ( strcmp(params.auto.mode,'auto'))
             
             fclose(pFile);
         end
-        
+        waitfor(r);
     end
 end
-%
-%     if ( strcmp(params.auto.mode, 'manual'))
-%     fprintf('Autonomy Mode: Manual');
-%
-%     send(openLoopIsActivePublisher, openLoopIsActiveMsg);
-%     send(closedLoopIsActivePublisher, closedLoopIsActiveMsg);
-%
-%     send(pidAltSettingPublisher, pidAltSettingMsg);
-%     send(pidYawSettingPublisher, pidYawSettingMsg);
-%     send(ahsCmdPublisher, ayprCmdMsg);
-%     send(openLoopIsActivePublisher, openLoopIsActiveMsg);
-%     send(closedLoopIsActivePublisher, closedLoopIsActiveMsg);
-%
-%     while(1)
-%         waitfor(r);
-%     end
-% end
+
+if ( strcmp(params.auto.mode, 'manual'))
+    fprintf('Autonomy Mode: Manual');
+    %
+    %     send(openLoopIsActivePublisher, openLoopIsActiveMsg);
+    %     send(closedLoopIsActivePublisher, closedLoopIsActiveMsg);
+    %
+    %     send(pidAltSettingPublisher, pidAltSettingMsg);
+    %     send(pidYawSettingPublisher, pidYawSettingMsg);
+    %     send(ahsCmdPublisher, ayprCmdMsg);
+    %     send(openLoopIsActivePublisher, openLoopIsActiveMsg);
+    %     send(closedLoopIsActivePublisher, closedLoopIsActiveMsg);
+    %
+    %     while(1)
+    %         waitfor(r);
+    %     end
+end
+fprintf('Autonomy node complete.\n');
