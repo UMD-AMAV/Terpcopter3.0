@@ -31,9 +31,9 @@ params = loadParams();
 
 % missions
 %mission = loadMission_takeoffHoverLand(); % yaw pitch roll (manual)
-mission = loadMission_takeoffHoverFlyForwardLand(); % yaw, roll (manual)
+%mission = loadMission_takeoffHoverFlyForwardLand(); % yaw, roll (manual)
 
-%mission = loadMission_takeoffHoverPointLand();  % pitch, roll (manual)
+mission = loadMission_takeoffHoverPointLand();  % pitch, roll (manual)
 %mission = loadMission_takeoffHoverOverHLand(); % all channels autonomous
 
 
@@ -102,6 +102,7 @@ logFlag = 1;
 dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
 autonomyLog = [params.env.matlabRoot '/autonomy_' dateString '.log'];
 
+timeForPlot = tic;
 
 if ( strcmp(params.auto.mode,'auto'))
     send(ayprCmdPublisher, ayprCmdMsg);
@@ -174,7 +175,7 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover_fixed_orient'
                     completionFlag = bhv_hover_fixed_orient(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_point_to_direction'
-                    completionFlag = bhv_point_to_direction(stateEstimateMsg, ayprCmd, completion, t);
+                    completionFlag = bhv_point_to_direction(stateEstimateMsg, ayprCmd, completion, t, bhvTime);
                 case 'bhv_land'
                     completionFlag = bhv_land(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_hover_over_H'
@@ -223,7 +224,7 @@ if ( strcmp(params.auto.mode,'auto'))
             pFile = fopen( autonomyLog ,'a');
             
             % write csv file
-            fprintf(pFile,'%6.6f,',t);
+            fprintf(pFile,'%6.6f,',toc(timeForPlot));
             fprintf(pFile,'%d,',currentBehavior);
             
             fprintf(pFile,'%6.6f,',ayprCmdMsg.AltDesiredMeters);

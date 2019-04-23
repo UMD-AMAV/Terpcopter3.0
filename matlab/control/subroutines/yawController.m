@@ -1,9 +1,9 @@
 function [yawStickCmd, yawControl] = yawController(yawControl, curTime, yawDeg, yawDesDeg)
 
 % gains/parameters
-yawFiltTimeConstant = 0.2; sec
-kp = 0.1/10; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
-yawStickLimit = 0.2;
+yawFiltTimeConstant = 0.2; %sec
+kp = 0.5; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
+yawStickLimit = 0.5;
 
 % unpack states
 prevYawDeg = yawControl.prevVal;
