@@ -7,6 +7,7 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd,
     % TODO: 
     % - add topic with H (x,y) data as input
     % - do some processing    
+    
     % - set ayprCmdMsg.PitchDesiredDegrees = 0;
     % - set ayprCmdMsg.RollDesiredDegrees = 0;
     

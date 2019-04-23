@@ -34,7 +34,6 @@ end
 % Subscribers
 stateEstimateSubscriber = rossubscriber('/stateEstimate');
 ayprCmdSubscriber = rossubscriber('/ayprCmd');
-
 controlStartSubscriber = rossubscriber('/startControl', 'std_msgs/Bool');
 
 % Publishers

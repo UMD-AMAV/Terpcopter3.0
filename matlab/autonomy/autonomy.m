@@ -17,6 +17,7 @@
 % ayprCmdMsg.YawDesiredDegrees = 0;
 % ayprCmdMsg.PitchDesiredDegrees = 0;
 % ayprCmdMsg.RollDesiredDegrees = 0;
+
 % ayprCmdMsg.AltSwitch = 0;
 % ayprCmdMsg.YawSwitch = 0;
 % ayprCmdMsg.PitchSwitch = 0;
@@ -30,9 +31,10 @@ params = loadParams();
 
 % missions
 %mission = loadMission_takeoffHoverLand(); % yaw pitch roll (manual)
-%mission = loadMission_takeoffHoverFlyForwardLand(); % yaw, roll (manual)
+mission = loadMission_takeoffHoverFlyForwardLand(); % yaw, roll (manual)
+
 %mission = loadMission_takeoffHoverPointLand();  % pitch, roll (manual)
-mission = loadMission_takeoffHoverOverHLand(); % all channels autonomous
+%mission = loadMission_takeoffHoverOverHLand(); % all channels autonomous
 
 
 fprintf('Launching Autonomy Node...\n');
