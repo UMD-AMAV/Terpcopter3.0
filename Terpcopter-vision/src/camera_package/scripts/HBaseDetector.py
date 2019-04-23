@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import math
 from std_msgs.msg import Bool
-for std_msgs.msg import Float32
+from std_msgs.msg import Float32
 
 def eucdist(x1,y1,x2,y2):
     dist = math.sqrt((x1-x2)**2 + (y1-y2)**2)
@@ -18,9 +18,9 @@ def HBase(frame):
     pubHAngle = rospy.Publisher('hAngle',Float32,queue_size=10)
     pubHDetected = rospy.Publisher('hDetected',Bool,queue_size=10)
     homeBaseDetected = False
-    centerX = -10000.0
-    centerY = -10000.0
-    pubHANgle = -10000.0
+    hError = -10000.0
+    vError = -10000.0
+    angle = -10000.0
     h_image,w_image= frame.shape[:2] #here we store width and height of frame
     hsv_frame = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) #convert RGB color scheme to HSV color scheme for better color recognition
     v = np.median(frame)
@@ -33,8 +33,8 @@ def HBase(frame):
     masking_black = cv2.morphologyEx(masking_black,cv2.MORPH_CLOSE,kernel)
     frame_blur = cv2.bilateralFilter(masking_black, 9, 75, 75)
     autoEdge = cv2.Canny(frame_blur, lower, higher)
-    contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_CCOMP,cv2.CHAIN_APPROX_NONE) #for different version of OpenCV we only have 2 values to unpack from findContour
-    #im2, contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE) #finding the contour around the yellow region
+    #contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_CCOMP,cv2.CHAIN_APPROX_NONE) #for different version of OpenCV we only have 2 values to unpack from findContour
+    im2, contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE) #finding the contour around the yellow region
     contourFound = 0
     i = 1
     j = 1
@@ -72,7 +72,6 @@ def HBase(frame):
     lineIncontour = False
     linesP = cv2.HoughLinesP(autoEdge, 1, np.pi / 180, 50, None, 50, 10)
     maxL = 0
-    angle = 0
     flag = False
     if(len(hbaseContour) > 0):
         if linesP is not None:

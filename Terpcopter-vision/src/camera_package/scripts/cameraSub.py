@@ -71,7 +71,7 @@ def callbackImage(data):
     ObstacleAvoidance.obstacleDetection(cv_image, detector_obst)
     # ObstacleDetection.objectDetect(cv_image,detector_target)
     HBaseDetector.HBase(cv_image)
-    DropOffDetection.dropOffDetection(cv_frame)
+    DropOffDetection.dropOffDetection(cv_image)
 
 ###############################################################################
 # Horizontal Error callback function
