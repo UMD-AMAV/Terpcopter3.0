@@ -22,7 +22,7 @@ i = 1;
 mission.bhv{i}.name = 'bhv_takeoff';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.3; 
 mission.bhv{i}.completion.status = false;
 
 i = i + 1;
@@ -30,8 +30,8 @@ i = i + 1;
 mission.bhv{i}.name = 'bhv_hover';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
-mission.bhv{i}.completion.durationSec = 1; % 1seconds
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.75; 
+mission.bhv{i}.completion.durationSec = 2; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;
@@ -42,11 +42,22 @@ mission.bhv{i}.ayprCmd.AltSwitch = 1;
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
 mission.bhv{i}.ayprCmd.YawSwitch = 1; 
 mission.bhv{i}.ayprCmd.YawDesiredDegrees = 0; 
-mission.bhv{i}.completion.durationSec = 9.95; % 10 seconds
+mission.bhv{i}.completion.durationSec = 5; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;
-% Behavior 4: Land
+% Behavior 3: Point
+mission.bhv{i}.name = 'bhv_point_to_direction';
+mission.bhv{i}.ayprCmd = default_aypr_msg();
+mission.bhv{i}.ayprCmd.AltSwitch = 1; 
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
+mission.bhv{i}.ayprCmd.YawSwitch = 1; 
+mission.bhv{i}.ayprCmd.YawDesiredDegrees = 180; 
+mission.bhv{i}.completion.durationSec = 5; % 10 seconds
+mission.bhv{i}.completion.status = false;     % completion flag
+
+i = i + 1;
+% Behavior 3: Land
 mission.bhv{i}.name = 'bhv_land';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 

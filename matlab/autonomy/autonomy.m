@@ -30,15 +30,10 @@ params = loadParams();
 
 % missions
 %mission = loadMission_takeoffHoverLand(); % yaw pitch roll (manual)
-mission = loadMission_takeoffHoverFlyForwardLand(); % yaw pitch roll (manual)
+%mission = loadMission_takeoffHoverFlyForwardLand(); % yaw, roll (manual)
+%mission = loadMission_takeoffHoverPointLand();  % pitch, roll (manual)
+mission = loadMission_takeoffHoverOverHLand(); % all channels autonomous
 
-% mission = loadMission_takeoffHoverPointLand();  % pitch, roll (manual)
-% mission = loadMission_takeoffHoverFixedOrientLand(); % autonomous w/drift
-% TODO: mission = loadMission_takeoffHoverOverHLand(); % 1 point
-
-
-
-%mission = loadMissionAltModeTest(); %hover test
 
 fprintf('Launching Autonomy Node...\n');
 
@@ -173,13 +168,16 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover'
                     completionFlag = bhv_hover(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_fly_forward'
-                    completionFlag = bhv_fly_forward(stateEstimateMsg, ayprCmd, completion, bhvTime);              
+                    completionFlag = bhv_fly_forward(stateEstimateMsg, ayprCmd, completion, bhvTime);
                 case 'bhv_hover_fixed_orient'
                     completionFlag = bhv_hover_fixed_orient(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_point_to_direction'
                     completionFlag = bhv_point_to_direction(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_land'
                     completionFlag = bhv_land(stateEstimateMsg, ayprCmd, completion, t);
+                case 'bhv_hover_over_H'
+                    [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime);
+                    mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls pitch/roll 
                     
                     % TODO:
                     
@@ -203,10 +201,7 @@ if ( strcmp(params.auto.mode,'auto'))
                     % 'bhv_move_to_target'
                     
                     
-                    %                 case 'bhv_hover_over_H'
-                    %                     [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, t);
-                    %                     % update ayprCmd
-                    %                     mission.bhv{1}.ayprCmd = ayprCmd;
+                    
                     %                 case 'bhv_point_to_target'
                     %                     [completionFlag] = bhv_point_to_target(stateEstimateMsg, yawErrorCameraMsg, aypr, completion, t);
                     %                     ayprCmdMsg.HeadingRad = yawErrorCameraMsg.Data;
