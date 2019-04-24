@@ -85,3 +85,11 @@ roslaunch terpcopter_driver terpcopter_camera_node.launch
 ```
 rosrun camera_package cameraSub.py
 
+# Links for SD Card cloning
+
+Resize and clone in linux: 
+1) http://www.knight-of-pi.org/how-to-shrink-raspberry-pi-sd-card-images-with-gparted-and-dd/
+2) https://askubuntu.com/questions/227924/sd-card-cloning-using-the-dd-command
+3) https://www.cyberciti.biz/faq/linux-unix-dd-command-show-progress-while-coping/
+
+
