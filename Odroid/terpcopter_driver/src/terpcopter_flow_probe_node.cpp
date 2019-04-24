@@ -94,8 +94,8 @@ while (STOP == false)
 	airspeedX[2] = '\0';
 	airspeedY[2] = '\0';
 
-	flowvec[0] = ((atoi(airspeedX)-50.0f)/5.0f); 
-	flowvec[1] = (atoi(airspeedY)-50.0f)/5.0f; 
+	flowvec[0] = ((atoi(airspeedX)-50.0f)/10.0f); 
+	flowvec[1] = (atoi(airspeedY)-50.0f)/10.0f; 
 	
 	ROS_INFO(" :%f :%f \n",flowvec[0],flowvec[1]);
 
