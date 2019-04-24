@@ -58,6 +58,7 @@ message_generation
    targetDetection.msg
    openLoopStickCmd.msg
    altControlDebug.msg
+   servoSwitchCmd.msg
  )
 
 ## Generate services in the 'srv' folder

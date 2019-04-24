@@ -105,12 +105,15 @@ vtxStatusPublisher = rospublisher('vtxStatus','std_msgs/Bool');
 
 stickCmdSubscriber = rossubscriber('stickCmd','terpcopter_msgs/stickCmd');
 
+servoSwitchCmdSubscriber = rossubscriber('servoSwitch', 'terpcopter_msgs/servoSwitchCmd');
+
 if ( strcmp(params.vtx.mode,'flight') )
     r = robotics.Rate(20);
     reset(r);
     
     while(1)
         stickCmdMsg = stickCmdSubscriber.LatestMessage;
+        servoSwitchCmdMsg = servoSwitchCmdSubscriber.LatestMessage;
         %fprintf(stickCmdMsg);
         %waitfor(r);
         % extract u_stick_cmd from the latest stickCmd ROS message
@@ -119,6 +122,7 @@ if ( strcmp(params.vtx.mode,'flight') )
             u_stick_cmd(2) = stickCmdMsg.Roll;
             u_stick_cmd(3) = stickCmdMsg.Pitch;
             u_stick_cmd(4) = stickCmdMsg.Yaw;
+            u_stick_cmd(5) = stickCmdMsg.Thrust; %-1;
             disp("transmitting")
         else
             disp('Empty AHSCmd!')

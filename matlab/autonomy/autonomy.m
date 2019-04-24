@@ -64,6 +64,8 @@ stateEstimateSubscriber = rossubscriber('/stateEstimate');
 fprintf('Subscribing to startMission ...\n');
 startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
 
+servoSwitchCmdPublisher = rospublisher('/servoSwitch', 'terpcopter_msgs/servoSwitchCmd');
+
 
 
 
@@ -89,6 +91,9 @@ pause(0.1)
 
 % Unpacking Initial ROS Messages
 [ayprCmdMsg] = default_aypr_msg();
+% servo switch 'false' = closed servo
+servoSwitchMsg = rosmessage(servoSwitchCmdPublisher);
+servoSwitchMsg.Servo = -1;                
 
 % initial variables
 stick_thrust = -1;
@@ -106,6 +111,7 @@ timeForPlot = tic;
 
 if ( strcmp(params.auto.mode,'auto'))
     send(ayprCmdPublisher, ayprCmdMsg);
+    send(servoSwitchCmdPublisher, servoSwitchMsg);
     
     % This enables the capability to start the mission through the TunerGUI
     startMissionMsg = receive(startMissionSubscriber);
@@ -218,6 +224,9 @@ if ( strcmp(params.auto.mode,'auto'))
         ayprCmdMsg = mission.bhv{1}.ayprCmd;
         send(ayprCmdPublisher, ayprCmdMsg);
         fprintf('Published Ahs Cmd. Alt : %3.3f \t Yaw: %3.3f\n', ayprCmdMsg.AltDesiredMeters, ayprCmdMsg.YawDesiredDegrees);
+
+        % send(servoSwitchCmdPublisher, servoSwitchMsg);
+
         
         
         if ( logFlag )
