@@ -1,4 +1,0 @@
-float32 altitudeMeters
-float32 headingRad
-float32 forwardSpeedMps
-float32 crabSpeedMps

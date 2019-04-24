@@ -76,11 +76,11 @@ rollControl.lastTime = 0;
 rollControl.prevVal = 0;
 
 
-% set loop rate and initialize
 disp('initialize loop');
 r = robotics.Rate(90);
 reset(r);
 send(stickCmdPublisher, stickCmdMsg); % send initial stick command.
+
 
 disp('Waiting for Start...')
 controlStartFlag = controlStartSubscriber.LatestMessage;
@@ -88,6 +88,7 @@ while ( ~controlStartFlag.Data )
     controlStartFlag = controlStartSubscriber.LatestMessage;
 end
 disp('Entering loop...');
+
 while(1)
     
     % get latest messages
@@ -124,7 +125,7 @@ while(1)
     else
         u_yaw = 0;
     end
-    
+   
     % pitch control
     if ( ayprCmdMsg.PitchSwitch==1 )
         [u_pitch, pitchControl] = pitchController(pitchControl, t, pitchDeg, pitch_d);
@@ -144,6 +145,7 @@ while(1)
     stickCmdMsg.Yaw = u_yaw;
     stickCmdMsg.Pitch = u_pitch;
     stickCmdMsg.Roll = u_roll;
+
     
     % send stick commands
     fprintf('Stick Cmd.Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ) );

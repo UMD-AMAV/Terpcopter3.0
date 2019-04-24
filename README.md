@@ -65,6 +65,13 @@ cd into workspace catkin_ws
 source ./devel/setup.bash 
 ```
 
+# Flow Probe Nodes
+
+- The teensy board on which the flow probe is attached might not work (Serial input pauses after a few lines). Follow instructions on this link to install the latest UDEV Rules for the board : https://www.pjrc.com/teensy/49-teensy.rules
+
+- The serial porst need root access to run. Try steps in this link to change : https://askubuntu.com/a/58122
+
+
 Odroid Desktop no launch bar fix: source: https://ubuntuforums.org/showthread.php?t=2337119
 ```
 1) Open a hard terminal again using [Crtl]+[Alt]+[F1] - and log in if necessary

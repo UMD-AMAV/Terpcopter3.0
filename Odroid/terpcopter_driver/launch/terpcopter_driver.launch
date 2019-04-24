@@ -7,4 +7,8 @@
 		<param name="serial_port" type="str" value="/dev/ttyUSB1" />
 	</node>
 
+	<node name="terpcopter_flow_probe_node" pkg="terpcopter_driver" type="terpcopter_flow_probe_node" >
+		<param name="serial_port" type="str" value="/dev/ttyUSB0" />
+	</node>
+
 </launch>
