@@ -77,7 +77,7 @@ if ( strcmp(params.vtx.mode,'flight') )
     % avialable serial ports
     comlist = seriallist();
     for i = 1:size(comlist,2)
-        if contains(comlist(i),'USB0')
+        if contains(comlist(i),'USB1')
             params.env.com_port = comlist(i);
             foundComPort = true;
             disp('Found USB COM port')
