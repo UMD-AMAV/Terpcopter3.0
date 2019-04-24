@@ -1,6 +1,6 @@
-function completionFlag = bhv_fly_forward_flowprobe(stateEstimateMsg, ayprCmd, completion, t)
+function [completionFlag, ayprCmd] = bhv_fly_forward_flowprobe(stateEstimateMsg, ayprCmd, fpMsg, completion, bhvTime)
 
-
+%% output pitchDesiredDeg
 
 forwardErrorHistory = struct;
 forwardErrorHistory.lastTime = 0; %stateEstimateMsg.Time;
@@ -15,7 +15,6 @@ u_t_alt = 2*max(min(1,u_t_alt),0)-1;
 u_d = 0.5; %ahsCmdMsg.ForwardSpeedMps;
 % update errors
 forwardError = u_d - u;
-
 flowProbeHeight = 0.1;
 u = stateEstimateMsg.ForwardVelocity;
 if(velCorrect)
@@ -23,35 +22,13 @@ if(velCorrect)
     u = (u + (omega*flowProbeHeight))/cos(pitch);
 end
 
+%% set ayprCmd
+ayprCmdMsg.PitchDesiredDegrees = pitchDesiredDeg;
 
-
-
-
-
-%     global timestamps
-%     toleranceRadians = 0.35;
-%
-%     disp(stateEstimateMsg.Yaw);
-%
-%     yawDesiredRadians = deg2rad(ayprCmd.YawDesiredDeg);
-%
-%     pointToDirectionComplete = abs(yawDesiredRadians - stateEstimateMsg.Yaw) < toleranceRadians;
-%
-%     if pointToDirectionComplete
-%         disp('point to direction satisfied')
-%         current_event_time = t;
-%     else
-%         disp('point to direction not satisfied')
-%         current_event_time = t;
-%         timestamps.behavior_satisfied_timestamp = t;
-%     end
-%     yaw_current = rad2deg(stateEstimateMsg.Yaw);
-%     elapsed_satisfied_time = current_event_time - timestamps.behavior_satisfied_timestamp;
-%     fprintf('Desired Yaw: %f Degrees\tCurrent Yaw %f Degrees\nDesired Time: %f\tElapsed time: %f\n', ayprCmd.desiredYawDegrees, yaw_current, completion.durationSec, elapsed_satisfied_time);
-%
-%     if elapsed_satisfied_time >= completion.durationSec
-%         completionFlag = 1;
-%         return;
-%     end
-%     completionFlag = 0;
+% complete
+if bhvTime >= completion.durationSec
+    completionFlag = 1;
+    return;
+end
+completionFlag = 0;
 end

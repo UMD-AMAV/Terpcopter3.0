@@ -32,7 +32,7 @@ params = loadParams();
 % missions
 %mission = loadMission_takeoffHoverLand(); % yaw pitch roll (manual)
 %mission = loadMission_takeoffHoverFlyForwardLand(); % yaw, roll (manual)
-
+%mission = loadMission_takeoffHoverFlyForwardProbeLand()
 mission = loadMission_takeoffHoverPointLand();  % pitch, roll (manual)
 %mission = loadMission_takeoffHoverOverHLand(); % all channels autonomous
 
