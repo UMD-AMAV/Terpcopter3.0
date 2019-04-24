@@ -36,7 +36,7 @@ mission.bhv{i}.completion.status = false;     % completion flag
 
 
 i = i + 1;
-% Behavior 2: Hover
+% Behavior 3: Fly Forward
 mission.bhv{i}.name = 'bhv_fly_forward_probe';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
@@ -44,13 +44,13 @@ mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.75;
 mission.bhv{i}.ayprCmd.PitchSwitch = 1; 
 mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 0; 
 %mission.bhv{i}.ayprCmd.YawSwitch = 1; 
-%mission.bhv{i}.ayprCmd.YawDesiredDegrees = 0; 
-mission.bhv{i}.completion.durationSec = 1; % 
+% mission.bhv{i}.ayprCmd.YawDesiredDegrees = 0; 
+mission.bhv{i}.completion.durationSec = 2; % 
 mission.bhv{i}.completion.status = false;     % completion flag
 
 
 i = i + 1;
-% Behavior 3: Land
+% Behavior 4: Land
 mission.bhv{i}.name = 'bhv_land';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 

@@ -6,29 +6,29 @@ fVelSetpoint = 0.2;
 fVelGains.kp = 0.1;
 fVelGains.ki = 0.0;
 fVelGains.kd = 0.1;
-fVelCorrect = false;
+fVelCorrect = true;
 flowProbeHeight = 0.1;
 
-pitch = stateEstimateMsg.Pitch
-t = stateEstimateMsg.Time
-dt = t - fVelErrorHistory.lastTime;
-
 if(fVelCorrect)
-    omega = (pitch - fVelErrorHistory.lastPitch)/dt;            % not sure of the sign/direction
+    omega = (pitch - lastPitch)/dt;            % not sure of the sign/direction
     fVel = (fpMsg + (omega*flowProbeHeight))/cos(pitch);
 else
     fVel = fpMsg
-end
+    
 
 fVelError = fVelSetpoint - fVel;
+
+t = stateEstimateMsg.Time
+dt = t - fVelErrorHistory.lastTime;
 fVelErrorHistory.lastSum = fVelErrorHistory.lastSum + fVelError * dt;
 fVelErrorDot = (fVelError - fVelErrorHistory.lastVal) / dt;
 
-pitchDesiredDeg = (-1)*(fVelGains.kp * fVelError + fVelGains.kd * fVelErrorDot + fVelGains.ki * fVelErrorHistory.lastSum);
+uPitch = (-1)*(fVelGains.kp * fVelError + fVelGains.kd * fVelErrorDot + fVelGains.ki * fVelErrorHistory.lastSum);
 
 fVelErrorHistory.lastTime = currTime;
 fVelErrorHistory.lastVal = fVelError;
-fVelErrorHistory.lastPitch = pitch;
+
+aypr = max(-1,min(1,uPitch));
 
 % displayFlag = 1;
 % if ( displayFlag )    

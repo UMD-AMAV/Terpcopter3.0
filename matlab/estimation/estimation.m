@@ -43,10 +43,15 @@ stateEstimatePublisher = rospublisher('/stateEstimate', 'terpcopter_msgs/stateEs
 pause(2)
 stateMsg = rosmessage(stateEstimatePublisher);
 %stateMsg.Range = 0.2;
-t0 = [];
 
 r = robotics.Rate(100);
 reset(r);
+
+% timestamp
+ti = rostime('now');
+t0 = [];
+abs_t = double(ti.Sec)+double(ti.Nsec)*10^-9;
+if isempty(t0), t0 = abs_t; end
 
 % smooting filter
 a = 0;
@@ -162,12 +167,10 @@ while(1)
     stateMsg.Roll = state.phi;
     stateMsg.Pitch = state.theta;
     
-    % timestamp
-    ti= rostime('now');
-    abs_t = eval([int2str(ti.Sec) '.' ...
-        int2str(ti.Nsec)]);
+   % timestamp
+    ti = rostime('now');
+    abs_t = double(ti.Sec)+double(ti.Nsec)*10^-9;
     
-    if isempty(t0), t0 = abs_t; end
     t = abs_t-t0;
     stateMsg.Time = t;
     % fixed loop pause

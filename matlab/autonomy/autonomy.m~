@@ -92,7 +92,7 @@ pause(0.1)
 
 % initial variables
 stick_thrust = -1;
-fVelErrorHistory = struct;
+fV
 
 r = robotics.Rate(25);
 reset(r);
@@ -162,11 +162,8 @@ if ( strcmp(params.auto.mode,'auto'))
             [mission.bhv] = pop(mission.bhv, t);
             currentBehavior = currentBehavior + 1;
             disp('**** Popped Behavior ****');
-            if strcmp(mission.bhv{1}.name,'bhv_fly_forward_probe')
-                fVelErrorHistory.lastVal = 0
-                fVelErrorHistory.lastSum = 0
-                fVelErrorHistory.lastTime = stateEstimateMsg.Time
-                fVelErrorHistory.lastPitch = stateEstimateMsg.Pitch
+            if strcmp(mission.bhv[1].name,'bhv_fly_forward_probe')
+                
         else
             % check status of remaining behavior
             %Set Handles within each behavior
