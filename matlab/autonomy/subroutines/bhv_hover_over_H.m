@@ -1,15 +1,17 @@
-function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime)
+function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
 
     % unpack state estimate
-    pitchDeg = stateEstimateMsg.Pitch;
-    rollDeg = stateEstimateMsg.Deg;
-
+    pitch = stateEstimateMsg.PitchDegrees;
+    roll = stateEstimateMsg.RollDegrees;
+    yaw = stateEstimateMsg.YawDegrees;
+    
     % TODO: 
     % - add topic with H (x,y) data as input
     % - do some processing    
     
-    % - set ayprCmdMsg.PitchDesiredDegrees = 0;
-    % - set ayprCmdMsg.RollDesiredDegrees = 0;
+    % set ayprCmd
+    % - set ayprCmdMsg.PitchDesiredDegrees = 0;    
+    ayprCmdMsg.yawDesiredDegrees = hAngle;
     
     % Terminating condition
     if bhvTime >= completion.durationSec

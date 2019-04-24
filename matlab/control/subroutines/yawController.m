@@ -4,6 +4,7 @@ function [yawStickCmd, yawControl] = yawController(yawControl, curTime, yawDeg, 
 yawFiltTimeConstant = 0.2; %sec
 kp = 0.35; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
 yawStickLimit = 0.4;
+deadbandDeg = 2.5;
 
 % unpack states
 prevYawDeg = yawControl.prevVal;
@@ -17,13 +18,18 @@ alpha = dt / ( yawFiltTimeConstant + dt);
 yawFiltDeg = (1-alpha)*prevYawDeg + alpha*yawDeg;
 
 % altitude error
-yawErrorDeg = yawDesDeg - yawFiltDeg;
+yawErrorDeg = signedAngularDist( yawDesDeg*pi/180, yawFiltDeg*pi/180 );
 
 % proportional control
 yawStickCmd = kp*yawErrorDeg; 
 
 % saturate
 yawStickCmd = max(-yawStickLimit,min(1,yawStickLimit));
+
+% deadband
+if ( abs(yawErrorDeg) <= deadbandDeg )
+   yawStickCmd = 0; 
+end
 
 % pack up structure
 yawControl.lastTime = curTime;

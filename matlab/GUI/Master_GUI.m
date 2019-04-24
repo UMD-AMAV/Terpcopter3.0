@@ -51,16 +51,11 @@ function Master_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to Master_GUI (see VARARGIN)
-<<<<<<< HEAD
 
-% Jerrar: Modify this script to loadParams and give pathToGUI if needed
 pathToGUI = '/home/amav/amav/Terpcopter3.0/matlab/GUI';
 %pathToGUI = '/home/wolek/Desktop/Research/Projects/UMD/AMAV/Terpcopter3.0/matlab/GUI';
 cd(pathToGUI)
 
-=======
-%cd("/home/amav/amav/Terpcopter3.0/matlab/GUI")
->>>>>>> origin/implementPayloadChannel
 % Choose default command line output for Master_GUI
 handles.output = hObject;
 

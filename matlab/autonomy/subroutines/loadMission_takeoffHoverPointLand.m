@@ -1,4 +1,4 @@
-function mission = loadMission_takeoffHoverPointLand()
+function mission = loadMission_servoTest()
 mission.config.firstLoop = 1;
 
 mission.config.H_detector = 0;

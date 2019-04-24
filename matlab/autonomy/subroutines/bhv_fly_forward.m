@@ -1,4 +1,4 @@
-function completionFlag = bhv_fly_forward(stateEstimateMsg, ayprCmd, completion, bhvTime )
+function completionFlag = bhv_fly_forward(completion, bhvTime )
 
     if bhvTime >= completion.durationSec
         completionFlag = 1;
