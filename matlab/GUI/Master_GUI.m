@@ -86,12 +86,14 @@ varargout{1} = handles.output;
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
 set(handles.text2,'String','launching');
+disp('Callback for px4 launch...');
 system('./scripts/px4_script.sh &');
 first_run = 1;
 error_flag = 0;
 while( error_flag==1 || first_run == 1 )
     pause(0.1);
     try
+        disp('Trying to subscribe to /mavros/imu/data...');
         sub = rossubscriber('/mavros/imu/data');
         first_run = 0;
         error_flag = 0;
