@@ -1,12 +1,9 @@
-# import rospy
+import rospy
 import cv2
 import numpy as np
 import math
-# import imutils
-# from std_msgs.msg import String
-# from std_msgs.msg import Bool
-# from _feedback import feedback
-# from _targetPose import targetPose
+from std_msgs.msg import Bool
+from std_msgs.msg import Float32
 
 def eucdist(x1,y1,x2,y2):
     dist = math.sqrt((x1-x2)**2 + (y1-y2)**2)
@@ -16,8 +13,14 @@ def eucdist(x1,y1,x2,y2):
 def HBase(frame):
     #height,width= frame.shape[:2]
     #frame = cv2.resize(frame,(int(0.5*width), int(0.5*height)), interpolation = cv2.INTER_AREA)
-    # pubIP = rospy.Publisher('deltaYawHome', Float32, queue_size=10)
-    # FlagIP = rospy.Publisher('HomeFlag',Bool,queue_size=10)
+    pubHPixelX = rospy.Publisher('hPixelX', Float32, queue_size=10)
+    pubHPixelY = rospy.Publisher('hPixelY', Float32, queue_size=10)
+    pubHAngle = rospy.Publisher('hAngle',Float32,queue_size=10)
+    pubHDetected = rospy.Publisher('hDetected',Bool,queue_size=10)
+    homeBaseDetected = False
+    hError = -10000.0
+    vError = -10000.0
+    angle = -10000.0
     h_image,w_image= frame.shape[:2] #here we store width and height of frame
     hsv_frame = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) #convert RGB color scheme to HSV color scheme for better color recognition
     v = np.median(frame)
@@ -30,8 +33,8 @@ def HBase(frame):
     masking_black = cv2.morphologyEx(masking_black,cv2.MORPH_CLOSE,kernel)
     frame_blur = cv2.bilateralFilter(masking_black, 9, 75, 75)
     autoEdge = cv2.Canny(frame_blur, lower, higher)
-    contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_CCOMP,cv2.CHAIN_APPROX_NONE) #for different version of OpenCV we only have 2 values to unpack from findContour
-    #im2, contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE) #finding the contour around the yellow region
+    #contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_CCOMP,cv2.CHAIN_APPROX_NONE) #for different version of OpenCV we only have 2 values to unpack from findContour
+    im2, contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE) #finding the contour around the yellow region
     contourFound = 0
     i = 1
     j = 1
@@ -60,13 +63,15 @@ def HBase(frame):
                     vError = (h_image/2 - cY)
                     cv2.putText(frame,"HError = " + str(hError), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
                     cv2.putText(frame,"VError = " + str(vError), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
+                    homeBaseDetected = True
+                    break
           cntNumber += 1
     
     #Detects the probable lines within the detected home base.
     #We calculate the angle of longest line
+    lineIncontour = False
     linesP = cv2.HoughLinesP(autoEdge, 1, np.pi / 180, 50, None, 50, 10)
     maxL = 0
-    angle = 0
     flag = False
     if(len(hbaseContour) > 0):
         if linesP is not None:
@@ -76,72 +81,26 @@ def HBase(frame):
                     if(l[1] > hbaseContour[0][1] and l[3] > hbaseContour[0][1] and l[1] < (hbaseContour[0][1] + hbaseContour[0][3]) and l[3] < (hbaseContour[0][1] + hbaseContour[0][3])):
                         if(eucdist(l[0],l[1],l[2],l[3]) > maxL):
                             longestLine = l
+                            lineIncontour = True
                             maxL = eucdist(l[0],l[1],l[2],l[3])
-
-        cv2.line(frame, (longestLine[0], longestLine[1]), (longestLine[2], longestLine[3]), (0,0,255), 3, cv2.LINE_AA)
-        y = longestLine[1] - longestLine[3]
-        x = longestLine[0] - longestLine[2]
-        angle = math.atan(y/x)
-        angle = math.degrees(angle)
-        if(angle < 0):
-            angle = angle * (-1)
-        else:
-            angle = 180 - angle
-        flag = True
-        cv2.putText(frame,"Angle = " + str(angle), (20,80), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
-    # pubIP.publish(angle)
-    # FlagIP.publish(flag)
-
+                
+        print(lineIncontour)
+        if(lineIncontour):
+            cv2.line(frame, (longestLine[0], longestLine[1]), (longestLine[2], longestLine[3]), (0,0,255), 3, cv2.LINE_AA)
+            y = longestLine[1] - longestLine[3]
+            x = longestLine[0] - longestLine[2]
+            angle = math.atan(y/x)
+            angle = math.degrees(angle)
+            if(angle < 0):
+                angle = angle * (-1)
+            else:
+                angle = 180 - angle
+            flag = True
+            cv2.putText(frame,"Angle = " + str(angle), (20,80), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
+    
+    pubHDetected.publish(homeBaseDetected)
+    pubHAngle.publish(angle)
+    pubHPixelX.publish(hError)
+    pubHPixelY.publish(vError)
     cv2.imshow("HomeBase", frame)
     cv2.waitKey(1)
-    return frame
-    # if cv2.waitKey(1) & 0xFF == ord('q'):
-    #     break
-#cap = cv2.VideoCapture("C:\DesktopExtra\AMAV\Terpcopter3.0\Terpcopter-vision\src\camera_package\scripts\Vid2.mp4")
-
-#while cap.isOpened():
-#while True:
-    #ret, frame = cap.read()
-
-path  = "C:\DesktopExtra\AMAV\Terpcopter3.0\Terpcopter-vision\src\camera_package\scripts\TestData\image"
-pathO  = "C:\DesktopExtra\AMAV\Terpcopter3.0\Terpcopter-vision\src\camera_package\scripts\OutputData\image"
-it = 0
-while True:
-    imgPath = path + str(it) + ".png"
-    imgPathO = pathO + str(it) + ".png" 
-    frame = cv2.imread(imgPath)
-    img = HBase(frame)
-    #cv2.imwrite(imgPathO,img)
-    
-    cv2.imshow("Frames", img)
-    key = cv2.waitKey(33)
-    if key == ord('n'):
-        it += 1
-    if key == ord('p'):
-        it = it - 1
-    if key == ord('q'):
-        break
-    if it == 950:
-        break
-    
-cv2.destroyAllWindows()
-
-'''
-cap.release()
-cv2.destroyAllWindows()
-'''
-    
-
-    # return frame
-
-# def main():
-#     cap = cv2.VideoCapture(1)
-#     while(True):
-#         ret, frame = cap.read()
-#         frame = HBase(frame)
-#         cv2.imshow("HomeBase", frame)
-#         if cv2.waitKey(1)& 0xff==ord('q'):
-#             cv2.destroyAllWindows()
-#             break
-# if __name__ == '__main__':
-#     main()

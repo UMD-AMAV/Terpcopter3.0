@@ -1,7 +1,16 @@
+import rospy
 import cv2
 import numpy as np
+from std_msgs.msg import Bool
+from std_msgs.msg import Float32
+
     
 def dropOffDetection(frame):
+    pubDropOffX = rospy.Publisher('targetPixelX', Float32, queue_size=10)
+    pubDropOffY = rospy.Publisher('targetPixelY', Float32, queue_size=10)
+    pubDropOffDetected = rospy.Publisher('targetDetected', Bool, queue_size=10)
+    dropOffDetected = False
+    centerX, centerY = -10000.0, -10000.0
     h_image,w_image= frame.shape[:2] #here we store width and height of frame
     hsv_frame = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) #convert RGB color scheme to HSV color scheme for better color recognition
     v = np.median(frame)
@@ -73,14 +82,28 @@ def dropOffDetection(frame):
         if(abs(redCenter[0][0] - whiteCenter[0][0]) < 10 and abs(redCenter[0][1] - whiteCenter[0][1]) < 10):
             cv2.ellipse(frame, redContour[0], (0,255,0),2)
             cv2.putText(frame,'Dropoff Detected Strong Detection', redCenter[0], cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0),2, lineType=cv2.LINE_AA)
+            dropOffDetected = True
+            centerX = (w_image/2 - redCenter[0][0])
+            centerY = (h_image/2 - redCenter[0][1])
         else:
             cv2.ellipse(frame, redContour[0], (0,255,255),2)
             cv2.putText(frame,'Dropoff Detected Weak Detection', redCenter[0], cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0),2, lineType=cv2.LINE_AA)
+            dropOffDetected = True
+            centerX = (w_image/2 - redCenter[0][0])
+            centerY = (h_image/2 - redCenter[0][1])
 
     elif(contourFoundRed and (not contourFoundWhite)):
             cv2.ellipse(frame, redContour[0], (0,255,255),2)
             cv2.putText(frame,'Dropoff Detected Weak Detection', redCenter[0], cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 0),2, lineType=cv2.LINE_AA)
-    cv2.imshow("Target", frame)
+            dropOffDetected = True
+            centerX = (w_image/2 - redCenter[0][0])
+            centerY = (h_image/2 - redCenter[0][1])
+    
+
+    pubDropOffDetected.publish(dropOffDetected)
+    pubDropOffX.publish(centerX)
+    pubDropOffY.publish(centerY)
+    cv2.imshow("DropOffTarget", frame)
     #cv2.imshow("Blure Frame", frame_blur)
     cv2.waitKey(1)
 
