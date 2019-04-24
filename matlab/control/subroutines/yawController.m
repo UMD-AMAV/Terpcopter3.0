@@ -1,5 +1,7 @@
 function [yawStickCmd, yawControl] = yawController(yawControl, curTime, yawDeg, yawDesDeg)
 
+% Note: clockwise is negative stick cmd
+
 % gains/parameters
 yawFiltTimeConstant = 0.2; %sec
 kp = 0.35; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
@@ -18,10 +20,10 @@ alpha = dt / ( yawFiltTimeConstant + dt);
 yawFiltDeg = (1-alpha)*prevYawDeg + alpha*yawDeg;
 
 % altitude error
-yawErrorDeg = signedAngularDist( yawDesDeg*pi/180, yawFiltDeg*pi/180 );
+yawErrorDeg = 180/pi*signedAngularDist( yawDesDeg*pi/180, yawFiltDeg*pi/180 );
 
 % proportional control
-yawStickCmd = kp*yawErrorDeg; 
+yawStickCmd = -kp*yawErrorDeg; 
 
 % saturate
 yawStickCmd = max(-yawStickLimit,min(1,yawStickLimit));
@@ -33,7 +35,7 @@ end
 
 % pack up structure
 yawControl.lastTime = curTime;
-yawControl.prevVal = prevYawDeg;
+yawControl.prevVal = yawDeg;
 
 displayFlag = 1;
 if ( displayFlag )
@@ -53,7 +55,7 @@ if ( displayFlag )
     % constant parameters
     fprintf(pFile,'%6.6f,',yawFiltTimeConstant);
     fprintf(pFile,'%6.6f,',kp);
-    fprintf(pFile,'%6.6f\n,',yawStickLimit);
+    fprintf(pFile,'%6.6f,\n',yawStickLimit);
 
     fclose(pFile);
     

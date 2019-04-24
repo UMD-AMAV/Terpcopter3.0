@@ -101,6 +101,7 @@ servoSwitchMsg.Servo = -1;
 
 % initial variables
 stick_thrust = -1;
+servoCmd = 1; % default
 
 r = robotics.Rate(25);
 reset(r);
@@ -112,6 +113,7 @@ dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
 autonomyLog = [params.env.matlabRoot '/autonomy_' dateString '.log'];
 
 timeForPlot = tic;
+numBhvs = length( mission.bhv );
 
 if ( strcmp(params.auto.mode,'auto'))
     send(ayprCmdPublisher, ayprCmdMsg);
@@ -204,11 +206,17 @@ if ( strcmp(params.auto.mode,'auto'))
         end
         
         % publish
+        if ( currentBehavior > numBhvs )
+            disp('=====================================');
+            disp('          Mission Complete');
+            disp('=====================================');
+        else
         ayprCmdMsg = mission.bhv{1}.ayprCmd;
         send(ayprCmdPublisher, ayprCmdMsg);
+        servoSwitchMsg.Servo = servoCmd;
         send(servoSwitchCmdPublisher, servoSwitchMsg);
         fprintf('Published Ahs Cmd. Alt : %3.3f \t Yaw: %3.3f\n', ayprCmdMsg.AltDesiredMeters, ayprCmdMsg.YawDesiredDegrees);
-        
+        end
         
         if ( logFlag )
             pFile = fopen( autonomyLog ,'a');

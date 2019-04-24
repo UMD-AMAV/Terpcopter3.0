@@ -12,11 +12,20 @@ data = csvread(filepath);
 % parse out
 t = data(:,1);
 dt = data(:,2);
-desVal = data(:,3);
-actualVal = data(:,4);
-filtVal = data(:,5);
+desVal = mod(data(:,3),360);
+actualVal = mod(data(:,4),360);
+filtVal = mod(data(:,5),360);
 errorVal = data(:,6);
 stickCmd = data(:,7);
+
+%     % write csv file
+%     1 fprintf(pFile,'%6.6f,',curTime);
+%    2  fprintf(pFile,'%6.6f,',dt);
+%    3  fprintf(pFile,'%6.6f,',yawDesDeg);
+%    4  fprintf(pFile,'%6.6f,',yawDeg);
+%    5  fprintf(pFile,'%6.6f,',yawFiltDeg);
+%    6  fprintf(pFile,'%6.6f,',yawErrorDeg);
+%    7  fprintf(pFile,'%6.6f,',yawStickCmd);
 
 filtTimeConstant = data(:,5);
 kp = data(:,6);

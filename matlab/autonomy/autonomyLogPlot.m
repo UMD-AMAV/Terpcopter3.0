@@ -15,7 +15,7 @@ t = t - t(1);
 curBhv = data(:,2);
 
 altDes = data(:,3);
-yawDes = data(:,4);
+yawDes = mod(data(:,4),360);
 pitchDes = data(:,5);
 rollDes = data(:,6);
 
@@ -29,7 +29,7 @@ est_Time = data(:,12);
 est_North = data(:,13);
 est_East = data(:,14);
 est_Up= data(:,15);
-est_Yaw = data(:,16);
+est_Yaw = mod(data(:,16),360);
 est_Pitch = data(:,17);
 est_Roll = data(:,18);
 

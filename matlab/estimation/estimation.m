@@ -91,8 +91,7 @@ while(1)
     % Receive Latest Imu and Lidar data
     imuMsg = imuDataSubscriber.LatestMessage;
     lidarMsg = lidarDataSubscriber.LatestMessage;
-    fpMsg = flowProbeDataSubscriber.LatestMessage;
-    
+
     if isempty(imuMsg)
         state = NaN;
         disp('No imu data\n');
@@ -159,9 +158,7 @@ while(1)
     stateMsg.Roll = state.phi;
     stateMsg.Pitch = state.theta;
     
-    stateMsg.ForwardVelocity = fpMsg.Data;
-    fprintf('Velocity : %3.3f\n',fpMsg.Data);
-    
+
     % timestamp
     ti= rostime('now');
     abs_t = eval([int2str(ti.Sec) '.' ...

@@ -63,7 +63,7 @@ stickCmdMsg.Yaw = 0;
 stickCmdMsg.Pitch = 0;
 stickCmdMsg.Roll = 0;
 
-u_stick_cmd = [0 0 0 0];
+u_stick_cmd = [0 0 0 0 0];
 
 global lastStickCmd_time
 lastStickCmd_time = rostime('now');
@@ -77,7 +77,7 @@ if ( strcmp(params.vtx.mode,'flight') )
     % avialable serial ports
     comlist = seriallist();
     for i = 1:size(comlist,2)
-        if contains(comlist(i),'USB1')
+        if contains(comlist(i),'USB0')
             params.env.com_port = comlist(i);
             foundComPort = true;
             disp('Found USB COM port')
@@ -122,7 +122,7 @@ if ( strcmp(params.vtx.mode,'flight') )
             u_stick_cmd(2) = stickCmdMsg.Roll;
             u_stick_cmd(3) = stickCmdMsg.Pitch;
             u_stick_cmd(4) = stickCmdMsg.Yaw;
-            u_stick_cmd(5) = stickCmdMsg.Thrust; %-1;
+            u_stick_cmd(5) = servoSwitchCmdMsg.Servo; %-1;
             disp("transmitting")
         else
             disp('Empty AHSCmd!')
