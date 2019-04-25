@@ -65,9 +65,9 @@ j = 0;
 imuMsg = imuDataSubscriber.LatestMessage;
 lidarMsg = lidarDataSubscriber.LatestMessage;
 
-if isempty(imuMsg)
+if isempty(imuMsg && lidarMsg)
     state = NaN;
-    disp('No imu data\n');
+    disp('No imu or lidar data\n');
     return;
 end
 w = imuMsg.Orientation.W;

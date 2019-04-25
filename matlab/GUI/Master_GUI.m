@@ -101,7 +101,6 @@ while( error_flag==1 || first_run == 1 )
         error_flag = 1;
     end
 end
-disp('recieved IMU');
 msg = receive(sub,30);
 set(handles.text2,'String','active');
  msg = receive(sub,30);

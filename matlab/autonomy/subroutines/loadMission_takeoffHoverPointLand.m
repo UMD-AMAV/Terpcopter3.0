@@ -1,4 +1,4 @@
-function mission = loadMission_servoTest()
+function mission = loadMission_takeoffHoverPointLand()
 mission.config.firstLoop = 1;
 
 mission.config.H_detector = 0;
@@ -30,7 +30,7 @@ i = i + 1;
 mission.bhv{i}.name = 'bhv_hover';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.75; 
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
 mission.bhv{i}.completion.durationSec = 2; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
@@ -41,8 +41,8 @@ mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
 mission.bhv{i}.ayprCmd.YawSwitch = 1; 
-mission.bhv{i}.ayprCmd.YawDesiredDegrees = 300; 
-mission.bhv{i}.completion.durationSec = 5; % 10 seconds
+mission.bhv{i}.ayprCmd.YawDesiredDegrees = 0; 
+mission.bhv{i}.completion.durationSec = 5; %  seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;
@@ -52,8 +52,8 @@ mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
 mission.bhv{i}.ayprCmd.YawSwitch = 1; 
-mission.bhv{i}.ayprCmd.YawDesiredDegrees = 210; 
-mission.bhv{i}.completion.durationSec = 5; % 10 seconds
+mission.bhv{i}.ayprCmd.YawDesiredDegrees = 90; 
+mission.bhv{i}.completion.durationSec = 15; %  seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;
