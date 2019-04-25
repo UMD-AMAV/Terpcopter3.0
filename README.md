@@ -55,6 +55,13 @@ roslaunch terpcopter_driver terpcopter_flow_probe_node.launch
 - Node publishes velocity in standard float32 message. Might print 2 values in terminal. Ignore second value.
 - Note the value of the velocity and corresponding direction of quadrotor. Mount according to marked side on flowprobe pointing to front of the drone. If no mark present adjust for sign in code.
 
+# Flow Probe Nodes
+
+- The teensy board on which the flow probe is attached might not work (Serial input pauses after a few lines). Follow instructions on this link to install the latest UDEV Rules for the board : https://www.pjrc.com/teensy/49-teensy.rules
+
+- The serial porst need root access to run. Try steps in this link to change : https://askubuntu.com/a/58122
+
+
 # Issues Noticed
 
 When launching launch files one might get "... is not a launch file". If this is the case: 
@@ -65,14 +72,7 @@ cd into workspace catkin_ws
 source ./devel/setup.bash 
 ```
 
-# Flow Probe Nodes
-
-- The teensy board on which the flow probe is attached might not work (Serial input pauses after a few lines). Follow instructions on this link to install the latest UDEV Rules for the board : https://www.pjrc.com/teensy/49-teensy.rules
-
-- The serial porst need root access to run. Try steps in this link to change : https://askubuntu.com/a/58122
-
-
-Odroid Desktop no launch bar fix: source: https://ubuntuforums.org/showthread.php?t=2337119
+## Odroid Desktop no launch bar fix: source: https://ubuntuforums.org/showthread.php?t=2337119
 ```
 1) Open a hard terminal again using [Crtl]+[Alt]+[F1] - and log in if necessary
 2) $ cd ~/.config/dconf
@@ -91,6 +91,14 @@ roslaunch terpcopter_driver terpcopter_camera_node.launch
 - Then run the perception using 
 ```
 rosrun camera_package cameraSub.py
+
+## No IMU Data fix: 
+
+When a camera is connected mavros is not able to pull topics from pixhawk due to usb port issue. To fix: 
+
+1. Unplug all usb connections from Odroid
+2. Plug pixhawk usb and launch mavors
+3. Now connect rest of the usb's back
 
 # Links for SD Card cloning
 
