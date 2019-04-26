@@ -41,10 +41,10 @@ params = loadParams();
 
 % missions
 % mission = loadMission_takeoffHoverLand();
-%mission = loadMission_takeoffHoverFlyForwardLand();
+%mis./lsion = loadMission_takeoffHoverFlyForwardLand();
 %mission = loadMission_takeoffHoverFlyForwardProbeLand();
-mission = loadMission_takeoffHoverPointLand();
-%mission = loadMission_takeoffHoverOverHLand();
+%mission = loadMission_takeoffHoverPointLand();
+mission = loadMission_takeoffHoverOverHLand();
 % mission = loadMission_servoTest();
 
 fprintf('Launching Autonomy Node...\n');
@@ -213,7 +213,7 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_fly_forward'
                     completionFlag = bhv_fly_forward(completion, bhvTime);
                 case 'bhv_land'
-                    completionFlag = bhv_land(completion, t);
+                    completionFlag = bhv_land(completion, bhvTime);
                 otherwise
             end
             mission.bhv{1}.completion.status = completionFlag;

@@ -1,7 +1,7 @@
 function [rollStickCmd, rollControl] = rollController(rollControl, curTime, rollDeg, rollDesDeg)
 
 % gains/parameters
-rollFiltTimeConstant = 0.2; sec
+rollFiltTimeConstant = 0.2; % seconds
 kp = 0.1/10; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
 rollStickLimit = 0.2;
 
