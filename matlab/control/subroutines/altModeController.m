@@ -3,7 +3,7 @@ function [altRateCmd, altControl] = altModeController(altControl, curTime, zcur,
 % gains/tuning parameters (constants)
 altFiltTimeConstant = 0.1;
 climbRateCmd = 0.35;
-descentRateCmd = -0.23;
+descentRateCmd = -0.50;
 setpointDeadband = 0.05;
 
 % unpack states
@@ -72,7 +72,7 @@ if ( displayFlag )
     fprintf(pFile,'%6.6f,',altFiltTimeConstant);
     fprintf(pFile,'%6.6f,',climbRateCmd);
     fprintf(pFile,'%6.6f,',descentRateCmd);
-    fprintf(pFile,'%6.6f \n,',setpointDeadband);
+    fprintf(pFile,'%6.6f,\n',setpointDeadband);
 
     fclose(pFile);
     

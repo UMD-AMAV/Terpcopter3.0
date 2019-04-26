@@ -17,11 +17,21 @@
 % ayprCmdMsg.YawDesiredDegrees = 0;
 % ayprCmdMsg.PitchDesiredDegrees = 0;
 % ayprCmdMsg.RollDesiredDegrees = 0;
-
 % ayprCmdMsg.AltSwitch = 0;
 % ayprCmdMsg.YawSwitch = 0;
 % ayprCmdMsg.PitchSwitch = 0;
 % ayprCmdMsg.RollSwitch = 0;
+%
+% Reference: H detection
+% hDetected = 0 (no H detected) , 1 (H detected) 
+% hAngle = -180 to 180 (deg) 
+% hPixelX = -360 to 360 (pixels)
+% hPixelY = -640 to 640
+%
+% Reference: target detection
+% targetDetected = 0 (no H detected) , 1 (H detected)  
+% targetPixelX = -360 to 360 (pixels)
+% targetPixelY = -640 to 640
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % prepare workspace
@@ -30,13 +40,12 @@ addpath('../')
 params = loadParams();
 
 % missions
-%mission = loadMission_takeoffHoverLand();
+% mission = loadMission_takeoffHoverLand();
 %mission = loadMission_takeoffHoverFlyForwardLand();
 %mission = loadMission_takeoffHoverFlyForwardProbeLand();
-
 mission = loadMission_takeoffHoverPointLand();
 %mission = loadMission_takeoffHoverOverHLand();
-%mission = loadMission_servoTest();
+% mission = loadMission_servoTest();
 
 fprintf('Launching Autonomy Node...\n');
 
@@ -73,15 +82,17 @@ servoSwitchCmdPublisher = rospublisher('/servoSwitch', 'terpcopter_msgs/servoSwi
 % vision-based subscribers depend on mission
 if ( mission.config.H_detector )
     fprintf('Subscribing to H detector topics ...\n');
-    hAngleSub = rossubscriber('/hAngle');
+    % H detection
     hDetectedSub = rossubscriber('/hDetected');
+    hAngleSub = rossubscriber('/hAngle');
     hPixelXSub = rossubscriber('/hPixelX');
     hPixelYSub = rossubscriber('/hPixelY');
-end
-if ( mission.config.target_detector )
-    fprintf('Subscribing to target detector topics ...\n');
-    yawErrorCameraSubscriber = rossubscriber('/yawSetpoint');
-    targetDetectionFlagSubscriber = rossubscriber('/targetFlag', 'std_msgs/Bool');
+    % Obstacle
+    targetObstSub = rossubscriber('/targetObst'); % binary
+    % Bullseye
+    targetPixelXSub = rossubscriber('/targetPixelX');
+    targetPixelYSub = rossubscriber('/targetPixelY');
+    targetDetectedSub = rossubscriber('/targetDetected');
 end
 if ( mission.config.flowProbe )
     fprintf('Subscribing to flowprobe ...\n');
@@ -132,14 +143,17 @@ if ( strcmp(params.auto.mode,'auto'))
         stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
         
         if ( mission.config.H_detector )
-            hDetected = hDetectedSub.LatestMessage.Data;
-            hAngle = hAngleSub.LatestMessage.Data;
-            hPixelX = hPixelX.LatestMessage.Data;
-            hPixelY= hPixelY.LatestMessage.Data;
-        end
-        if ( mission.config.target_detector )
-            yawErrorCameraMsg = yawErrorCameraSubscriber.LatestMessage;
-            targetDetectionFlagMsg = targetDetectionFlagSubscriber.LatestMessage;
+            hDetected = hDetectedSub.LatestMessage.Data
+            hAngle = hAngleSub.LatestMessage.Data
+            hPixelX = hPixelXSub.LatestMessage.Data
+            hPixelY= hPixelYSub.LatestMessage.Data
+            
+            targetObstSub.LatestMessage.Data
+            
+            % Bullseye
+            targetX = targetPixelXSub.LatestMessage.Data
+            targetY = targetPixelYSub.LatestMessage.Data
+            targetDet = targetDetectedSub.LatestMessage.Data
         end
         if ( mission.config.flowProbe )
             fpMsg = flowProbeDataSubscriber.LatestMessage;
@@ -211,11 +225,11 @@ if ( strcmp(params.auto.mode,'auto'))
             disp('          Mission Complete');
             disp('=====================================');
         else
-        ayprCmdMsg = mission.bhv{1}.ayprCmd;
-        send(ayprCmdPublisher, ayprCmdMsg);
-        servoSwitchMsg.Servo = servoCmd;
-        send(servoSwitchCmdPublisher, servoSwitchMsg);
-        fprintf('Published Ahs Cmd. Alt : %3.3f \t Yaw: %3.3f\n', ayprCmdMsg.AltDesiredMeters, ayprCmdMsg.YawDesiredDegrees);
+            ayprCmdMsg = mission.bhv{1}.ayprCmd;
+            send(ayprCmdPublisher, ayprCmdMsg);
+            servoSwitchMsg.Servo = servoCmd;
+            send(servoSwitchCmdPublisher, servoSwitchMsg);
+            fprintf('Published Ahs Cmd. Alt : %3.3f \t Yaw: %3.3f\n', ayprCmdMsg.AltDesiredMeters, ayprCmdMsg.YawDesiredDegrees);
         end
         
         if ( logFlag )

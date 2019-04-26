@@ -65,11 +65,14 @@ j = 0;
 imuMsg = imuDataSubscriber.LatestMessage;
 lidarMsg = lidarDataSubscriber.LatestMessage;
 
-if isempty(imuMsg && lidarMsg)
-    state = NaN;
-    disp('No imu or lidar data\n');
-    return;
-end
+% Sai: this causes an error:
+% cannot convert to logical from .Imu
+% if isempty(imuMsg && lidarMsg)
+%     state = NaN;
+%     disp('No imu or lidar data\n');
+%     return;
+% end
+
 w = imuMsg.Orientation.W;
 x = imuMsg.Orientation.X;
 y = imuMsg.Orientation.Y;
@@ -77,9 +80,11 @@ z = imuMsg.Orientation.Z;
 
 euler = quat2eul([w x y z]);
 %yaw measured clock wise is negative.
-state.psi_inertial = rad2deg(euler(1));
+disp('psi:')
+state.psi_inertial = rad2deg(euler(1))
 state.theta = rad2deg(euler(2));
 state.phi = rad2deg(euler(3));
+
 
 %get relative yaw = - inertial yaw_intial - inertial yaw
 inertial_yaw_initial = state.psi_inertial;
@@ -104,18 +109,18 @@ while(1)
     
     euler = quat2eul([w x y z]);
     %yaw measured clock wise is negative.
-    state.psi_inertial = rad2deg(euler(1));
-    state.theta = rad2deg(euler(2));
+    state.psi_inertial = mod(90-rad2deg(euler(1)),360)
+    state.theta = -rad2deg(euler(2));
     state.phi = rad2deg(euler(3));
     
-    state.psi_inertial = round(state.psi_inertial,1);
+    %state.psi_inertial = round(state.psi_inertial,1);
     
     %get relative yaw = - inertial yaw_intial - inertial yaw
     if isempty(inertial_yaw_initial), inertial_yaw_initial = state.psi_inertial; end
     state.psi_relative = -state.psi_inertial + inertial_yaw_initial;
 
     %rounding off angles to 1 decimal place
-    state.psi_inertial = round(state.psi_inertial,1);
+    %state.psi_inertial = round(state.psi_inertial,1);
     state.psi_relative = round(state.psi_relative,1);
     state.theta = round(state.theta,1);
     state.phi = round(state.phi,1);
@@ -154,7 +159,7 @@ while(1)
     %range
     stateMsg.Up = stateMsg.Range;
     %disp(stateMsg.Up);
-    stateMsg.Yaw = state.psi_relative;
+    stateMsg.Yaw = state.psi_inertial;
     stateMsg.Roll = state.phi;
     stateMsg.Pitch = state.theta;
     

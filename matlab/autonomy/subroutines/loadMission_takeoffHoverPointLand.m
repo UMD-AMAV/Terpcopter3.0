@@ -41,20 +41,20 @@ mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
 mission.bhv{i}.ayprCmd.YawSwitch = 1; 
-mission.bhv{i}.ayprCmd.YawDesiredDegrees = 0; 
-mission.bhv{i}.completion.durationSec = 5; %  seconds
+mission.bhv{i}.ayprCmd.YawDesiredDegrees = 290; 
+mission.bhv{i}.completion.durationSec = 10; %  seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
-i = i + 1;
-% Behavior 3: Point
-mission.bhv{i}.name = 'bhv_point_to_direction';
-mission.bhv{i}.ayprCmd = default_aypr_msg();
-mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
-mission.bhv{i}.ayprCmd.YawSwitch = 1; 
-mission.bhv{i}.ayprCmd.YawDesiredDegrees = 90; 
-mission.bhv{i}.completion.durationSec = 15; %  seconds
-mission.bhv{i}.completion.status = false;     % completion flag
+% i = i + 1;
+% % Behavior 3: Point
+% mission.bhv{i}.name = 'bhv_point_to_direction';
+% mission.bhv{i}.ayprCmd = default_aypr_msg();
+% mission.bhv{i}.ayprCmd.AltSwitch = 1; 
+% mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
+% mission.bhv{i}.ayprCmd.YawSwitch = 1; 
+% mission.bhv{i}.ayprCmd.YawDesiredDegrees = 90; 
+% mission.bhv{i}.completion.durationSec = 15; %  seconds
+% mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;
 % Behavior 3: Land
