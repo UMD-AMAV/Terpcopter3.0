@@ -40,14 +40,14 @@ mission.bhv{i}.name = 'bhv_hover_over_H';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
-mission.bhv{i}.ayprCmd.YawSwitch = 1; 
-mission.bhv{i}.ayprCmd.YawDesiredDegrees = 0; 
+% mission.bhv{i}.ayprCmd.YawSwitch = 1; 
+% mission.bhv{i}.ayprCmd.YawDesiredDegrees = 0; 
 % % roll and pitch are actively controlled but we initialize values here
-% mission.bhv{i}.ayprCmd.RollSwitch = 1; 
-% mission.bhv{i}.ayprCmd.RollDesiredDegrees = 0; 
-% mission.bhv{i}.ayprCmd.PitchSwitch = 1; 
-% mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 0; 
-mission.bhv{i}.completion.durationSec = 5; % 10 seconds
+mission.bhv{i}.ayprCmd.RollSwitch = 1; 
+mission.bhv{i}.ayprCmd.RollDesiredDegrees = 0; 
+mission.bhv{i}.ayprCmd.PitchSwitch = 1; 
+mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 0; 
+mission.bhv{i}.completion.durationSec = 60*10; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;

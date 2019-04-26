@@ -2,7 +2,7 @@ function [rollStickCmd, rollControl] = rollController(rollControl, curTime, roll
 
 % gains/parameters
 rollFiltTimeConstant = 0.2; % seconds
-kp = 0.1/10; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
+kp = 0.1/20; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
 rollStickLimit = 0.2;
 
 % unpack states
@@ -23,7 +23,7 @@ rollErrorDeg = rollDesDeg - rollFiltDeg;
 rollStickCmd = kp*rollErrorDeg; 
 
 % saturate
-rollStickCmd = max(-rollStickLimit,min(1,rollStickLimit));
+rollStickCmd = max(-rollStickLimit,min(rollStickCmd,rollStickLimit));
 
 % pack up structure
 rollControl.lastTime = curTime;

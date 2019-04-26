@@ -23,7 +23,7 @@ pitchErrorDeg = pitchDesDeg - pitchFiltDeg;
 pitchStickCmd = kp*pitchErrorDeg; 
 
 % saturate
-pitchStickCmd = max(-pitchStickLimit,min(1,pitchStickLimit));
+pitchStickCmd = max(-pitchStickLimit,min(pitchStickCmd,pitchStickLimit));
 
 %% pack up structure
 pitchControl.lastTime = curTime;

@@ -1,7 +1,7 @@
 function mission = loadMission_servoTest()
 mission.config.firstLoop = 1;
 
-mission.config.H_detector = 1;
+mission.config.H_detector = 0;
 mission.config.target_detector = 0;
 mission.config.flowProbe = 0;
 

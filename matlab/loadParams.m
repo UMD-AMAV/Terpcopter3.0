@@ -20,7 +20,7 @@ params.vtx.mode = 'flight'; % 'sim' or 'flight'
 % transmitter           throttle roll pitch yaw
 params.vtx.stick_lim = [100; 100; 100; 100; 100];
 params.vtx.trim_lim = [29; 29; 29; 29; 29];
-params.vtx.trim_val = [0 0 24 0 0]/100; 
+params.vtx.trim_val = [0 12 24 0 0]/100; 
 
 % simulator
 params.vtx.T = 30; % simulation time

@@ -60,7 +60,8 @@ end
 fprintf('Setting up ayprsCmd Publisher ...\n');
 ayprCmdPublisher = rospublisher('/ayprCmd', 'terpcopter_msgs/ayprCmd');
 controlStartPublisher = rospublisher('/startControl', 'std_msgs/Bool');
-
+fprintf('Setting up servoSwitch Publisher ...\n');
+servoSwitchCmdPublisher = rospublisher('/servoSwitch', 'terpcopter_msgs/servoSwitchCmd');
 
 % initialize control off
 controlStartMsg = rosmessage('std_msgs/Bool');
@@ -73,8 +74,7 @@ fprintf('Subscribing to stateEstimate ...\n');
 stateEstimateSubscriber = rossubscriber('/stateEstimate');
 fprintf('Subscribing to startMission ...\n');
 startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
-fprintf('Subscribing to servoSwitch ...\n');
-servoSwitchCmdPublisher = rospublisher('/servoSwitch', 'terpcopter_msgs/servoSwitchCmd');
+
 
 
 
@@ -108,7 +108,7 @@ pause(0.1)
 [ayprCmdMsg] = default_aypr_msg();
 % servo switch 'false' = closed servo
 servoSwitchMsg = rosmessage(servoSwitchCmdPublisher);
-servoSwitchMsg.Servo = -1;
+servoSwitchMsg.Servo = 1;
 
 % initial variables
 stick_thrust = -1;

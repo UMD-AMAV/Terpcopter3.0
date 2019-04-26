@@ -148,7 +148,7 @@ while(1)
 
     
     % send stick commands
-    fprintf('Stick Cmd.Thrust : %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f \n', stickCmdMsg.Thrust , stateEstimateMsg.Up, z_d, ( z - z_d ) );
+    fprintf('Stick Cmd.Thrust : %3.3f, Stick Cmd.Pitch: %3.3f, Stick Cmd.Roll: %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f \n', stickCmdMsg.Thrust, stickCmdMsg.Pitch, stickCmdMsg.Roll , stateEstimateMsg.Up, z_d, ( z - z_d ) );
     send(stickCmdPublisher, stickCmdMsg);
     waitfor(r);
 end
