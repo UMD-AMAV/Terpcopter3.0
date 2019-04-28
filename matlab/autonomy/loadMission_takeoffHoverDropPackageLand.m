@@ -1,4 +1,4 @@
-function mission = loadMission_takeoffHoverLand()
+function mission = loadMission_takeoffHoverDropPackageLand()
 mission.config.firstLoop = 1;
 
 mission.config.H_detector = 0;

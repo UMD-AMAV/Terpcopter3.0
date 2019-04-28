@@ -10,7 +10,7 @@ def eucdist(x1,y1,x2,y2):
     return dist
 
 
-def HBase(frame):
+def HBase(frame, frameCounter):
     #height,width= frame.shape[:2]
     #frame = cv2.resize(frame,(int(0.5*width), int(0.5*height)), interpolation = cv2.INTER_AREA)
     pubHPixelX = rospy.Publisher('hPixelX', Float32, queue_size=10)
@@ -97,10 +97,16 @@ def HBase(frame):
                 angle = 180 - angle
             flag = True
             cv2.putText(frame,"Angle = " + str(angle), (20,80), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
-    
-    pubHDetected.publish(homeBaseDetected)
+    if(frameCounter == 9):
+        flagD =True    
+        pubHDetected.publish(flagD)
     pubHAngle.publish(angle)
     pubHPixelX.publish(hError)
     pubHPixelY.publish(vError)
     cv2.imshow("HomeBase", frame)
     cv2.waitKey(1)
+    if(homeBaseDetected):
+        frameCounter += 1
+    else:
+        frameCounter = 0
+    return frameCounter

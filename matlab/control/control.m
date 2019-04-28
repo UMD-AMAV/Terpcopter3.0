@@ -145,7 +145,6 @@ while(1)
     stickCmdMsg.Yaw = u_yaw;
     stickCmdMsg.Pitch = u_pitch;
     stickCmdMsg.Roll = u_roll;
-
     
     % send stick commands
     fprintf('Stick Cmd.Thrust : %3.3f, Stick Cmd.Pitch: %3.3f, Stick Cmd.Roll: %3.3f, Altitude : %3.3f, Altitude_SP : %3.3f, Error : %3.3f \n', stickCmdMsg.Thrust, stickCmdMsg.Pitch, stickCmdMsg.Roll , stateEstimateMsg.Up, z_d, ( z - z_d ) );

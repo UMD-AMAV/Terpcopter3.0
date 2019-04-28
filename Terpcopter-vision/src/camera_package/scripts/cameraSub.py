@@ -19,7 +19,7 @@ from _targetPose import targetPose
 import ObstacleAvoidance
 import HBaseDetector
 import DropOffDetection
-
+global frameCounter
 try:
     sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 except:
@@ -33,6 +33,7 @@ except:
 # Input Parameter: data - RGB image frame data of datatype-(CompressedImage)
 
 def callbackImage(data):
+    global frameCounter
     np_array = np.fromstring(data.data,np.uint8)   #Loading data in np array
     cv_image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)  #Convert image to openCV format
 
@@ -70,7 +71,9 @@ def callbackImage(data):
     #                   Input Parameters: Image frame in openCV image format, blob detection parameter object
     ObstacleAvoidance.obstacleDetection(cv_image, detector_obst)
     # ObstacleDetection.objectDetect(cv_image,detector_target)
-    HBaseDetector.HBase(cv_image)
+    frameCounter = HBaseDetector.HBase(cv_image, frameCounter)
+    if(frameCounter == 10):
+        frameCounter = 0    
     DropOffDetection.dropOffDetection(cv_image)
 
 ###############################################################################
@@ -105,4 +108,6 @@ def imageSubscriber():
 
 # main loop
 if __name__ == '__main__':
+    global frameCounter
+    frameCounter = 0
     imageSubscriber()
