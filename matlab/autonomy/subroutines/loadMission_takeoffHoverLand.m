@@ -23,10 +23,10 @@ mission.bhv{i}.name = 'bhv_takeoff';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1;
-mission.bhv{i}.ayprCmd.RollSwitch = 1; 
-mission.bhv{i}.ayprCmd.RollDesiredDegrees = -20;
-mission.bhv{i}.ayprCmd.PitchSwitch = 1; 
-mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 10;
+% mission.bhv{i}.ayprCmd.RollSwitch = 1; 
+% mission.bhv{i}.ayprCmd.RollDesiredDegrees = -20;
+% mission.bhv{i}.ayprCmd.PitchSwitch = 1; 
+% mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 10;
 mission.bhv{i}.completion.status = false;
 
 i = i + 1;
@@ -35,8 +35,9 @@ mission.bhv{i}.name = 'bhv_hover';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
-mission.bhv{i}.completion.durationSec = 9.95; % 10 seconds
+mission.bhv{i}.completion.durationSec = 5; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
+
 
 i = i + 1;
 % Behavior 3: Land

@@ -39,7 +39,14 @@ mission.bhv{i}.completion.durationSec = 9.95; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;
-% Behavior 3: Land
+% Behavior 3: Drop Package
+mission.bhv{i}.name = 'bhv_hover_drop';
+mission.bhv{i}.ayprCmd = default_aypr_msg();
+mission.bhv{i}.completion.durationSec = 3;
+mission.bhv{i}.completion.status = false; 
+
+i = i + 1;
+% Behavior 4: Land
 mission.bhv{i}.name = 'bhv_land';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 

@@ -2,7 +2,7 @@ function [altRateCmd, altControl] = altModeController(altControl, curTime, zcur,
 
 % gains/tuning parameters (constants)
 altFiltTimeConstant = 0.1;
-climbRateCmd = 1;
+climbRateCmd = 0.3;
 descentRateCmd = -0.50;
 setpointDeadband = 0.05;
 
