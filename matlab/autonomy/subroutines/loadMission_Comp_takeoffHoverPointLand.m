@@ -61,7 +61,7 @@ i = i + 1;
 mission.bhv{i}.name = 'bhv_land';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.2; 
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.0; 
 mission.bhv{i}.completion.durationSec = 10*60; % make this very long so vehicle hovers above ground before manual takeover
 mission.bhv{i}.completion.status = false;     % completion flag
 

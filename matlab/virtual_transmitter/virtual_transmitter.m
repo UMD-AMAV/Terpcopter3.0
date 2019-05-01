@@ -35,7 +35,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % prepare workspace
-clear; close all; clc; format compact;
+clear; close all; clc; format compact; clear all;
 
 % intialize ros node
 if(~robotics.ros.internal.Global.isNodeActive)
@@ -122,7 +122,9 @@ if ( strcmp(params.vtx.mode,'flight') )
             u_stick_cmd(2) = stickCmdMsg.Roll;
             u_stick_cmd(3) = stickCmdMsg.Pitch;
             u_stick_cmd(4) = stickCmdMsg.Yaw;
-            u_stick_cmd(5) = servoSwitchCmdMsg.Servo; %-1;
+            if ~isempty(servoSwitchCmdMsg.Servo)
+                u_stick_cmd(5) = servoSwitchCmdMsg.Servo; %-1;
+            end
             disp("transmitting")
         else
             disp('Empty AHSCmd!')

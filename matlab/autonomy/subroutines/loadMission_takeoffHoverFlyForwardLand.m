@@ -22,7 +22,11 @@ i = 1;
 mission.bhv{i}.name = 'bhv_takeoff';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.3; 
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
+mission.bhv{i}.ayprCmd.PitchSwitch = 1; 
+mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 5; 
+mission.bhv{i}.ayprCmd.RollSwitch = 1; 
+mission.bhv{i}.ayprCmd.RollDesiredDegrees = -6; 
 mission.bhv{i}.completion.status = false;
 
 i = i + 1;
@@ -30,8 +34,8 @@ i = i + 1;
 mission.bhv{i}.name = 'bhv_hover';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.75; 
-mission.bhv{i}.completion.durationSec = 2; % 10 seconds
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
+mission.bhv{i}.completion.durationSec = 10; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
 

@@ -40,14 +40,14 @@ addpath('../')
 params = loadParams();
 
 % Competition Missions
-mission = loadMission_Comp_takeoffHoverPointLand();
+% mission = loadMission_Comp_takeoffHoverPointLand();
 
 
 % Cypress Missions
 % missions
 % mission = loadMission_takeoffHoverLand();
 % mission = loadMission_takeoffHoverDropPackageLand();
-% mission = loadMission_takeoffHoverFlyForwardLand();
+ mission = loadMission_takeoffHoverFlyForwardLand();
 % mission = loadMission_takeoffHoverFlyForwardProbeLand();
 %mission = loadMission_takeoffHoverPointLand();
 % mission = loadMission_takeoffHoverOverHLand();
