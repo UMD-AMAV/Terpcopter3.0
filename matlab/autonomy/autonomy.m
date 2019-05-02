@@ -47,10 +47,10 @@ params = loadParams();
 % missions
 % mission = loadMission_takeoffHoverLand();
 % mission = loadMission_takeoffHoverDropPackageLand();
- mission = loadMission_takeoffHoverFlyForwardLand();
+% mission = loadMission_takeoffHoverFlyForwardLand();
 % mission = loadMission_takeoffHoverFlyForwardProbeLand();
-%mission = loadMission_takeoffHoverPointLand();
-% mission = loadMission_takeoffHoverOverHLand();
+% mission = loadMission_takeoffHoverPointLand();
+mission = loadMission_takeoffHoverOverHLand();
 % mission = loadMission_servoTest();
 % mission = loadMission_takeoffHoverFlyForwardDropPackageLand();
 

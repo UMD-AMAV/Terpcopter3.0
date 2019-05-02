@@ -24,9 +24,9 @@ mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
 mission.bhv{i}.ayprCmd.PitchSwitch = 1; 
-mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 5; 
+mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 7; 
 mission.bhv{i}.ayprCmd.RollSwitch = 1; 
-mission.bhv{i}.ayprCmd.RollDesiredDegrees = -6; 
+mission.bhv{i}.ayprCmd.RollDesiredDegrees = 6; 
 mission.bhv{i}.completion.status = false;
 
 i = i + 1;

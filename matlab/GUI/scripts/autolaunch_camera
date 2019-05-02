@@ -4,5 +4,5 @@ spawn ssh odroid@192.168.1.3
 expect "password"
 send "odroid\r"
 expect "odroid"
-send "roslaunch terpcopter_driver terpcopter_camera_node.launch\r"
+send "roslaunch video_stream_opencv camera.launch\r"
 interact

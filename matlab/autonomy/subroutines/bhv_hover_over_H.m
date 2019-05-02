@@ -1,5 +1,5 @@
 function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
-
+    
     % hDetected = 0 (no H detected) , 1 (H detected) 
     % hAngle = -180 to 180 (deg) 
     % hPixelX = -360 to 360 (pixels)
@@ -18,6 +18,7 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd,
         % yawDesired = yaw + hAngle;
         pitchDesired = hPixelY;
         rollDesired = hPixelX;
+%         time = bhvTime;
     else
         pitchDesired = 0;
         rollDesired = 0;
