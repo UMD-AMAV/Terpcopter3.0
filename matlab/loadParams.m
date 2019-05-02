@@ -17,10 +17,10 @@ params.env.matlabRoot = '/home/amav/amav/Terpcopter3.0/matlab';
 % mode of operation 
 params.vtx.mode = 'flight'; % 'sim' or 'flight' 
 
-% transmitter           throttle roll pitch yaw
+% transmitter           throttle roll pitch yaw Aux
 params.vtx.stick_lim = [100; 100; 100; 100; 100];
 params.vtx.trim_lim = [29; 29; 29; 29; 29];
-params.vtx.trim_val = [0 10 10 10 0]/100; %25 30
+params.vtx.trim_val = [0  15 20 0 0]/100; %25 30
 
 % simulator
 params.vtx.T = 30; % simulation time
