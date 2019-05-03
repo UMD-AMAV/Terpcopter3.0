@@ -36,7 +36,7 @@ mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;
 % Behavior 3: Hover over the H
-mission.bhv{i}.name = 'bhv_hover_over_H';
+mission.bhv{i}.name = 'bhv_hover_over_H_';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 

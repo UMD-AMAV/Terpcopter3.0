@@ -45,8 +45,8 @@ global key_roll key_pitch;
 key_roll = 0;
 key_pitch = 0;
 set(h_fig,'KeyPressFcn',@arrowToInt);
-set(gcf, 'Position',  [100, 100, 300, 50])
-text(0.1,0.4,'Keystroke Capture','FontSize',16);
+set(gcf, 'Position',  [100, 100, 500, 500])
+title('Keystroke Capture','FontSize',16);
 
 % Competition Missions
 % mission = loadMission_Comp_takeoffHoverPointLand();
@@ -60,6 +60,7 @@ text(0.1,0.4,'Keystroke Capture','FontSize',16);
 % mission = loadMission_takeoffHoverFlyForwardProbeLand();
 % mission = loadMission_takeoffHoverPointLand();
 mission = loadMission_takeoffHoverOverHKeyLand();
+% mission = loadMission_takeoffHoverOverHWithRadiusLand();
 % mission = loadMission_servoTest();
 % mission = loadMission_takeoffHoverFlyForwardDropPackageLand();
 

@@ -16,19 +16,25 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H_key(stateEstimateMsg, aypr
     % - set ayprCmdMsg.PitchDesiredDegrees = 0;
     % ayprCmd.YawDesiredDegrees = yawDesired;
     
-    arrowPixelIncrement = 5;
+    arrowPixelIncrement = 10;
     hPixelX  = arrowPixelIncrement*key_roll;
     hPixelY = arrowPixelIncrement*key_pitch;
     
-    pixelStickGainPitch = 0.001;
-    pixelStickGainRoll = 0.001;
+    pixelStickGainPitch = 0.005;
+    pixelStickGainRoll = 0.005;
     
-    ayprCmd.PitchDesiredDegrees = hPixelX * pixelStickGainPitch;
-    ayprCmd.RollDesiredDegrees = hPixelY * pixelStickGainRoll;
+    rawPitchCmd = hPixelX * pixelStickGainPitch;
+    rawRollCmd = hPixelY * pixelStickGainRoll;
+    
+    satLimit = 0.4;
+    ayprCmd.PitchDesiredDegrees = max(-satLimit, min(satLimit, rawPitchCmd));
+    ayprCmd.RollDesiredDegrees = min(-satLimit, min(satLimit, rawRollCmd));
+    
+    % saturate
     
     disp('-------');
-    fprintf('Roll (Arrow, HPixel, StickCmd) = (%d, %d, %3.3f)\n',key_roll, hPixelX, ayprCmd.PitchDesiredDegrees);
-    fprintf('Pitch (Arrow, HPixel, StickCmd) = (%d, %d, %3.3f)\n',key_pitch, hPixelY, ayprCmd.RollDesiredDegrees);
+    fprintf('Roll (Arrow, HPixel, RawVal, StickCmd) = (%d, %d, %3.3f, %3.3f)\n',key_roll, hPixelX, rawPitchCmd, ayprCmd.PitchDesiredDegrees);
+    fprintf('Pitch (Arrow, HPixel, RawVal, StickCmd) = (%d, %d, %3.3f, %3.3f)\n',key_pitch, hPixelY, rawRollCmd, ayprCmd.RollDesiredDegrees);
     
     
     % Terminating condition

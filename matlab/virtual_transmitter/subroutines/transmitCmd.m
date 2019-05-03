@@ -28,6 +28,10 @@ for i = 1:5
     % u_stick_net(i)= max(-1,min(1,u_stick_net(i)));
 end
 
+u_stick_net
+
+pwm = u_stick_net*4000 + 5000
+
 % conver u_stick_net to PWM 
 channel1Command = 5000+ 4000*u_stick_net(1);  % throttle (up)
 channel2Command = 5000+ 4000*u_stick_net(2);  % roll     (right)

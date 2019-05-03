@@ -25,14 +25,6 @@ mission.bhv{i}.ayprCmd.AltSwitch = 1;
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
 mission.bhv{i}.completion.status = false;
 
-i = i + 1;
-% Behavior 2: Hover
-mission.bhv{i}.name = 'bhv_hover';
-mission.bhv{i}.ayprCmd = default_aypr_msg();
-mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
-mission.bhv{i}.completion.durationSec = 1; % 1seconds
-mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;
 % Behavior 3: Hover with a Fixed Orientation
