@@ -22,7 +22,7 @@ function varargout = Master_GUI(varargin)
 
 % Edit the above text to modify the response to help Master_GUI
 
-% Last Modified by GUIDE v2.5 12-Feb-2019 18:57:46
+% Last Modified by GUIDE v2.5 02-May-2019 20:52:22
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,6 +52,7 @@ function Master_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to Master_GUI (see VARARGIN)
 
+global pathToGUI
 pathToGUI = '/home/amav/amav/Terpcopter3.0/matlab/GUI';
 %pathToGUI = '/home/wolek/Desktop/Research/Projects/UMD/AMAV/Terpcopter3.0/matlab/GUI';
 cd(pathToGUI)
@@ -84,6 +85,11 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
+cwd = split(pwd(),'/');
+if cwd{end} ~= "GUI"
+    global pathToGUI
+    cd(pathToGUI)
+end
 set(handles.text2,'String','launching');
 disp('Callback for px4 launch...');
 system('./scripts/px4_script.sh &');
@@ -113,6 +119,11 @@ set(handles.text2,'String','active');
 
 % --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)
+cwd = split(pwd(),'/');
+if cwd{end} ~= "GUI"
+    global pathToGUI
+    cd(pathToGUI)
+end
 set(handles.text3,'String','launching');
 system('./scripts/camera_script.sh &')
 first_run = 1;
@@ -137,6 +148,11 @@ set(handles.text3,'String','active');
 
 % --- Executes on button press in pushbutton4.
 function pushbutton4_Callback(hObject, eventdata, handles)
+cwd = split(pwd(),'/');
+if cwd{end} ~= "GUI"
+    global pathToGUI
+    cd(pathToGUI)
+end
 set(handles.text4,'String','launching');
 system('./scripts/estimation_script.sh &')
 first_run = 1;
@@ -161,6 +177,11 @@ set(handles.text4,'String','active');
 
 % --- Executes on button press in pushbutton5.
 function pushbutton5_Callback(hObject, eventdata, handles)
+cwd = split(pwd(),'/');
+if cwd{end} ~= "GUI"
+    global pathToGUI
+    cd(pathToGUI)
+end
 set(handles.text5,'String','launching');
 system('./scripts/virtual_transmitter_script.sh &')
 first_run = 1;
@@ -184,6 +205,11 @@ set(handles.text5,'String','active');
 
 % --- Executes on button press in pushbutton6.
 function pushbutton6_Callback(hObject, eventdata, handles)
+cwd = split(pwd(),'/');
+if cwd{end} ~= "GUI"
+    global pathToGUI
+    cd(pathToGUI)
+end
 set(handles.text6,'String','launching');
 system('./scripts/autonomy_script.sh &')
 first_run = 1;
@@ -208,6 +234,11 @@ set(handles.text6,'String','active');
 
 % --- Executes on button press in pushbutton7.
 function pushbutton7_Callback(hObject, eventdata, handles)
+cwd = split(pwd(),'/');
+if cwd{end} ~= "GUI"
+    global pathToGUI
+    cd(pathToGUI)
+end
 set(handles.text7,'String','launching');
 system('./scripts/control_script.sh &')
 first_run = 1;
@@ -229,9 +260,26 @@ set(handles.text7,'String','active');
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% --- Executes on button press in pushbutton11.
+function pushbutton11_Callback(hObject, eventdata, handles)
+cwd = split(pwd(),'/');
+if cwd{end} ~= "GUI"
+    global pathToGUI
+    cd(pathToGUI)
+end
+set(handles.text11,'String','launched');
+system('./scripts/vision_script.sh &')
+% hObject    handle to pushbutton11 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
 % --- Executes on button press in pushbutton9.
 function pushbutton9_Callback(hObject, eventdata, handles)
+cwd = split(pwd(),'/');
+if cwd{end} ~= "GUI"
+    global pathToGUI
+    cd(pathToGUI)
+end
 set(handles.text2,'String','launching');
 system('./scripts/px4_script.sh &');
 first_run = 1;

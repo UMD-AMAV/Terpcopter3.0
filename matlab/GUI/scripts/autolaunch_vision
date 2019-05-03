@@ -1,0 +1,2 @@
+#!/bin/bash
+xterm -e source source ~/catkin_ws/devel/setup.bash && rosrun camera_package cameraSub.py
