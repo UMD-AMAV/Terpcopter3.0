@@ -1,0 +1,8 @@
+clear all;
+close all;
+clc;
+
+h_fig = figure;
+key_left, key_right, key_
+while(1)
+set(h_fig,'KeyPressFcn',@myfun);

@@ -39,6 +39,15 @@ clear; close all; clc; format compact;
 addpath('../')
 params = loadParams();
 
+% keystroke capture
+h_fig = figure;
+global key_roll key_pitch;
+key_roll = 0;
+key_pitch = 0;
+set(h_fig,'KeyPressFcn',@arrowToInt);
+set(gcf, 'Position',  [100, 100, 300, 50])
+text(0.1,0.4,'Keystroke Capture','FontSize',16);
+
 % Competition Missions
 % mission = loadMission_Comp_takeoffHoverPointLand();
 
@@ -50,7 +59,7 @@ params = loadParams();
 % mission = loadMission_takeoffHoverFlyForwardLand();
 % mission = loadMission_takeoffHoverFlyForwardProbeLand();
 % mission = loadMission_takeoffHoverPointLand();
-mission = loadMission_takeoffHoverOverHLand();
+mission = loadMission_takeoffHoverOverHKeyLand();
 % mission = loadMission_servoTest();
 % mission = loadMission_takeoffHoverFlyForwardDropPackageLand();
 
@@ -213,6 +222,9 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover_over_H'
                     [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
                     mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)
+                case 'bhv_hover_over_H_key'
+                    [completionFlag, ayprCmd] = bhv_hover_over_H_key(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
+                    mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)                                    
                 case 'bhv_hover_drop'
                     [completionFlag, servoCmd] = bhv_hover_drop(completion, bhvTime );
                 case 'bhv_point_to_direction'
