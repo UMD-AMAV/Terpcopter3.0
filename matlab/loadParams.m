@@ -20,7 +20,7 @@ params.vtx.mode = 'flight'; % 'sim' or 'flight'
 % transmitter           throttle roll pitch yaw Aux
 params.vtx.stick_lim = [100; 100; 100; 100; 100];
 params.vtx.trim_lim = [29; 29; 29; 29; 29];
-offset = [-5 -6 -5 -5 0]/29;% DO NOT CHANGE , AW
+offset = [-5 -6 -5 -6 0]/29;% DO NOT CHANGE , AW
 params.vtx.trim_val = offset; %25 30
 %params.vtx.trim_val = [0 0 0 0 0];
 %params.vtx.trim_val = offset;

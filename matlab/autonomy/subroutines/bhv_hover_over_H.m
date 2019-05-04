@@ -13,6 +13,8 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd,
     % TODO:
     % - add topic with H (x,y) data as input
     % - do some processing
+    
+    % Persistent variables for the if H is not detected 
     persistent lastPixelX lastPixelY
     Kx = 0.00333/5;
     Ky = 0.00333/5;

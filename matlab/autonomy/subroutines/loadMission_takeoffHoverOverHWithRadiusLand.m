@@ -35,8 +35,8 @@ mission.bhv{i}.completion.durationSec = 1; % 1seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;
-% Behavior 3: Hover over the H
-mission.bhv{i}.name = 'bhv_hover_over_H_';
+% Behavior 3: Hover over the H With Radius Tolerance
+mission.bhv{i}.name = 'bhv_hover_over_H_With_Radius';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
@@ -48,7 +48,8 @@ mission.bhv{i}.ayprCmd.RollDesiredDegrees = 0;
 mission.bhv{i}.ayprCmd.PitchSwitch = 1; 
 mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 0; 
 mission.bhv{i}.completion.durationSec = 10; % 10 seconds
-mission.bhv{i}.completion.acceptableRadiusPixels = 70;
+mission.bhv{i}.completion.hoverRadiusPixels = 50;
+mission.bhv{i}.completion.acceptableRadiusPixels = 150;
 mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;

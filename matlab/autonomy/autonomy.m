@@ -54,7 +54,7 @@ title('Keystroke Capture','FontSize',16);
 
 % Cypress Missions
 % missions
-% mission = loadMission_takeoffHoverLand();
+ mission = loadMission_takeoffHoverLand();
 % mission = loadMission_takeoffHoverDropPackageLand();
 % mission = loadMission_takeoffHoverFlyForwardLand();
 % mission = loadMission_takeoffHoverFlyForwardProbeLand();
@@ -64,7 +64,7 @@ title('Keystroke Capture','FontSize',16);
 % mission = loadMission_servoTest();
 % mission = loadMission_takeoffHoverFlyForwardDropPackageLand();
 % mission = loadMission_PitchRollTestJerrar();
- mission = loadMission_StayOverHJerrar();
+% mission = loadMission_StayOverHJerrar();
 
 fprintf('Launching Autonomy Node...\n');
 
