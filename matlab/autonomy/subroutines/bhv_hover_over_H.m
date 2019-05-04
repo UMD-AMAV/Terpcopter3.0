@@ -13,16 +13,17 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd,
 % TODO:
 % - add topic with H (x,y) data as input
 % - do some processing
-persistent lastPixelX lastPixelY lastAngleH lastValidUpdateTime;
-Kx = 0.00333/5;
-Ky = 0.00333/5;
-R = 150;% radius (pixels);
-latchOnTime = 1.5; % sec
+persistent lastPixelX lastPixelY lastValidUpdateTime;
+Kx = 0.02/100; % was /5
+Ky = 0.02/100;
+Rlatch = 100;% radius (pixels);
+Rdz = 15;
+latchOnTime = 4.0; % sec
+satLimit = 0.1;
 
 if isempty(lastPixelX)
     lastPixelX = 0;
     lastPixelY = 0;
-    lastAngleH = 0;
     lastValidUpdateTime = -1E3;
     pitchDesired = 0;
     rollDesired = 0;
@@ -34,7 +35,7 @@ else
         if ( bhvTime - lastValidUpdateTime <= latchOnTime )
             vLast = [lastPixelX lastPixelY];
             vNew = [hPixelX hPixelY];
-            if ( norm(vLast-vNew) <= R ) % accept
+            if ( norm(vLast-vNew) <= Rlatch ) % accept
                 disp('H detected: Within radius, updated H pixels');
                 lastPixelX = hPixelX;
                 lastPixelY = hPixelY;
@@ -47,7 +48,7 @@ else
                 rollDesired = Kx*lastPixelX;
             end
         else
-            % first time h is detected, accept value as valid, or 
+            % first time h is detected, accept value as valid, or
             disp('H detected: first time / or reset , Updated H pixels');
             lastPixelX = hPixelX;
             lastPixelY = hPixelY;
@@ -71,8 +72,18 @@ end
 % set ayprCmd
 % - set ayprCmdMsg.PitchDesiredDegrees = 0;
 % ayprCmd.YawDesiredDegrees = yawDesired;
-ayprCmd.PitchDesiredDegrees = pitchDesired;
-ayprCmd.RollDesiredDegrees = rollDesired;
+
+ayprCmd.PitchDesiredDegrees = max(-satLimit, min(satLimit, pitchDesired));
+ayprCmd.RollDesiredDegrees = max(-satLimit, min(satLimit, rollDesired));
+
+if ( hDetected )
+    errorR = sqrt(hPixelX*hPixelX + hPixelY*hPixelY);
+    if ( errorR <= Rdz )
+        disp('In deadzone');
+        ayprCmd.PitchDesiredDegrees = 0;
+        ayprCmd.RollDesiredDegrees = 0;
+    end
+end
 
 % Terminating condition
 if bhvTime >= completion.durationSec

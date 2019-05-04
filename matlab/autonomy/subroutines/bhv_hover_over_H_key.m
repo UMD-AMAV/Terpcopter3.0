@@ -28,7 +28,7 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H_key(stateEstimateMsg, aypr
     
     satLimit = 0.4;
     ayprCmd.PitchDesiredDegrees = max(-satLimit, min(satLimit, rawPitchCmd));
-    ayprCmd.RollDesiredDegrees = min(-satLimit, min(satLimit, rawRollCmd));
+    ayprCmd.RollDesiredDegrees = max(-satLimit, min(satLimit, rawRollCmd));
     
     % saturate
     
