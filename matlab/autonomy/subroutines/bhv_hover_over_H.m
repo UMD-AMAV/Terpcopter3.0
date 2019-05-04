@@ -10,20 +10,31 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd,
     % roll = stateEstimateMsg.RollDegrees;    
     % yaw = stateEstimateMsg.YawDegrees;
     
-    
-    % TODO: 
+    % TODO:
     % - add topic with H (x,y) data as input
-    % - do some processing    
-    if ( hDetected ) 
-        % yawDesired = yaw + hAngle;
-        pitchDesired = hPixelY;
-        rollDesired = hPixelX;
-%         time = bhvTime;
-    else
-        pitchDesired = 0;
-        rollDesired = 0;
-    end
+    % - do some processing
+    persistent lastPixelX lastPixelY
+    Kx = 0.00333/5;
+    Ky = 0.00333/5;
     
+    if isempty(lastPixelX)
+        lastPixelX = 0;
+        lastPixelY = 0;
+        pitchDesired = Ky*lastPixelY;
+        rollDesired = Kx*lastPixelX;
+    else
+        if ( hDetected )
+            % yawDesired = yaw + hAngle;
+            lastPixelX = hPixelX;
+            lastPixelY = hPixelY;
+            pitchDesired = Ky*hPixelY;
+            rollDesired = Kx*hPixelX;
+            %         time = bhvTime;
+        else
+             pitchDesired = Ky*lastPixelY;
+             rollDesired = Kx*lastPixelX;
+        end
+    end
     % set ayprCmd
     % - set ayprCmdMsg.PitchDesiredDegrees = 0;
     % ayprCmd.YawDesiredDegrees = yawDesired;

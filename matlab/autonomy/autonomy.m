@@ -59,10 +59,12 @@ title('Keystroke Capture','FontSize',16);
 % mission = loadMission_takeoffHoverFlyForwardLand();
 % mission = loadMission_takeoffHoverFlyForwardProbeLand();
 % mission = loadMission_takeoffHoverPointLand();
-mission = loadMission_takeoffHoverOverHKeyLand();
+% mission = loadMission_takeoffHoverOverHKeyLand();
 % mission = loadMission_takeoffHoverOverHWithRadiusLand();
 % mission = loadMission_servoTest();
 % mission = loadMission_takeoffHoverFlyForwardDropPackageLand();
+% mission = loadMission_PitchRollTestJerrar();
+ mission = loadMission_StayOverHJerrar();
 
 fprintf('Launching Autonomy Node...\n');
 
