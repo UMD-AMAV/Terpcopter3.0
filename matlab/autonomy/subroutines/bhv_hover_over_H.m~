@@ -17,7 +17,7 @@ persistent lastPixelX lastPixelY lastAngleH lastValidUpdateTime;
 Kx = 0.00333/5;
 Ky = 0.00333/5;
 R = 150;% radius (pixels);
-latchOnTime = 1.5; % sec
+latchOnTime = 5; % sec
 
 if isempty(lastPixelX)
     lastPixelX = 0;
@@ -35,20 +35,19 @@ else
             vLast = [lastPixelX lastPixelY];
             vNew = [hPixelX hPixelY];
             if ( norm(vLast-vNew) <= R ) % accept
-                disp('H detected: Within radius, updated H pixels');
                 lastPixelX = hPixelX;
                 lastPixelY = hPixelY;
                 lastValidUpdateTime = bhvTime;
                 pitchDesired = Ky*hPixelY;
                 rollDesired = Kx*hPixelX;
             else % reject outlier
-                disp('H detected: Outside radius, rejecting outlier');
                 pitchDesired = Ky*lastPixelY;
                 rollDesired = Kx*lastPixelX;
             end
         else
             % first time h is detected, accept value as valid, or 
-            disp('H detected: first time / or reset , Updated H pixels');
+            % H has continuously been 
+            disp('H detected for first time / or H 
             lastPixelX = hPixelX;
             lastPixelY = hPixelY;
             lastValidUpdateTime = bhvTime;
@@ -58,11 +57,9 @@ else
     else
         % no H detected, but we recently detected, so use the last value:
         if ( bhvTime - lastValidUpdateTime <= latchOnTime )
-            disp('No H: Using last value');
             pitchDesired = Ky*lastPixelY;
             rollDesired = Kx*lastPixelX;
         else  % no H detected in long time (or ever)
-            disp('No H: Setting zeros');
             pitchDesired = 0;
             rollDesired = 0;
         end
