@@ -14,12 +14,12 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd,
 % - add topic with H (x,y) data as input
 % - do some processing
 persistent lastPixelX lastPixelY lastValidUpdateTime;
-Kx = 0.02/100; % was /5
-Ky = 0.02/100;
+Kx = 0.05/100; % was /5          % over 2m   Kx = 0.02/100
+Ky = 0.05/100;                   % over 2m   Ky = 0.02/100
 Rlatch = 100;% radius (pixels);
 Rdz = 15;
 latchOnTime = 4.0; % sec
-satLimit = 0.1;
+satLimit = 0.1;                 % over 2m   satLimit = 0.1
 
 if isempty(lastPixelX)
     lastPixelX = 0;

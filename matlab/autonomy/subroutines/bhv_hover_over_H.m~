@@ -13,16 +13,17 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd,
 % TODO:
 % - add topic with H (x,y) data as input
 % - do some processing
-persistent lastPixelX lastPixelY lastAngleH lastValidUpdateTime;
-Kx = 0.00333/5;
-Ky = 0.00333/5;
-R = 150;% radius (pixels);
-latchOnTime = 5; % sec
+persistent lastPixelX lastPixelY lastValidUpdateTime;
+Kx = 0.1/100; % was /5
+Ky = 0.1/100;
+Rlatch = 100;% radius (pixels);
+Rdz = 15;
+latchOnTime = 4.0; % sec
+satLimit = 0.05;
 
 if isempty(lastPixelX)
     lastPixelX = 0;
     lastPixelY = 0;
-    lastAngleH = 0;
     lastValidUpdateTime = -1E3;
     pitchDesired = 0;
     rollDesired = 0;
@@ -34,20 +35,21 @@ else
         if ( bhvTime - lastValidUpdateTime <= latchOnTime )
             vLast = [lastPixelX lastPixelY];
             vNew = [hPixelX hPixelY];
-            if ( norm(vLast-vNew) <= R ) % accept
+            if ( norm(vLast-vNew) <= Rlatch ) % accept
+                disp('H detected: Within radius, updated H pixels');
                 lastPixelX = hPixelX;
                 lastPixelY = hPixelY;
                 lastValidUpdateTime = bhvTime;
                 pitchDesired = Ky*hPixelY;
                 rollDesired = Kx*hPixelX;
             else % reject outlier
+                disp('H detected: Outside radius, rejecting outlier');
                 pitchDesired = Ky*lastPixelY;
                 rollDesired = Kx*lastPixelX;
             end
         else
-            % first time h is detected, accept value as valid, or 
-            % H has continuously been 
-            disp('H detected for first time / or H 
+            % first time h is detected, accept value as valid, or
+            disp('H detected: first time / or reset , Updated H pixels');
             lastPixelX = hPixelX;
             lastPixelY = hPixelY;
             lastValidUpdateTime = bhvTime;
@@ -57,9 +59,11 @@ else
     else
         % no H detected, but we recently detected, so use the last value:
         if ( bhvTime - lastValidUpdateTime <= latchOnTime )
+            disp('No H: Using last value');
             pitchDesired = Ky*lastPixelY;
             rollDesired = Kx*lastPixelX;
         else  % no H detected in long time (or ever)
+            disp('No H: Setting zeros');
             pitchDesired = 0;
             rollDesired = 0;
         end
@@ -68,8 +72,11 @@ end
 % set ayprCmd
 % - set ayprCmdMsg.PitchDesiredDegrees = 0;
 % ayprCmd.YawDesiredDegrees = yawDesired;
-ayprCmd.PitchDesiredDegrees = pitchDesired;
-ayprCmd.RollDesiredDegrees = rollDesired;
+
+ayprCmd.PitchDesiredDegrees = max(-satLimit, min(satLimit, pitchDesired));
+ayprCmd.RollDesiredDegrees = max(-satLimit, min(satLimit, rollDesired));
+
+
 
 % Terminating condition
 if bhvTime >= completion.durationSec
