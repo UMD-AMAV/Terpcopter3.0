@@ -62,11 +62,12 @@ end
 % mission = loadMission_takeoffHoverFlyForwardProbeLand();
 % mission = loadMission_takeoffHoverPointLand();
 % mission = loadMission_takeoffHoverOverHKeyLand();
+% mission = loadMission_takeoffHoverOverHLand();
 % mission = loadMission_takeoffHoverOverHWithRadiusLand();
 % mission = loadMission_servoTest();
 % mission = loadMission_takeoffHoverFlyForwardDropPackageLand();
 % mission = loadMission_PitchRollTestJerrar();
-mission = loadMission_StayOverHJerrar();
+ mission = loadMission_StayOverHJerrar();
 
 fprintf('Launching Autonomy Node...\n');
 
@@ -225,7 +226,9 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover_fixed_orient'
                     completionFlag = bhv_hover_fixed_orient(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_hover_over_H'
-                    [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
+                    %[completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
+                    %[completionFlag, ayprCmd] = bhv_hover_over_H_impulse_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
+                    [completionFlag, ayprCmd] = bhv_hover_over_H_continuous_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
                     mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)
                 case 'bhv_hover_over_H_key'
                     [completionFlag, ayprCmd] = bhv_hover_over_H_key(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);

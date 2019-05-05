@@ -17,14 +17,14 @@ persistent lastPixelX lastPixelY lastValidUpdateTime lastImpulseInitialTime init
 Kx = 0.05/100; % was /5          % over 2m   Kx = 0.02/100
 Ky = 0.05/100;                   % over 2m   Ky = 0.02/100
 
-boundRadius = 0;  
+boundRadius = 80; % pixel units  
 start_impulse = 0;
-impulsePitch = 0.075;
-impulseRoll = 0.075;
+impulsePitch = 0.15;
+impulseRoll = 0.15;
 Rlatch = 100;% radius (pixels);
-impulseDuration = 0.3;
+impulseDuration = 0.2;
 latchOnTime = 4.0; % sec
-satLimit = 0.1;                 % over 2m   satLimit = 0.1
+satLimit = 0.12;                 % over 2m   satLimit = 0.1
 validThreshold = 2; % No. of Valid frames in vicinty to trust H location
             pitchDesired = 0;
             rollDesired = 0;
