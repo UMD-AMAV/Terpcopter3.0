@@ -71,9 +71,9 @@ else
 %                 if (validCounts > validThreshold)
 %                     lastValidUpdateTime = bhvTime;
 %                 end
-                
-            else
-                validCounts = 0;
+%                 
+%             else
+%                 validCounts = 0;
             end
         end
     else

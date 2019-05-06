@@ -165,17 +165,18 @@ if ( strcmp(params.auto.mode,'auto'))
         stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
         
         if ( mission.config.H_detector )
+            try 
             hDetected = hDetectedSub.LatestMessage.Data
             hAngle = hAngleSub.LatestMessage.Data
             hPixelX = hPixelXSub.LatestMessage.Data
             hPixelY= hPixelYSub.LatestMessage.Data
+            end
             
-            targetObstSub.LatestMessage.Data
-            
-            % Bullseye
-            targetX = targetPixelXSub.LatestMessage.Data
-            targetY = targetPixelYSub.LatestMessage.Data
-            targetDet = targetDetectedSub.LatestMessage.Data
+%             targetObstSub.LatestMessage.Data             
+%             % Bullseye
+%             targetX = targetPixelXSub.LatestMessage.Data
+%             targetY = targetPixelYSub.LatestMessage.Data
+%             targetDet = targetDetectedSub.LatestMessage.Data
         end
         if ( mission.config.flowProbe )
             fpMsg = flowProbeDataSubscriber.LatestMessage;
@@ -226,9 +227,9 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover_fixed_orient'
                     completionFlag = bhv_hover_fixed_orient(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_hover_over_H'
-                    %[completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
+                    [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
                     %[completionFlag, ayprCmd] = bhv_hover_over_H_impulse_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
-                    [completionFlag, ayprCmd] = bhv_hover_over_H_continuous_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
+                    %[completionFlag, ayprCmd] = bhv_hover_over_H_continuous_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
                     mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)
                 case 'bhv_hover_over_H_key'
                     [completionFlag, ayprCmd] = bhv_hover_over_H_key(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);

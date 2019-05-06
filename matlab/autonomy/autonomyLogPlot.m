@@ -80,8 +80,6 @@ set(gca,'FontSize',16);
 % plot switches
 figure(2);
 subplot(4,1,1)
-plot(t,altDes,'k--','linewidth',2);
-hold on;
 plot(t,est_Up,'b-','linewidth',2);
 grid on;
 xlabel('Time (sec)');
@@ -89,8 +87,6 @@ ylabel('Altitude (m)');
 set(gca,'FontSize',16);
 
 subplot(4,1,2)
-plot(t,yawDes,'k--','linewidth',2);
-hold on;
 plot(t,est_Yaw,'b-','linewidth',2);
 grid on;
 xlabel('Time (sec)');
@@ -98,8 +94,6 @@ ylabel('Yaw (deg)');
 set(gca,'FontSize',16);
 
 subplot(4,1,3)
-plot(t,pitchDes,'k--','linewidth',2);
-hold on;
 plot(t,est_Pitch,'b-','linewidth',2);
 grid on;
 xlabel('Time (sec)');
@@ -107,9 +101,38 @@ ylabel('Pitch (deg)');
 set(gca,'FontSize',16);
 
 subplot(4,1,4)
-plot(t,rollDes,'k--','linewidth',2);
-hold on;
 plot(t,est_Roll,'b-','linewidth',2);
+grid on;
+xlabel('Time (sec)');
+ylabel('Roll (deg)');
+set(gca,'FontSize',16);
+
+
+% plot switches
+figure(2);
+subplot(4,1,1)
+plot(t,altDes,'k--','linewidth',2);
+grid on;
+xlabel('Time (sec)');
+ylabel('Altitude (m)');
+set(gca,'FontSize',16);
+
+subplot(4,1,2)
+plot(t,yawDes,'k--','linewidth',2);
+grid on;
+xlabel('Time (sec)');
+ylabel('Yaw (deg)');
+set(gca,'FontSize',16);
+
+subplot(4,1,3)
+plot(t,pitchDes,'k--','linewidth',2);
+grid on;
+xlabel('Time (sec)');
+ylabel('Pitch (deg)');
+set(gca,'FontSize',16);
+
+subplot(4,1,4)
+plot(t,rollDes,'k--','linewidth',2);
 grid on;
 xlabel('Time (sec)');
 ylabel('Roll (deg)');
