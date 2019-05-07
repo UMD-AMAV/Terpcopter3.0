@@ -285,7 +285,13 @@ if ( strcmp(params.auto.mode,'auto'))
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Up);
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Yaw);
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Pitch);
-            fprintf(pFile,'%6.6f,\n',stateEstimateMsg.Roll);
+            fprintf(pFile,'%6.6f,',stateEstimateMsg.Roll);
+            
+            fprintf(pFile,'%6.6f,',hDetected);
+            fprintf(pFile,'%6.6f,',hPixelX);
+            fprintf(pFile,'%6.6f,',hPixelY);            
+            fprintf(pFile,'%6.6f\n',hAngle);            
+            
             
             fclose(pFile);
         end

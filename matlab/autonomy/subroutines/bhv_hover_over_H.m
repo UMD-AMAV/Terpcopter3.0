@@ -14,8 +14,8 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd,
 % - add topic with H (x,y) data as input
 % - do some processing
 persistent lastPixelX lastPixelY lastValidUpdateTime;
-Kx = 0.12/100; % was /5          % over 2m   Kx = 0.02/100
-Ky = 0.04/100;                   % over 2m   Ky = 0.02/100
+Kroll = 0.06/100; % 
+Kpitch = 0.06/100;    
 Rlatch = 100;% radius (pixels);
 Rdz = 15;
 latchOnTime = 4.0; % sec
@@ -40,12 +40,12 @@ else
                 lastPixelX = hPixelX;
                 lastPixelY = hPixelY;
                 lastValidUpdateTime = bhvTime;
-                pitchDesired = Ky*hPixelY;
-                rollDesired = Kx*hPixelX;
+                pitchDesired = Kpitch*hPixelY;
+                rollDesired = Kroll*hPixelX;
             else % reject outlier
                 disp('H detected: Outside radius, rejecting outlier');
-                pitchDesired = Ky*lastPixelY;
-                rollDesired = Kx*lastPixelX;
+                pitchDesired = Kpitch*lastPixelY;
+                rollDesired = Kroll*lastPixelX;
             end
         else
             % first time h is detected, accept value as valid, or
@@ -53,15 +53,15 @@ else
             lastPixelX = hPixelX;
             lastPixelY = hPixelY;
             lastValidUpdateTime = bhvTime;
-            pitchDesired = Ky*hPixelY;
-            rollDesired = Kx*hPixelX;
+            pitchDesired = Kpitch*hPixelY;
+            rollDesired = Kroll*hPixelX;
         end
     else
         % no H detected, but we recently detected, so use the last value:
         if ( bhvTime - lastValidUpdateTime <= latchOnTime )
             disp('No H: Using last value');
-            pitchDesired = Ky*lastPixelY;
-            rollDesired = Kx*lastPixelX;
+            pitchDesired = Kpitch*lastPixelY;
+            rollDesired = Kroll*lastPixelX;
         else  % no H detected in long time (or ever)
             disp('No H: Setting zeros');
             pitchDesired = 0;
@@ -85,6 +85,11 @@ if ( hDetected )
     end
 end
 
+disp('----');
+hDetected
+hPixelX
+hPixelY
+ayprCmd
 % Terminating condition
 if bhvTime >= completion.durationSec
     completionFlag = 1;
