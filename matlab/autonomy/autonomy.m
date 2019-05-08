@@ -165,7 +165,6 @@ if ( strcmp(params.auto.mode,'auto'))
         imuMsg = imuDataSubscriber.LatestMessage;
         if ( mission.config.H_detector )
             try
-<<<<<<< HEAD
                 hDetected = hDetectedSub.LatestMessage.Data
                 hAngle = hAngleSub.LatestMessage.Data
                 hPixelX = hPixelXSub.LatestMessage.Data
@@ -177,13 +176,6 @@ if ( strcmp(params.auto.mode,'auto'))
             %             targetX = targetPixelXSub.LatestMessage.Data
             %             targetY = targetPixelYSub.LatestMessage.Data
             %             targetDet = targetDetectedSub.LatestMessage.Data
-=======
-                hDetected = hDetectedSub.LatestMessage.Data;
-                hAngle = hAngleSub.LatestMessage.Data;
-                hPixelX = hPixelXSub.LatestMessage.Data;
-                hPixelY= hPixelYSub.LatestMessage.Data;
-            end
->>>>>>> 119183f773059a0d5c0359f38ba532d8aa69eb4c
         end
         if ( mission.config.flowProbe )
             fpMsg = flowProbeDataSubscriber.LatestMessage;
@@ -295,9 +287,7 @@ if ( strcmp(params.auto.mode,'auto'))
             fprintf(pFile,'%6.6f,',stateEstimateMsg.East);
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Up);
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Yaw);
-            fprintf(pFile,'%6.6f,',stateEstimateMsg.Pitch);
-<<<<<<< HEAD
-                        
+            fprintf(pFile,'%6.6f,',stateEstimateMsg.Pitch);          
             if ( mission.config.H_detector )
                 fprintf(pFile,'%6.6f,',stateEstimateMsg.Roll);
                 fprintf(pFile,'%6.6f,',hDetected);
@@ -307,14 +297,6 @@ if ( strcmp(params.auto.mode,'auto'))
             else
                 fprintf(pFile,'%6.6f\n,',stateEstimateMsg.Roll);
             end
-=======
-            fprintf(pFile,'%6.6f,',stateEstimateMsg.Roll);
-            
-            fprintf(pFile,'%6.6f,',hDetected);
-            fprintf(pFile,'%6.6f,',hPixelX);
-            fprintf(pFile,'%6.6f,',hPixelY);
-            fprintf(pFile,'%6.6f\n',hAngle);
->>>>>>> 119183f773059a0d5c0359f38ba532d8aa69eb4c
             
             
             fclose(pFile);

@@ -1,9 +1,13 @@
 function [pxFilt, pyFilt] = Hfilter(stateEstimateMsg, imuMsg, bhvTime, hDetected, hAngle, hPixelX, hPixelY, logname)
 
+
+
 % hDetected = 0 (no H detected) , 1 (H detected)
 % hAngle = -180 to 180 (deg)
 % hPixelX = -360 to 360 (pixels)
 % hPixelY = -640 to 640
+
+
 
 % process noise
 stdev_pos = 1;% m
@@ -25,19 +29,36 @@ accelFiltTimeConstant = 0.5; % sec
 Pinit = diag([stdev_pos^2 stdev_pos^2 stdev_vel^2 stdev_vel^2 stdev_accel^2 stdev_accel^2]); % 6 x 6
 xinit = [0 0 0 0 0 0]';
 
+% initialize
+persistent lastTime lastAx lastAy xkm1_km1 Pkm1_km1 lastValidTime lastHrefYawDeg lastPixelX lastPixelY lastHangle;
+
+if isempty(xkm1_km1)
+    xkm1_km1 = xinit;
+    Pkm1_km1 = Pinit;
+    lastTime = 0;
+    lastAx = 0;
+    lastAy = 0;
+    lastValidTime = 0;
+    lastHrefYawDeg  = 0;
+    lastPixelX  = 0;
+    lastPixelY  = 0;
+    lastHangle  = 0;
+end
+
+% compute time step
+T = bhvTime - lastTime;
+
 % derived parameter
 % z = [x y vx vy ax ay];
 Q = diag([stdev_pos^2 stdev_pos^2 stdev_vel^2 stdev_vel^2 stdev_accel^2 stdev_accel^2]); % 6 x 6
 R_det = diag([stdev_pm^2 stdev_pm^2 stdev_am^2 stdev_am^2]); % 4 x 4
-R_no_det = diag([stdev_pm^2 stdev_pm^2 stdev_am^2 stdev_am^2]);% 4 x 4
+R_no_det = diag([stdev_am^2 stdev_am^2]);% 2 x 2
 
-% initialize
-persistent lastTime lastAx lastAy xkm1_km1 Pkm1_km1 lastValidTime lastHrefYawDeg lastPixelX lastPixelY lastHangle;
 
 % unpack state estimate
 % pitch = stateEstimateMsg.PitchDegrees;
 % roll = stateEstimateMsg.RollDegrees;
-currentYawDeg = stateEstimateMsg.YawDegrees;
+currentYawDeg = stateEstimateMsg.Yaw;
 axRaw = imuMsg.LinearAcceleration.X;
 ayRaw = imuMsg.LinearAcceleration.Y;
 
@@ -46,32 +67,26 @@ alpha = T / ( accelFiltTimeConstant + T);
 axFilt = (1-alpha)*lastAx + alpha*axRaw;
 ayFilt = (1-alpha)*lastAy + alpha*ayRaw;
 
-if isempty(xkm1_km1)
-    xkm1_km1 = xinit;
-    Pkm1_km1 = Pinit;
-end
 
-% compute time step
-T = bhvTime - lastTime;
+
+
 
 % z = [x y vx vy ax ay bx by];
 S = T^2/2;
 F = [1 0 T 0 S 0;
-    0 1 0 T 0 S;
-    0 0 1 0 T 0;
-    0 0 0 1 0 T;
-    0 0 0 0 0 0;
-    0 0 0 0 0 0];
+     0 1 0 T 0 S;
+     0 0 1 0 T 0;
+     0 0 0 1 0 T;
+     0 0 0 0 0 0;
+     0 0 0 0 0 0];
 G = 0;
 ukm1 = 0;
 H_det = [1 0 0 0 0 0;
     0 1 0 0 0 0;
     0 0 0 0 1 0;
     0 0 0 0 0 1];
-H_no_det = [0 0 0 0 0 0;
-    0 0 0 0 0 0;
-    0 0 0 0 1 0;
-    0 0 0 0 0 1];
+H_no_det = [ 0 0 0 0 1 0;
+             0 0 0 0 0 1];
 
 % check if measurement passes through gate
 gateSatisfied = 0;
@@ -200,7 +215,7 @@ if ( logFlag )
     fprintf(pFile,'%6.6f,',lastHrefYawDeg);
     fprintf(pFile,'%6.6f,',lastPixelX);
     fprintf(pFile,'%6.6f,',lastPixelY);
-    fprintf(pFile,'%6.6f\n,',lastHangle);
+    fprintf(pFile,'%6.6f,\n',lastHangle);
     fclose(pFile);
 end
 
