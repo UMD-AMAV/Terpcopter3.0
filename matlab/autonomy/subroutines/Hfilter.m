@@ -1,13 +1,10 @@
 function [pxFilt, pyFilt] = Hfilter(stateEstimateMsg, imuMsg, bhvTime, hDetected, hAngle, hPixelX, hPixelY, logname)
 
 
-
 % hDetected = 0 (no H detected) , 1 (H detected)
 % hAngle = -180 to 180 (deg)
 % hPixelX = -360 to 360 (pixels)
 % hPixelY = -640 to 640
-
-
 
 % process noise
 stdev_pos = 1;% m
@@ -23,7 +20,7 @@ kcam = 1/100; % meters/pixel (at a fixed altitude)
 
 % outlier rejection
 Raccept = 150; % pixels
-accelFiltTimeConstant = 0.5; % sec
+accelFiltTimeConstant = 1; % sec
 
 % initial filter conditions
 Pinit = diag([stdev_pos^2 stdev_pos^2 stdev_vel^2 stdev_vel^2 stdev_accel^2 stdev_accel^2]); % 6 x 6
@@ -108,9 +105,9 @@ end
 if ( gateSatisfied )
     th = hAngle;
 else
-    th = signedAngularDist(currentYawDeg, lastHrefYawDeg) + 90;
+    th = signedAngularDist(currentYawDeg*pi/180, lastHrefYawDeg*pi/180)*180/pi + 90;
 end
-R = [cos(th) -sin(th); sin(th) cos(th)];
+R = [cosd(th) -sind(th); sind(th) cosd(th)];
 
 % rotate accelerations
 a = R*[axFilt ayFilt]';
@@ -215,7 +212,11 @@ if ( logFlag )
     fprintf(pFile,'%6.6f,',lastHrefYawDeg);
     fprintf(pFile,'%6.6f,',lastPixelX);
     fprintf(pFile,'%6.6f,',lastPixelY);
-    fprintf(pFile,'%6.6f,\n',lastHangle);
+    fprintf(pFile,'%6.6f,',lastHangle);
+    
+    fprintf(pFile,'%6.6f,',th);
+    fprintf(pFile,'%6.6f,',axFilt);
+    fprintf(pFile,'%6.6f,\n',ayFilt);    
     fclose(pFile);
 end
 
