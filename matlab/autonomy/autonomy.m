@@ -68,7 +68,8 @@ end
 % mission = loadMission_takeoffHoverFlyForwardDropPackageLand();
 % mission = loadMission_PitchRollTestJerrar();
 % mission = loadMission_StayOverHJerrar();
-mission = loadmission_CompetitionTakeoffHoverPointLand();
+% mission = loadmission_CompetitionTakeoffHoverPointLand();
+mission = loadMission_StayOverHJerrar();
 
 fprintf('Launching Autonomy Node...\n');
 
@@ -83,6 +84,7 @@ end
 fprintf('Setting up ayprsCmd Publisher ...\n');
 ayprCmdPublisher = rospublisher('/ayprCmd', 'terpcopter_msgs/ayprCmd');
 controlStartPublisher = rospublisher('/startControl', 'std_msgs/Bool');
+imuDataSubscriber = rossubscriber('/mavros/imu/data');
 fprintf('Setting up servoSwitch Publisher ...\n');
 servoSwitchCmdPublisher = rospublisher('/servoSwitch', 'terpcopter_msgs/servoSwitchCmd');
 
@@ -91,16 +93,11 @@ controlStartMsg = rosmessage('std_msgs/Bool');
 controlStartMsg.Data = 0;
 send(controlStartPublisher , controlStartMsg);
 
-
 % Subscribers
 fprintf('Subscribing to stateEstimate ...\n');
 stateEstimateSubscriber = rossubscriber('/stateEstimate');
 fprintf('Subscribing to startMission ...\n');
 startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
-
-
-
-
 
 % vision-based subscribers depend on mission
 if ( mission.config.H_detector )
@@ -145,6 +142,7 @@ currentBehavior = 1;
 logFlag = 1;
 dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
 autonomyLog = [params.env.matlabRoot '/autonomy_' dateString '.log'];
+hfilterLog = [params.env.matlabRoot '/hFilter_' dateString '.log'];
 
 timeForPlot = tic;
 numBhvs = length( mission.bhv );
@@ -164,9 +162,10 @@ if ( strcmp(params.auto.mode,'auto'))
         
         % get latest messages
         stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
-        
+        imuMsg = imuDataSubscriber.LatestMessage;
         if ( mission.config.H_detector )
             try
+<<<<<<< HEAD
                 hDetected = hDetectedSub.LatestMessage.Data
                 hAngle = hAngleSub.LatestMessage.Data
                 hPixelX = hPixelXSub.LatestMessage.Data
@@ -178,6 +177,13 @@ if ( strcmp(params.auto.mode,'auto'))
             %             targetX = targetPixelXSub.LatestMessage.Data
             %             targetY = targetPixelYSub.LatestMessage.Data
             %             targetDet = targetDetectedSub.LatestMessage.Data
+=======
+                hDetected = hDetectedSub.LatestMessage.Data;
+                hAngle = hAngleSub.LatestMessage.Data;
+                hPixelX = hPixelXSub.LatestMessage.Data;
+                hPixelY= hPixelYSub.LatestMessage.Data;
+            end
+>>>>>>> 119183f773059a0d5c0359f38ba532d8aa69eb4c
         end
         if ( mission.config.flowProbe )
             fpMsg = flowProbeDataSubscriber.LatestMessage;
@@ -228,6 +234,10 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover_fixed_orient'
                     completionFlag = bhv_hover_fixed_orient(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_hover_over_H'
+                    % this function is only for testing/logging data and
+                    % does not currently affect hover_over_h behavior
+                    [hPixelFilt, yPixelFilt] = Hfilter(stateEstimateMsg, imuMsg, bhvTime, hDetected, hAngle, hPixelX, hPixelY, hfilterLog);
+                    % behavior
                     [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
                     %[completionFlag, ayprCmd] = bhv_hover_over_H_impulse_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
                     %[completionFlag, ayprCmd] = bhv_hover_over_H_continuous_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
@@ -286,6 +296,7 @@ if ( strcmp(params.auto.mode,'auto'))
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Up);
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Yaw);
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Pitch);
+<<<<<<< HEAD
                         
             if ( mission.config.H_detector )
                 fprintf(pFile,'%6.6f,',stateEstimateMsg.Roll);
@@ -296,6 +307,14 @@ if ( strcmp(params.auto.mode,'auto'))
             else
                 fprintf(pFile,'%6.6f\n,',stateEstimateMsg.Roll);
             end
+=======
+            fprintf(pFile,'%6.6f,',stateEstimateMsg.Roll);
+            
+            fprintf(pFile,'%6.6f,',hDetected);
+            fprintf(pFile,'%6.6f,',hPixelX);
+            fprintf(pFile,'%6.6f,',hPixelY);
+            fprintf(pFile,'%6.6f\n',hAngle);
+>>>>>>> 119183f773059a0d5c0359f38ba532d8aa69eb4c
             
             
             fclose(pFile);
