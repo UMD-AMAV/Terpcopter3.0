@@ -13,10 +13,10 @@ def eucdist(x1,y1,x2,y2):
 def HBase(frame, frameCounter):
     #height,width= frame.shape[:2]
     #frame = cv2.resize(frame,(int(0.5*width), int(0.5*height)), interpolation = cv2.INTER_AREA)
-    pubHPixelX = rospy.Publisher('hPixelX', Float32, queue_size=10)
-    pubHPixelY = rospy.Publisher('hPixelY', Float32, queue_size=10)
-    pubHAngle = rospy.Publisher('hAngle',Float32,queue_size=10)
-    pubHDetected = rospy.Publisher('hDetected',Bool,queue_size=10)
+    pubHPixelX = rospy.Publisher('hPixelX', Float32, queue_size=1)
+    pubHPixelY = rospy.Publisher('hPixelY', Float32, queue_size=1)
+    pubHAngle = rospy.Publisher('hAngle',Float32,queue_size=1)
+    pubHDetected = rospy.Publisher('hDetected',Bool,queue_size=1)
     homeBaseDetected = False
     hError = -10000.0
     vError = -10000.0

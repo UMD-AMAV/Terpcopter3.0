@@ -67,7 +67,8 @@ end
 % mission = loadMission_servoTest();
 % mission = loadMission_takeoffHoverFlyForwardDropPackageLand();
 % mission = loadMission_PitchRollTestJerrar();
- mission = loadMission_StayOverHJerrar();
+% mission = loadMission_StayOverHJerrar();
+mission = loadmission_CompetitionTakeoffHoverPointLand();
 
 fprintf('Launching Autonomy Node...\n');
 
@@ -165,18 +166,18 @@ if ( strcmp(params.auto.mode,'auto'))
         stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
         
         if ( mission.config.H_detector )
-            try 
-            hDetected = hDetectedSub.LatestMessage.Data
-            hAngle = hAngleSub.LatestMessage.Data
-            hPixelX = hPixelXSub.LatestMessage.Data
-            hPixelY= hPixelYSub.LatestMessage.Data
+            try
+                hDetected = hDetectedSub.LatestMessage.Data
+                hAngle = hAngleSub.LatestMessage.Data
+                hPixelX = hPixelXSub.LatestMessage.Data
+                hPixelY= hPixelYSub.LatestMessage.Data
             end
             
-%             targetObstSub.LatestMessage.Data             
-%             % Bullseye
-%             targetX = targetPixelXSub.LatestMessage.Data
-%             targetY = targetPixelYSub.LatestMessage.Data
-%             targetDet = targetDetectedSub.LatestMessage.Data
+            %             targetObstSub.LatestMessage.Data
+            %             % Bullseye
+            %             targetX = targetPixelXSub.LatestMessage.Data
+            %             targetY = targetPixelYSub.LatestMessage.Data
+            %             targetDet = targetDetectedSub.LatestMessage.Data
         end
         if ( mission.config.flowProbe )
             fpMsg = flowProbeDataSubscriber.LatestMessage;
@@ -285,12 +286,16 @@ if ( strcmp(params.auto.mode,'auto'))
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Up);
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Yaw);
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Pitch);
-            fprintf(pFile,'%6.6f,',stateEstimateMsg.Roll);
-            
-            fprintf(pFile,'%6.6f,',hDetected);
-            fprintf(pFile,'%6.6f,',hPixelX);
-            fprintf(pFile,'%6.6f,',hPixelY);            
-            fprintf(pFile,'%6.6f\n',hAngle);            
+                        
+            if ( mission.config.H_detector )
+                fprintf(pFile,'%6.6f,',stateEstimateMsg.Roll);
+                fprintf(pFile,'%6.6f,',hDetected);
+                fprintf(pFile,'%6.6f,',hPixelX);
+                fprintf(pFile,'%6.6f,',hPixelY);
+                fprintf(pFile,'%6.6f\n',hAngle);
+            else
+                fprintf(pFile,'%6.6f\n,',stateEstimateMsg.Roll);
+            end
             
             
             fclose(pFile);
