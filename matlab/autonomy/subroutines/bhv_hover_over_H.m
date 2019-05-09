@@ -16,10 +16,10 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd,
 persistent lastPixelX lastPixelY lastValidUpdateTime filtPixelX filtPixelY;
 Kroll = 0.06/100; % 
 Kpitch = 0.06/100;  
-Kx_no_det = 20;
-Ky_no_det = 20;
-Kx_det = 10*Kx_no_det;
-Ky_det = 10*Ky_no_det;
+Kx_no_det = 0.1;
+Ky_no_det = 0.1;
+Kx_det = 0.1;
+Ky_det = 0.1;
 
 Rlatch = 100;% radius (pixels);
 Rdz = 15;
@@ -67,8 +67,8 @@ else
         end
     else
         % no H detected, but we recently detected, so use the last value:
-        filtPixelX = filtPixelX - Kx_det*(filtPixelX);
-        filtPixelY = filtPixelY - Ky_det*(filtPixelY);
+        filtPixelX = filtPixelX - Kx_no_det*(filtPixelX);
+        filtPixelY = filtPixelY - Ky_no_det*(filtPixelY);
         
         if ( bhvTime - lastValidUpdateTime <= latchOnTime )
             disp('No H: Using last value');
