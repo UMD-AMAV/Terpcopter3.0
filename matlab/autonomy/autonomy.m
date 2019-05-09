@@ -103,16 +103,16 @@ startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
 if ( mission.config.H_detector )
     fprintf('Subscribing to H detector topics ...\n');
     % H detection
-    hDetectedSub = rossubscriber('/hDetected');
-    hAngleSub = rossubscriber('/hAngle');
-    hPixelXSub = rossubscriber('/hPixelX');
-    hPixelYSub = rossubscriber('/hPixelY');
+    %hDetectedSub = rossubscriber('/hDetected');
+    %hAngleSub = rossubscriber('/hAngle');
+    %hPixelXSub = rossubscriber('/hPixelX');
+    %hPixelYSub = rossubscriber('/hPixelY');
     % Obstacle
-    targetObstSub = rossubscriber('/targetObst'); % binary
+    %targetObstSub = rossubscriber('/targetObst'); % binary
     % Bullseye
-    targetPixelXSub = rossubscriber('/targetPixelX');
-    targetPixelYSub = rossubscriber('/targetPixelY');
-    targetDetectedSub = rossubscriber('/targetDetected');
+    %targetPixelXSub = rossubscriber('/targetPixelX');
+    %targetPixelYSub = rossubscriber('/targetPixelY');
+    %targetDetectedSub = rossubscriber('/targetDetected');
 end
 if ( mission.config.flowProbe )
     fprintf('Subscribing to flowprobe ...\n');
@@ -228,12 +228,14 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover_over_H'
                     % this function is only for testing/logging data and
                     % does not currently affect hover_over_h behavior
-                    [hPixelFilt, yPixelFilt] = Hfilter(stateEstimateMsg, imuMsg, bhvTime, hDetected, hAngle, hPixelX, hPixelY, hfilterLog);
+                    %[hPixelFilt, yPixelFilt] = Hfilter(stateEstimateMsg, imuMsg, bhvTime, hDetected, hAngle, hPixelX, hPixelY, hfilterLog);
                     % behavior
-                    [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
+                    %[completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
                     %[completionFlag, ayprCmd] = bhv_hover_over_H_impulse_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
+                    [completionFlag, ayprCmd] = bhv_hover_over_H_slam(stateEstimateMsg, ayprCmd, completion, bhvTime)
                     %[completionFlag, ayprCmd] = bhv_hover_over_H_continuous_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
-                    mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)
+
+                    %mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)
                 case 'bhv_hover_over_H_key'
                     [completionFlag, ayprCmd] = bhv_hover_over_H_key(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
                     mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)
@@ -288,15 +290,15 @@ if ( strcmp(params.auto.mode,'auto'))
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Up);
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Yaw);
             fprintf(pFile,'%6.6f,',stateEstimateMsg.Pitch);          
-            if ( mission.config.H_detector )
-                fprintf(pFile,'%6.6f,',stateEstimateMsg.Roll);
-                fprintf(pFile,'%6.6f,',hDetected);
-                fprintf(pFile,'%6.6f,',hPixelX);
-                fprintf(pFile,'%6.6f,',hPixelY);
-                fprintf(pFile,'%6.6f\n',hAngle);
-            else
+%             if ( mission.config.H_detector )
+%                 fprintf(pFile,'%6.6f,',stateEstimateMsg.Roll);
+%                 fprintf(pFile,'%6.6f,',hDetected);
+%                 fprintf(pFile,'%6.6f,',hPixelX);
+%                 fprintf(pFile,'%6.6f,',hPixelY);
+%                 fprintf(pFile,'%6.6f\n',hAngle);
+%             else
                 fprintf(pFile,'%6.6f\n,',stateEstimateMsg.Roll);
-            end
+%            end
             
             
             fclose(pFile);

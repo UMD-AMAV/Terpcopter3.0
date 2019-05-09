@@ -36,6 +36,8 @@ end
 % Subscribers
 imuDataSubscriber = rossubscriber('/mavros/imu/data');
 lidarDataSubscriber = rossubscriber('/mavros/distance_sensor/hrlv_ez4_pub');
+orbPoseSubscriber = rossubscriber('/orb_pose');
+
 
 % Publishers
 stateEstimatePublisher = rospublisher('/stateEstimate', 'terpcopter_msgs/stateEstimate');
@@ -64,6 +66,7 @@ j = 0;
 % Receive Latest Imu and Lidar data
 imuMsg = imuDataSubscriber.LatestMessage;
 lidarMsg = lidarDataSubscriber.LatestMessage;
+orbMsg = orbPoseSubscriber.LatestMessage;
 
 % Sai: this causes an error:
 % cannot convert to logical from .Imu
@@ -96,6 +99,8 @@ while(1)
     % Receive Latest Imu and Lidar data
     imuMsg = imuDataSubscriber.LatestMessage;
     lidarMsg = lidarDataSubscriber.LatestMessage;
+    orbMsg = orbPoseSubscriber.LatestMessage;
+
 
     if isempty(imuMsg)
         state = NaN;
@@ -160,8 +165,8 @@ while(1)
     stateMsg.Up = stateMsg.Range;
     %disp(stateMsg.Up);
     stateMsg.Yaw = state.psi_inertial;
-    stateMsg.Roll = state.phi;
-    stateMsg.Pitch = state.theta;
+    stateMsg.Roll = -orbMsg.Pose.Position.X;  % Temporarily changed to current X Pose
+    stateMsg.Pitch = -orbMsg.Pose.Position.Y; % Temporarily changed to current Y Pose
     
 
     % timestamp

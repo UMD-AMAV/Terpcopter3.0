@@ -66,14 +66,14 @@ yawControl.lastTime = 0;
 yawControl.prevVal = 0;
 
 % % initialize yaw controller state
-% pitchControl.log=[params.env.matlabRoot '/pitchControl_' dateString '.log'];
-% pitchControl.lastTime = 0;
-% pitchControl.prevVal = 0;
+ pitchControl.log=[params.env.matlabRoot '/pitchControl_' dateString '.log'];
+ pitchControl.lastTime = 0;
+ pitchControl.prevVal = 0;
 % 
 % % initialize yaw controller state
-% rollControl.log=[params.env.matlabRoot '/rollControl_' dateString '.log'];
-% rollControl.lastTime = 0;
-% rollControl.prevVal = 0;
+rollControl.log=[params.env.matlabRoot '/rollControl_' dateString '.log'];
+rollControl.lastTime = 0;
+rollControl.prevVal = 0;
 
 
 disp('initialize loop');
@@ -128,16 +128,16 @@ while(1)
    
     % pitch control
     if ( ayprCmdMsg.PitchSwitch==1 )
-        %[u_pitch, pitchControl] = pitchController(pitchControl, t, pitchDeg, pitch_d);
-        u_pitch = pitch_d;
+        [u_pitch, pitchControl] = pitchController(pitchControl, t, pitchDeg, pitch_d);
+        %u_pitch = pitch_d;
     else
         u_pitch = 0;
     end
     
     % roll control
     if ( ayprCmdMsg.RollSwitch==1 )
-        %[u_roll, rollControl] = rollController(rollControl, t, rollDeg, roll_d);
-        u_roll = roll_d;
+        [u_roll, rollControl] = pitchController(rollControl, t, rollDeg, roll_d);
+        %u_roll = roll_d;
     else
         u_roll = 0;
     end
