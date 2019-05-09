@@ -10,7 +10,7 @@ def eucdist(x1,y1,x2,y2):
     return dist
 
 
-def HBase(frame, frameCounter):
+def HBase(frame):
     #height,width= frame.shape[:2]
     #frame = cv2.resize(frame,(int(0.5*width), int(0.5*height)), interpolation = cv2.INTER_AREA)
     pubHPixelX = rospy.Publisher('hPixelX', Float32, queue_size=1)
@@ -59,8 +59,8 @@ def HBase(frame, frameCounter):
                         cY = int(M['m01']/M['m00'])
                         cv2.circle(frame, (cX,cY),8,(0,0,255),-1)
                     cv2.circle(frame, (int(w_image/2),int(h_image/2)),8,(0,255,0),-1)
-                    hError = (w_image/2 - cX)
-                    vError = (h_image/2 - cY)
+                    hError = (cX - w_image/2)
+                    vError = (cY - h_image/2 )
                     cv2.putText(frame,"HError = " + str(hError), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
                     cv2.putText(frame,"VError = " + str(vError), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
                     homeBaseDetected = True
@@ -88,7 +88,8 @@ def HBase(frame, frameCounter):
             cv2.line(frame, (longestLine[0], longestLine[1]), (longestLine[2], longestLine[3]), (0,0,255), 3, cv2.LINE_AA)
             y = longestLine[1] - longestLine[3]
             x = longestLine[0] - longestLine[2]
-            angle = math.atan(y/x)
+            
+            angle = math.atan2(y,x)
             angle = math.degrees(angle)
             if(angle < 0):
                 angle = angle * (-1)
@@ -102,4 +103,3 @@ def HBase(frame, frameCounter):
     pubHPixelY.publish(vError)
     cv2.imshow("HomeBase", frame)
     cv2.waitKey(1)
-    return frameCounter
