@@ -20,9 +20,9 @@ filtPixelY = data(:,5);
 
 figure;
 subplot(2,1,1)
-plot(t,hPixelX,'ko','linewidth',2);
+plot(hPixelX,'ko','linewidth',2);
 hold on;
-plot(t,filtPixelX,'r-','linewidth',2);
+plot(filtPixelX,'r-','linewidth',2);
 hold on;
 grid on;
 legend('raw','filt');
@@ -32,9 +32,9 @@ set(gca,'FontSize',16);
 
 
 subplot(2,1,2)
-plot(t,hPixelY,'ko','linewidth',2);
+plot(hPixelY,'ko','linewidth',2);
 hold on;
-plot(t,filtPixelY,'r-','linewidth',2);
+plot(filtPixelY,'r-','linewidth',2);
 hold on;
 grid on;
 legend('raw','filt');

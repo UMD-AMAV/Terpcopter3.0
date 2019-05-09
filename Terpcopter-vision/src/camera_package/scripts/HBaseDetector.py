@@ -84,7 +84,6 @@ def HBase(frame, frameCounter):
                             lineIncontour = True
                             maxL = eucdist(l[0],l[1],l[2],l[3])
                 
-        print(lineIncontour)
         if(lineIncontour):
             cv2.line(frame, (longestLine[0], longestLine[1]), (longestLine[2], longestLine[3]), (0,0,255), 3, cv2.LINE_AA)
             y = longestLine[1] - longestLine[3]
@@ -97,16 +96,10 @@ def HBase(frame, frameCounter):
                 angle = 180 - angle
             flag = True
             cv2.putText(frame,"Angle = " + str(angle), (20,80), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
-    if(frameCounter == 9):
-        flagD =True    
-        pubHDetected.publish(flagD)
+    pubHDetected.publish(homeBaseDetected)
     pubHAngle.publish(angle)
     pubHPixelX.publish(hError)
     pubHPixelY.publish(vError)
     cv2.imshow("HomeBase", frame)
     cv2.waitKey(1)
-    if(homeBaseDetected):
-        frameCounter += 1
-    else:
-        frameCounter = 0
     return frameCounter

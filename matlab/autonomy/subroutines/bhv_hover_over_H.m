@@ -115,8 +115,8 @@ if ( displayFlag )
     fprintf(pFile,'%6.6f,',hPixelX);
     fprintf(pFile,'%6.6f,',hPixelY);
     fprintf(pFile,'%6.6f,',filtPixelX);
-    fprintf(pFile,'%6.6f,\n',filtPixelY);
-
+    fprintf(pFile,'%6.6f,',filtPixelY);
+    fprintf(pFile,'%6.6f,\n',hDetected);
     fclose(pFile);    
 end
 
