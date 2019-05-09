@@ -1,0 +1,18 @@
+clear; close all; clc;
+
+
+% simulation of quad
+x0 = [0 0 0 0 0 0]';
+dt = 0.01;
+T = 10;
+N = floor(T/dt);
+for i = 1:1:N
+   xdot(1) = 
+   xdot(2) = 
+   xdot(3) = 
+   xdot(4) = 
+   xdot(5) = cos(t);
+   xdot(6) = sin(t);
+end
+
+

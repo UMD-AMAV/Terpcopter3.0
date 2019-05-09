@@ -16,11 +16,8 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd,
 persistent lastPixelX lastPixelY lastValidUpdateTime filtPixelX filtPixelY;
 Kroll = 0.06/100; % 
 Kpitch = 0.06/100;  
-Kx_no_det = 20;
-Kx_no_det = 20;
-Kx_det = 10*Kx_no_det;
-Ky_det = 10*Ky_no_det;
-
+Kx = 1;
+Ky = 1;
 Rlatch = 100;% radius (pixels);
 Rdz = 15;
 latchOnTime = 4.0; % sec
@@ -36,8 +33,7 @@ if isempty(lastPixelX)
     filtPixelY = 0;
 else
     if ( hDetected )
-        filtPixelX = filtPixelX - Kx_det*(filtPixelX - hPixelX);
-        filtPixelY = filtPixelY - Ky_det*(filtPixelY - hPixelY);
+        filtPixelX = filtPixelX - Kx*hPixelX;
         
         % we recently detected the H, use the last value to reject outliers
         if ( bhvTime - lastValidUpdateTime <= latchOnTime )
@@ -67,9 +63,6 @@ else
         end
     else
         % no H detected, but we recently detected, so use the last value:
-        filtPixelX = filtPixelX - Kx_det*(filtPixelX);
-        filtPixelY = filtPixelY - Ky_det*(filtPixelY);
-        
         if ( bhvTime - lastValidUpdateTime <= latchOnTime )
             disp('No H: Using last value');
             pitchDesired = Kpitch*lastPixelY;
@@ -97,26 +90,15 @@ if ( hDetected )
     end
 end
 
+disp('----');
+hDetected
+hPixelX
+hPixelY
+ayprCmd
 % Terminating condition
 if bhvTime >= completion.durationSec
     completionFlag = 1;
     return;
 end
 completionFlag = 0;
-
-log = 'bhvHover.log';
-if ( displayFlag )
-    
-    pFile = fopen( log ,'a');
-    
-    % write csv file
-    fprintf(pFile,'%6.6f,',bhvTime);
-    fprintf(pFile,'%6.6f,',hPixelX);
-    fprintf(pFile,'%6.6f,',hPixelY);
-    fprintf(pFile,'%6.6f,',filtPixelX);
-    fprintf(pFile,'%6.6f,\n',filtPixelY);
-
-    fclose(pFile);    
-end
-
 end

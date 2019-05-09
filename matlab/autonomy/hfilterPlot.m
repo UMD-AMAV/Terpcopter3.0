@@ -56,7 +56,11 @@ ayEst = data(:,14);
 % fprintf(pFile,'%6.6f,',lastPixelX);
 % fprintf(pFile,'%6.6f,',lastPixelY);
 % fprintf(pFile,'%6.6f,\n',lastHangle);
-%     
+% 
+%     fprintf(pFile,'%6.6f,',th);
+%     fprintf(pFile,'%6.6f,',axFilt);
+%     fprintf(pFile,'%6.6f,\n',ayFilt);  
+    
 
 % plot current behavior
 figure(1);
@@ -77,13 +81,16 @@ ylim([-640 640]);
 legend('hx','hy');
 set(gca,'FontSize',16);
 subplot(3,1,2)
-plot(t,hDetected,'bo-');
+plot(t,hDetected,'bo');
 xlabel('Time (sec)');
 ylabel('H detected');
+set(gca,'FontSize',16);
 subplot(3,1,3)
-plot(t,hAngle,'bo-');
+plot(t,hAngle,'bo');
 xlabel('Time (sec)');
 ylabel('H angle');
+set(gca,'FontSize',16);
+ylim([60 80])
 
 figure(3);
 plot(xEst,yEst); hold on;
