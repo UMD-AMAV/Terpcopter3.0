@@ -108,11 +108,11 @@ if ( mission.config.H_detector )
     hPixelXSub = rossubscriber('/hPixelX');
     hPixelYSub = rossubscriber('/hPixelY');
     % Obstacle
-    targetObstSub = rossubscriber('/targetObst'); % binary
-    % Bullseye
-    targetPixelXSub = rossubscriber('/targetPixelX');
-    targetPixelYSub = rossubscriber('/targetPixelY');
-    targetDetectedSub = rossubscriber('/targetDetected');
+%     targetObstSub = rossubscriber('/targetObst'); % binary
+%     % Bullseye
+%     targetPixelXSub = rossubscriber('/targetPixelX');
+%     targetPixelYSub = rossubscriber('/targetPixelY');
+%     targetDetectedSub = rossubscriber('/targetDetected');
 end
 if ( mission.config.flowProbe )
     fprintf('Subscribing to flowprobe ...\n');

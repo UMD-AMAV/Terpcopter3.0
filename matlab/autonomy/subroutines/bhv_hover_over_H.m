@@ -17,7 +17,7 @@ persistent lastPixelX lastPixelY lastValidUpdateTime filtPixelX filtPixelY;
 Kroll = 0.06/100; % 
 Kpitch = 0.06/100;  
 Kx_no_det = 20;
-Kx_no_det = 20;
+Ky_no_det = 20;
 Kx_det = 10*Kx_no_det;
 Ky_det = 10*Ky_no_det;
 
@@ -105,6 +105,7 @@ end
 completionFlag = 0;
 
 log = 'bhvHover.log';
+displayFlag = 1;
 if ( displayFlag )
     
     pFile = fopen( log ,'a');

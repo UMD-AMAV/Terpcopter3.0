@@ -47,7 +47,7 @@ mission.bhv{i}.ayprCmd.RollSwitch = 1;
 mission.bhv{i}.ayprCmd.RollDesiredDegrees = 0; 
 mission.bhv{i}.ayprCmd.PitchSwitch = 1; 
 mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 0; 
-mission.bhv{i}.completion.durationSec = 50; % 10 seconds
+mission.bhv{i}.completion.durationSec = 10; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;
