@@ -1,9 +1,9 @@
-clear all;
-close all;
+% clear all;
+% close all;
+% 
+% clc;
 
-clc;
-
-[file,path] = uigetfile();
+[file,path] = uigetfile('*.log');
 
 file
 filepath = [path file ];
@@ -122,6 +122,8 @@ set(gca,'FontSize',16);
 
 subplot(4,1,3)
 plot(t,est_Pitch,'b-','linewidth',2);
+hold on;
+plot(t,pitchDes*100,'k--','linewidth',2);
 grid on;
 xlabel('Time (sec)');
 ylabel('Pitch (deg)');
@@ -129,6 +131,8 @@ set(gca,'FontSize',16);
 
 subplot(4,1,4)
 plot(t,est_Roll,'b-','linewidth',2);
+hold on;
+plot(t,rollDes*100,'k--','linewidth',2);
 grid on;
 xlabel('Time (sec)');
 ylabel('Roll (deg)');
@@ -148,19 +152,19 @@ subplot(4,1,2)
 plot(t,yawDes,'k--','linewidth',2);
 grid on;
 xlabel('Time (sec)');
-ylabel('Yaw (deg)');
+ylabel('Yaw');
 set(gca,'FontSize',16);
 
 subplot(4,1,3)
-plot(t,pitchDes,'k--','linewidth',2);
+plot(t,pitchDes*100,'k--','linewidth',2);
 grid on;
 xlabel('Time (sec)');
-ylabel('Pitch (deg)');
+ylabel('Pitch');
 set(gca,'FontSize',16);
 
 subplot(4,1,4)
-plot(t,rollDes,'k--','linewidth',2);
+plot(t,rollDes*100,'k--','linewidth',2);
 grid on;
 xlabel('Time (sec)');
-ylabel('Roll (deg)');
+ylabel('Roll');
 set(gca,'FontSize',16);

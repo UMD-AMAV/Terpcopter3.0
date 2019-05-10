@@ -91,7 +91,6 @@ inertial_yaw_initial = state.psi_inertial;
 tic
 
 while(1)
-    fprintf('LoopRate Hz: %3.3f\n',1/toc)
     tic
     % Receive Latest Imu and Lidar data
     imuMsg = imuDataSubscriber.LatestMessage;
@@ -109,7 +108,7 @@ while(1)
     
     euler = quat2eul([w x y z]);
     %yaw measured clock wise is negative.
-    state.psi_inertial = mod(90-rad2deg(euler(1)),360)
+    state.psi_inertial = mod(90-rad2deg(euler(1)),360);
     state.theta = -rad2deg(euler(2));
     state.phi = rad2deg(euler(3));
     
@@ -174,6 +173,12 @@ while(1)
     stateMsg.Time = t;
     % fixed loop pause
     waitfor(r);
+    
+    fprintf('Yaw :   %03.01f\n',stateMsg.Yaw);
+    fprintf('Pitch : %03.01f\n',stateMsg.Pitch);
+    fprintf('Roll :  %03.01f\n',stateMsg.Roll);
+    fprintf('LoopRate Hz: %03d\n',round(1/toc) )
+     
     
     % publish stateEstimate
     send(stateEstimatePublisher, stateMsg);

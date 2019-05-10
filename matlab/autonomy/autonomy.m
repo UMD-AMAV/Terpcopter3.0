@@ -143,6 +143,8 @@ logFlag = 1;
 dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
 autonomyLog = [params.env.matlabRoot '/autonomy_' dateString '.log'];
 hfilterLog = [params.env.matlabRoot '/hFilter_' dateString '.log'];
+bhvLog = [params.env.matlabRoot '/bhv_' dateString '.log'];
+
 
 timeForPlot = tic;
 numBhvs = length( mission.bhv );
@@ -169,6 +171,11 @@ if ( strcmp(params.auto.mode,'auto'))
                 hAngle = hAngleSub.LatestMessage.Data
                 hPixelX = hPixelXSub.LatestMessage.Data
                 hPixelY= hPixelYSub.LatestMessage.Data
+                % TODO: make one message?
+                if ( hPixelX == -10000 || hPixelY == -10000 || hAngle == -10000 )
+                    disp('Bad H message');
+                    hDetected  = 0;
+                end
             catch
                 disp('No H message');
                 hDetected = 0;
@@ -236,7 +243,7 @@ if ( strcmp(params.auto.mode,'auto'))
                     % does not currently affect hover_over_h behavior
                     %[hPixelFilt, yPixelFilt] = Hfilter(stateEstimateMsg, imuMsg, bhvTime, hDetected, hAngle, hPixelX, hPixelY, hfilterLog);
                     % behavior
-                    [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
+                    [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY, bhvLog);
                     %[completionFlag, ayprCmd] = bhv_hover_over_H_impulse_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
                     %[completionFlag, ayprCmd] = bhv_hover_over_H_continuous_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
                     mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)
