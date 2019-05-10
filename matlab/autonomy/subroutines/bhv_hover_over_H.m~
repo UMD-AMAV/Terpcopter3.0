@@ -18,9 +18,9 @@ persistent filtPixelX filtPixelY;
 
 % gains/params
 Kroll = 0.06/100; %
-Kdr = 0.01; % this term will multiply ~ 1 pixel change per timestep (~0.04 sec)
+Kdr = 0.001; % assume 
 Kpitch = 0.06/100;
-Kdp = 0.01;
+Kdp = 0.001;
 Kx_no_det = 0.02;
 Ky_no_det = 0.02;
 Kx_det = 0.2;
