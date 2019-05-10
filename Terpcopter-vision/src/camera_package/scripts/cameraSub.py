@@ -33,7 +33,7 @@ except:
 # Input Parameter: data - RGB image frame data of datatype-(CompressedImage)
 
 def callbackImage(data):
-    global frameCounter
+    
     np_array = np.fromstring(data.data,np.uint8)   #Loading data in np array
     cv_image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)  #Convert image to openCV format
 
@@ -53,28 +53,26 @@ def callbackImage(data):
     '''
     ###########################################################################
     #Obstacle Detection
-    detector_obst = cv2.SimpleBlobDetector_create()
-    params2 = cv2.SimpleBlobDetector_Params()
+    #detector_obst = cv2.SimpleBlobDetector_create()
+    #params2 = cv2.SimpleBlobDetector_Params()
     # Initializing the parameters for color detection using the method of (Blob Detection)
-    params2.filterByArea = True
-    params2.minArea = 5000
-    params2.maxArea = 100000000
-    params2.filterByColor = True
-    params2.blobColor = 255
+    #params2.filterByArea = True
+    #params2.minArea = 5000
+    #params2.maxArea = 100000000
+    #params2.filterByColor = True
+    #params2.blobColor = 255
 
-    detector_obst = cv2.SimpleBlobDetector_create(params2)
+    #detector_obst = cv2.SimpleBlobDetector_create(params2)
     ###########################################################################
     # Call external libraries to perform Vision tasks
     # Functions: ObstacleAvoidance - Detects the (pink)obstacle blob in the image frame
     #                   Input Parameters: Image frame in openCV image format, blob detection parameter object
     #            ObstacleDetection - Detects the targets and publishes the Herror
     #                   Input Parameters: Image frame in openCV image format, blob detection parameter object
-    ObstacleAvoidance.obstacleDetection(cv_image, detector_obst)
+    #ObstacleAvoidance.obstacleDetection(cv_image, detector_obst)
     # ObstacleDetection.objectDetect(cv_image,detector_target)
-    frameCounter = HBaseDetector.HBase(cv_image, frameCounter)
-    if(frameCounter == 10):
-        frameCounter = 0    
-    DropOffDetection.dropOffDetection(cv_image)
+    HBaseDetector.HBase(cv_image)
+    #DropOffDetection.dropOffDetection(cv_image)
 
 ###############################################################################
 # Horizontal Error callback function
@@ -101,7 +99,7 @@ def imageSubscriber():
     rospy.init_node('imageSubscriber', anonymous=True)
     ###########################################################################
     # Subscribers
-    rospy.Subscriber('/terpcopter/cameras/forward/image/compressed', CompressedImage, callbackImage)
+    rospy.Subscriber('/camera/image_raw/compressed', CompressedImage, callbackImage, queue_size=1, buff_size=5000000, tcp_nodelay=True)
     rospy.Subscriber('targetPose',targetPose,callBackError)
 
     rospy.spin()

@@ -51,18 +51,18 @@ def HBase(frame):
                     cnt.append(c1)
                     (xf,yf,wf,hf) = cv2.boundingRect(c1)
                     hbaseContour.append([xf-5,yf-5,wf+5,hf+5])
-                    cv2.rectangle(frame, (xf,yf), (xf+wf,yf+hf), (0, 255, 0), 1)
-                    cv2.putText(frame,'HomeBase', (x+w, y+h), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
+                    #cv2.rectangle(frame, (xf,yf), (xf+wf,yf+hf), (0, 255, 0), 1)
+                    #cv2.putText(frame,'HomeBase', (x+w, y+h), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
                     M = cv2.moments(c1)
                     if (M['m00'] != 0):
                         cX = int(M['m10']/M['m00'])
                         cY = int(M['m01']/M['m00'])
                         cv2.circle(frame, (cX,cY),8,(0,0,255),-1)
-                    cv2.circle(frame, (int(w_image/2),int(h_image/2)),8,(0,255,0),-1)
+                    #cv2.circle(frame, (int(w_image/2),int(h_image/2)),8,(0,255,0),-1)
                     hError = (cX - w_image/2)
                     vError = (cY - h_image/2 )
-                    cv2.putText(frame,"HError = " + str(hError), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
-                    cv2.putText(frame,"VError = " + str(vError), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
+                    #cv2.putText(frame,"HError = " + str(hError), (20,20), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
+                    #cv2.putText(frame,"VError = " + str(vError), (20,50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
                     homeBaseDetected = True
                     break
           cntNumber += 1
@@ -85,7 +85,7 @@ def HBase(frame):
                             maxL = eucdist(l[0],l[1],l[2],l[3])
                 
         if(lineIncontour):
-            cv2.line(frame, (longestLine[0], longestLine[1]), (longestLine[2], longestLine[3]), (0,0,255), 3, cv2.LINE_AA)
+            #cv2.line(frame, (longestLine[0], longestLine[1]), (longestLine[2], longestLine[3]), (0,0,255), 3, cv2.LINE_AA)
             y = longestLine[1] - longestLine[3]
             x = longestLine[0] - longestLine[2]
             
@@ -96,10 +96,10 @@ def HBase(frame):
             else:
                 angle = 180 - angle
             flag = True
-            cv2.putText(frame,"Angle = " + str(angle), (20,80), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
+            #cv2.putText(frame,"Angle = " + str(angle), (20,80), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0),2, lineType=cv2.LINE_AA)
     pubHDetected.publish(homeBaseDetected)
     pubHAngle.publish(angle)
     pubHPixelX.publish(hError)
     pubHPixelY.publish(vError)
-    cv2.imshow("HomeBase", frame)
-    cv2.waitKey(1)
+    #cv2.imshow("HomeBase", frame)
+    #cv2.waitKey(1)
