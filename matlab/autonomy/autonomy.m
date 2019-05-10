@@ -195,7 +195,9 @@ if ( strcmp(params.auto.mode,'auto'))
         end
         
         % unpack statestimate
-        t = stateEstimateMsg.Time;
+        %t = stateEstimateMsg.Time;
+        t = toc( timeForPlot );
+        
         z = stateEstimateMsg.Up;
         fprintf('Received Msg, Quad Alttiude is : %3.3f m\n', z );
         
