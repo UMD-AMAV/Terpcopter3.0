@@ -1,24 +1,22 @@
-function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY, bhvLog)
+function [completionFlag, ayprCmd] = bhv_hover_over_H_align(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY, bhvLog)
 
 % hDetected = 0 (no H detected) , 1 (H detected)
-% hAngle = -180 to 180 (deg)
+% hAngle = 0 to 180 (deg) measured  CCW from x axis East
 % hPixelX = -360 to 360 (pixels)
 % hPixelY = -640 to 640
 
 % unpack state estimate
-% pitch = stateEstimateMsg.PitchDegrees;
-% roll = stateEstimateMsg.RollDegrees;
-% yaw = stateEstimateMsg.YawDegrees;
+
 
 % Note: Pitch cmd (+) = negative pitch (nose down)
 %       Roll cmd (-) = positivie roll (right wing down)
 
-persistent filtPixelX filtPixelY errorSumX errorSumY diffX diffY;
+persistent filtPixelX filtPixelY errorSumX errorSumY diffX diffY desiredYaw;
 
 % gains/params
 Kroll = 0.03/100; %
 Kdr = 0.005; %0.005; % this term will multiply ~ 1 pixel change per timestep (~0.04 sec)
-Kir = 1.5e-6;
+Kir = 1.5e-6; %1.5e-6
 
 Kpitch = 0.03/100;
 Kdp = 0.005; %0.005;
@@ -40,6 +38,7 @@ dt = 1/25;
 % z = stateEstimateMsg.Range;
 theta = stateEstimateMsg.Pitch;
 phi = stateEstimateMsg.Roll;
+yaw = stateEstimateMsg.Yaw;
 
 if isempty(filtPixelX)
     filtPixelX = 0;
@@ -48,6 +47,7 @@ if isempty(filtPixelX)
     errorSumY = 0;
     diffX = 0;
     diffY = 0;
+    desiredYaw = yaw;
 end
 
 % save pixelX from previous step for computing derivative
@@ -107,6 +107,13 @@ rollCmd = -Kroll*filtPixelX  - Kdr*diffX - Kir*errorSumY;
 ayprCmd.PitchDesiredDegrees = max(-satLimit, min(satLimit, pitchCmd));
 ayprCmd.RollDesiredDegrees = max(-satLimit, min(satLimit, rollCmd));
 
+% yaw control
+if ( hDetected )
+desiredYawCurrent = yaw - (hAngle-90);
+desiredYaw = (1-alpha)*desiredYaw + alpha*desiredYawCurrent;
+end
+ayprCmd.YawDesiredDegrees = desiredYaw;
+
 % behavior completes after time elapsed
 if bhvTime >= completion.durationSec
     completionFlag = 1;
@@ -135,8 +142,11 @@ fprintf(pFile,'%6.6f,',theta);
 fprintf(pFile,'%6.6f,',rollCmdProp);
 fprintf(pFile,'%6.6f,',rollCmd);
 fprintf(pFile,'%6.6f,',ayprCmd.RollDesiredDegrees);
-fprintf(pFile,'%6.6f,\n',phi);
+fprintf(pFile,'%6.6f,',phi);
+
+fprintf(pFile,'%6.6f,',hAngle);
+fprintf(pFile,'%6.6f,',yaw);
+fprintf(pFile,'%6.6f,\n',desiredYaw);
 
 fclose(pFile);
-
 end
