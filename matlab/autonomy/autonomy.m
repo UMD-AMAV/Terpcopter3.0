@@ -69,7 +69,8 @@ end
 % mission = loadMission_PitchRollTestJerrar();
 % mission = loadMission_StayOverHJerrar();
 % mission = loadmission_CompetitionTakeoffHoverPointLand();
-mission = loadMission_StayOverHJerrar();
+%mission = loadMission_StayOverHJerrar();
+mission = loadMission_HoverOverARTagLand();
 
 fprintf('Launching Autonomy Node...\n');
 
@@ -107,6 +108,7 @@ if ( mission.config.H_detector )
     hAngleSub = rossubscriber('/hAngle');
     hPixelXSub = rossubscriber('/hPixelX');
     hPixelYSub = rossubscriber('/hPixelY');
+    
     % Obstacle
 %     targetObstSub = rossubscriber('/targetObst'); % binary
 %     % Bullseye
@@ -118,9 +120,11 @@ if ( mission.config.flowProbe )
     fprintf('Subscribing to flowprobe ...\n');
     flowProbeDataSubscriber = rossubscriber('/terpcopter_flow_probe_node/flowProbe');
 end
-
-
-
+if (mission.config.ARTags)
+	%ARtag detection
+	fprintf('Subscribing to ARTags ...\n');
+	ARTagsDataSubscriber = rossubscriber('/tag_detections');
+end 
 
 pause(0.1)
 
@@ -181,6 +185,10 @@ if ( strcmp(params.auto.mode,'auto'))
             fpMsg = flowProbeDataSubscriber.LatestMessage;
         end
         
+        if ( mission.config.ARTags )
+    	    msg.. = ARTagsDataSubscriber.LatestMessage;
+        end
+        
         % unpack statestimate
         t = stateEstimateMsg.Time;
         z = stateEstimateMsg.Up;
@@ -234,6 +242,18 @@ if ( strcmp(params.auto.mode,'auto'))
                     %[completionFlag, ayprCmd] = bhv_hover_over_H_impulse_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
                     %[completionFlag, ayprCmd] = bhv_hover_over_H_continuous_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
                     mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)
+                    
+                case 'bhv_hover_over_ARTags'
+                    % this function is only for testing/logging data and
+                    % does not currently affect hover_over_h behavior
+                    [hPixelFilt, yPixelFilt] = Hfilter(stateEstimateMsg, imuMsg, bhvTime, hDetected, hAngle, hPixelX, hPixelY, hfilterLog);
+                    % behavior
+                    [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
+                    %[completionFlag, ayprCmd] = bhv_hover_over_H_impulse_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
+                    %[completionFlag, ayprCmd] = bhv_hover_over_H_continuous_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
+                    mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)
+                    
+                    
                 case 'bhv_hover_over_H_key'
                     [completionFlag, ayprCmd] = bhv_hover_over_H_key(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
                     mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)
