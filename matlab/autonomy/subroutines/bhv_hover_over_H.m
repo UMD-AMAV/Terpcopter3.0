@@ -1,4 +1,4 @@
-function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
+function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY, bhvLog)
 
 % hDetected = 0 (no H detected) , 1 (H detected)
 % hAngle = -180 to 180 (deg)
@@ -10,114 +10,133 @@ function [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd,
 % roll = stateEstimateMsg.RollDegrees;
 % yaw = stateEstimateMsg.YawDegrees;
 
-% TODO:
-% - add topic with H (x,y) data as input
-% - do some processing
-persistent lastPixelX lastPixelY lastValidUpdateTime filtPixelX filtPixelY;
-Kroll = 0.06/100; % 
-Kpitch = 0.06/100;  
-Kx_no_det = 20;
-Ky_no_det = 20;
-Kx_det = 10*Kx_no_det;
-Ky_det = 10*Ky_no_det;
+% Note: Pitch cmd (+) = negative pitch (nose down)
+%       Roll cmd (-) = positivie roll (right wing down)
 
-Rlatch = 100;% radius (pixels);
-Rdz = 15;
-latchOnTime = 4.0; % sec
-satLimit = 0.15;                 % over 2m   satLimit = 0.1
+persistent filtPixelX filtPixelY errorSumX errorSumY diffX diffY;
 
-if isempty(lastPixelX)
-    lastPixelX = 0;
-    lastPixelY = 0;
-    lastValidUpdateTime = -1E3;
-    pitchDesired = 0;
-    rollDesired = 0;
+% gains/params
+Kroll = 0.03/100; %
+Kdr = 0.005; %0.005; % this term will multiply ~ 1 pixel change per timestep (~0.04 sec)
+Kir = 1.5e-6;
+
+Kpitch = 0.03/100;
+Kdp = 0.005; %0.005;
+Kip = 1.5e-6;
+
+Kx_no_det = 0.02;
+Ky_no_det = 0.02;
+Kx_det = 0.2;
+Ky_det = 0.2;
+satLimit = 0.15;
+
+filtTimeConstant = 1;
+dt = 1/25;
+
+% pixelWidth = 640;
+% pixelHeight = 480;
+
+% unpack state
+% z = stateEstimateMsg.Range;
+theta = stateEstimateMsg.Pitch;
+phi = stateEstimateMsg.Roll;
+
+if isempty(filtPixelX)
     filtPixelX = 0;
     filtPixelY = 0;
-else
-    if ( hDetected )
-        filtPixelX = filtPixelX - Kx_det*(filtPixelX - hPixelX);
-        filtPixelY = filtPixelY - Ky_det*(filtPixelY - hPixelY);
-        
-        % we recently detected the H, use the last value to reject outliers
-        if ( bhvTime - lastValidUpdateTime <= latchOnTime )
-            vLast = [lastPixelX lastPixelY];
-            vNew = [hPixelX hPixelY];
-            if ( norm(vLast-vNew) <= Rlatch ) % accept
-                disp('H detected: Within radius, updated H pixels');
-                lastPixelX = hPixelX;
-                lastPixelY = hPixelY;
-                lastValidUpdateTime = bhvTime;
-                pitchDesired = Kpitch*hPixelY;
-                rollDesired = Kroll*hPixelX;
-            else % reject outlier
-                disp('H detected: Outside radius, rejecting outlier');
-                pitchDesired = Kpitch*lastPixelY;
-                rollDesired = Kroll*lastPixelX;
-            end
-        else
-            % first time h is detected, accept value as valid, or
-            disp('H detected: first time / or reset , Updated H pixels');
-            lastPixelX = hPixelX;
-            lastPixelY = hPixelY;
-            lastValidUpdateTime = bhvTime;
-            
-            pitchDesired = Kpitch*hPixelY;
-            rollDesired = Kroll*hPixelX;
-        end
-    else
-        % no H detected, but we recently detected, so use the last value:
-        filtPixelX = filtPixelX - Kx_det*(filtPixelX);
-        filtPixelY = filtPixelY - Ky_det*(filtPixelY);
-        
-        if ( bhvTime - lastValidUpdateTime <= latchOnTime )
-            disp('No H: Using last value');
-            pitchDesired = Kpitch*lastPixelY;
-            rollDesired = Kroll*lastPixelX;
-        else  % no H detected in long time (or ever)
-            disp('No H: Setting zeros');
-            pitchDesired = 0;
-            rollDesired = 0;
-        end
-    end
+    errorSumX = 0;
+    errorSumY = 0;
+    diffX = 0;
+    diffY = 0;
 end
-% set ayprCmd
-% - set ayprCmdMsg.PitchDesiredDegrees = 0;
-% ayprCmd.YawDesiredDegrees = yawDesired;
 
-ayprCmd.PitchDesiredDegrees = max(-satLimit, min(satLimit, pitchDesired));
-ayprCmd.RollDesiredDegrees = max(-satLimit, min(satLimit, rollDesired));
+% save pixelX from previous step for computing derivative
+filtPixelXprev = filtPixelX;
+filtPixelYprev = filtPixelY;
 
 if ( hDetected )
-    errorR = sqrt(hPixelX*hPixelX + hPixelY*hPixelY);
-    if ( errorR <= Rdz )
-        disp('In deadzone');
-        ayprCmd.PitchDesiredDegrees = 0;
-        ayprCmd.RollDesiredDegrees = 0;
-    end
+    filtPixelX = filtPixelX - Kx_det*(filtPixelX - hPixelX);
+    filtPixelY = filtPixelY - Ky_det*(filtPixelY - hPixelY);
+    
+else
+    % converge to zero
+    filtPixelX = filtPixelX - Kx_no_det*(filtPixelX);
+    filtPixelY = filtPixelY - Ky_no_det*(filtPixelY);
+    %         % diverge
+    %         filtPixelX = filtPixelX + Kx_no_det*(filtPixelX);
+    %         filtPixelY = filtPixelY + Ky_no_det*(filtPixelY);
 end
 
-% Terminating condition
+% integrator
+errorSumX = errorSumX + filtPixelX;
+errorSumY = errorSumY + filtPixelY;
+
+% leaky integrator
+errorSumX = 0.95*errorSumX ;
+errorSumY = 0.95*errorSumY ;
+
+
+% control (P)
+% pitchCmd = -Kpitch*filtPixelY;
+% rollCmd = -Kroll*filtPixelX;
+
+% low-pass filter
+alpha = dt / ( filtTimeConstant + dt);
+diffY = (1-alpha)*diffY + alpha*(filtPixelY - filtPixelYprev);
+diffX = (1-alpha)*diffX + alpha*(filtPixelX - filtPixelXprev);
+
+% % control (PD)
+% % pitchCmd = -Kpitch*filtPixelY + Kdp*(filtPixelY - filtPixelYprev);
+% % rollCmd = -Kroll*filtPixelX  + Kdr*(filtPixelX - filtPixelXprev);
+% pitchCmd = -Kpitch*filtPixelY - Kdp*diffY;
+% rollCmd = -Kroll*filtPixelX  - Kdr*diffX;
+
+% % control (PI)
+% pitchCmd = -Kpitch*filtPixelY - Kip*errorSumX;
+% rollCmd = -Kroll*filtPixelX  - Kir*errorSumY;
+
+% control (PID)
+pitchCmd = -Kpitch*filtPixelY - Kdp*diffY - Kip*errorSumX;
+rollCmd = -Kroll*filtPixelX  - Kdr*diffX - Kir*errorSumY;
+
+% correct for pitch/roll
+% pitchDesired = pitchDesired;% - pixelHeight/2*Kpitch*z*tand(theta);
+% rollDesired = rollDesired;% + pixelWidth/2*Kroll*z*tand(phi);
+
+% saturate
+ayprCmd.PitchDesiredDegrees = max(-satLimit, min(satLimit, pitchCmd));
+ayprCmd.RollDesiredDegrees = max(-satLimit, min(satLimit, rollCmd));
+
+% behavior completes after time elapsed
 if bhvTime >= completion.durationSec
     completionFlag = 1;
     return;
 end
 completionFlag = 0;
 
-log = 'bhvHover.log';
-displayFlag = 1;
-if ( displayFlag )
-    
-    pFile = fopen( log ,'a');
-    
-    % write csv file
-    fprintf(pFile,'%6.6f,',bhvTime);
-    fprintf(pFile,'%6.6f,',hPixelX);
-    fprintf(pFile,'%6.6f,',hPixelY);
-    fprintf(pFile,'%6.6f,',filtPixelX);
-    fprintf(pFile,'%6.6f,\n',filtPixelY);
+% for logging only:
+pitchCmdProp = -Kpitch*filtPixelY;
+rollCmdProp =  -Kroll*filtPixelX;
 
-    fclose(pFile);    
-end
+% write log
+pFile = fopen( bhvLog  ,'a');
+fprintf(pFile,'%6.6f,',bhvTime);
+fprintf(pFile,'%6.6f,',hPixelX);
+fprintf(pFile,'%6.6f,',hPixelY);
+fprintf(pFile,'%6.6f,',filtPixelX);
+fprintf(pFile,'%6.6f,',filtPixelY);
+fprintf(pFile,'%6.6f,',hDetected);
+
+fprintf(pFile,'%6.6f,',pitchCmdProp);
+fprintf(pFile,'%6.6f,',pitchCmd);
+fprintf(pFile,'%6.6f,',ayprCmd.PitchDesiredDegrees);
+fprintf(pFile,'%6.6f,',theta);
+
+fprintf(pFile,'%6.6f,',rollCmdProp);
+fprintf(pFile,'%6.6f,',rollCmd);
+fprintf(pFile,'%6.6f,',ayprCmd.RollDesiredDegrees);
+fprintf(pFile,'%6.6f,\n',phi);
+
+fclose(pFile);
 
 end

@@ -4,7 +4,7 @@ function [yawStickCmd, yawControl] = yawController(yawControl, curTime, yawDeg, 
 
 % gains/parameters
 yawFiltTimeConstant = 0.2; %sec
-kp = 10/180; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
+kp = 2.5/180; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
 yawStickLimit = 0.35;
 deadbandDeg = 2.5;
 
