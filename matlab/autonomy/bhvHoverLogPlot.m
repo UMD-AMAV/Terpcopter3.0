@@ -113,7 +113,15 @@ legend('raw','filt');
 %xlabel('Time (sec)');
 ylabel('Pixel Y');
 ylim([-320 320])
+hold off
 
 subplot(3,1,3)
 plot(hDetected)
 set(gca,'FontSize',16);
+
+figure;
+plot(hPixelX,hPixelY,'ko','linewidth',2);
+xlim([-320 320])
+ylim([-320 320])
+ylabel('Pixel Y');
+xlabel('Pixel X');
