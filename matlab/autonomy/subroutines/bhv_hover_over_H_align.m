@@ -47,7 +47,7 @@ if isempty(filtPixelX)
     errorSumY = 0;
     diffX = 0;
     diffY = 0;
-    desiredYaw = yaw;
+    desiredYaw = ayprCmd.YawDesiredDegrees;
 end
 
 % save pixelX from previous step for computing derivative
@@ -109,8 +109,8 @@ ayprCmd.RollDesiredDegrees = max(-satLimit, min(satLimit, rollCmd));
 
 % yaw control
 if ( hDetected )
-desiredYawCurrent = yaw - (hAngle-90);
-desiredYaw = (1-alpha)*desiredYaw + alpha*desiredYawCurrent;
+    desiredYawCurrent = yaw - (hAngle-90);
+    desiredYaw = (1-alpha)*desiredYaw + alpha*desiredYawCurrent;
 end
 ayprCmd.YawDesiredDegrees = desiredYaw;
 
