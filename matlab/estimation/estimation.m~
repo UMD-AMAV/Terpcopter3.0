@@ -36,7 +36,8 @@ end
 % Subscribers
 imuDataSubscriber = rossubscriber('/mavros/imu/data');
 lidarDataSubscriber = rossubscriber('/mavros/distance_sensor/hrlv_ez4_pub');
-odomDataSubscriber = rossubscriber('/orb_pose')
+orbPoseSubscriber = rossubscriber('/orb_pose');
+
 
 % Publishers
 stateEstimatePublisher = rospublisher('/stateEstimate', 'terpcopter_msgs/stateEstimate');
@@ -65,6 +66,7 @@ j = 0;
 % Receive Latest Imu and Lidar data
 imuMsg = imuDataSubscriber.LatestMessage;
 lidarMsg = lidarDataSubscriber.LatestMessage;
+orbMsg = orbPoseSubscriber.LatestMessage;
 
 % Sai: this causes an error:
 % cannot convert to logical from .Imu
@@ -82,7 +84,7 @@ z = imuMsg.Orientation.Z;
 euler = quat2eul([w x y z]);
 %yaw measured clock wise is negative.
 disp('psi:')
-state.psi_inertial = rad2deg(euler(1))
+state.psi_inertial = rad2deg(euler(1));
 state.theta = rad2deg(euler(2));
 state.phi = rad2deg(euler(3));
 
@@ -97,26 +99,22 @@ while(1)
     % Receive Latest Imu and Lidar data
     imuMsg = imuDataSubscriber.LatestMessage;
     lidarMsg = lidarDataSubscriber.LatestMessage;
-    odomMsg = odomDataSubscriber.LatestMessage;
-    
+    orbMsg = orbPoseSubscriber.LatestMessage;
+
+
     if isempty(imuMsg)
         state = NaN;
         disp('No imu data\n');
         return;
     end
-%     w = imuMsg.Orientation.W;
-%     x = imuMsg.Orientation.X;
-%     y = imuMsg.Orientation.Y;
-%     z = imuMsg.Orientation.Z;
+    w = imuMsg.Orientation.W;
+    x = imuMsg.Orientation.X;
+    y = imuMsg.Orientation.Y;
+    z = imuMsg.Orientation.Z;
     
-    w1 = odomMsg.Orientation.w;
-    x1 = odomMsg.Orientation.x;
-    y1 = odomMsg.Orientation.y;
-    z1 = odomMsg.Orientation.z;
-    
-    euler = quat2eul([w1 x1 y1 z1]);
+    euler = quat2eul([w x y z]);
     %yaw measured clock wise is negative.
-    state.psi_inertial = mod(90-rad2deg(euler(1)),360)
+    state.psi_inertial = mod(90-rad2deg(euler(1)),360);
     state.theta = -rad2deg(euler(2));
     state.phi = rad2deg(euler(3));
     
@@ -167,8 +165,8 @@ while(1)
     stateMsg.Up = stateMsg.Range;
     %disp(stateMsg.Up);
     stateMsg.Yaw = state.psi_inertial;
-    stateMsg.Roll = state.phi;
-    stateMsg.Pitch = state.theta;
+    stateMsg.Roll = -orbMsg.Pose.Position.X;  % Temporarily changed to current X Pose
+    stateMsg.Pitch = -orbMsg.Pose.Position.Y; % Temporarily changed to current Y Pose
     
 
     % timestamp

@@ -84,7 +84,7 @@ z = imuMsg.Orientation.Z;
 euler = quat2eul([w x y z]);
 %yaw measured clock wise is negative.
 disp('psi:')
-state.psi_inertial = rad2deg(euler(1))
+state.psi_inertial = rad2deg(euler(1));
 state.theta = rad2deg(euler(2));
 state.phi = rad2deg(euler(3));
 
@@ -114,7 +114,7 @@ while(1)
     
     euler = quat2eul([w x y z]);
     %yaw measured clock wise is negative.
-    state.psi_inertial = mod(90-rad2deg(euler(1)),360)
+    state.psi_inertial = mod(90-rad2deg(euler(1)),360);
     state.theta = -rad2deg(euler(2));
     state.phi = rad2deg(euler(3));
     

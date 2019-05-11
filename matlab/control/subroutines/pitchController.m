@@ -2,9 +2,9 @@ function [pitchStickCmd, pitchControl] = pitchController(pitchControl, curTime, 
 
 % gains/parameters
 %pitchFiltTimeConstant = 0.2; % seconds
-kp = 0.4; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
+kp = 0.15; % estimate : 10 deg error gives 0.1 stick cmd with kp = 0.1/10;
 pitchStickLimit = 0.3;
-kd = 0.0;
+kd = 0.0025;
 
 % unpack states
 prevPitchDeg = pitchControl.prevVal;
