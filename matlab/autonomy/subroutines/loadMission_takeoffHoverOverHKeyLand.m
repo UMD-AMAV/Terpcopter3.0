@@ -28,7 +28,7 @@ mission.bhv{i}.completion.status = false;
 
 i = i + 1;
 % Behavior 3: Hover with a Fixed Orientation
-mission.bhv{i}.name = 'bhv_hover_over_H_key';
+mission.bhv{i}.name = 'bhv_hover_over_Artag';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 

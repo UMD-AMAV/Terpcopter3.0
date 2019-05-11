@@ -1,8 +1,8 @@
-function mission = loadMission_takeoffHoverOverHLand()
+function mission = loadMission_takeoffHoverOverARTagLand()
 mission.config.firstLoop = 1;
 
 mission.config.H_detector = 0;
-mission.config.ARTags=0;
+mission.config.ARTags=1;
 mission.config.target_detector = 0;
 mission.config.flowProbe = 0;
 

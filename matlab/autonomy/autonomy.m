@@ -83,9 +83,9 @@ end
 
 % Publishers
 fprintf('Setting up ayprsCmd Publisher ...\n');
-ayprCmdPublisher = rospublisher('/ayprCmd', 'terpcopter_msgs/ayprCmd');
 controlStartPublisher = rospublisher('/startControl', 'std_msgs/Bool');
 imuDataSubscriber = rossubscriber('/mavros/imu/data');
+arTagSubscriber = rossubscriber('/arPose');
 fprintf('Setting up servoSwitch Publisher ...\n');
 servoSwitchCmdPublisher = rospublisher('/servoSwitch', 'terpcopter_msgs/servoSwitchCmd');
 
@@ -123,7 +123,7 @@ end
 if (mission.config.ARTags)
 	%ARtag detection
 	fprintf('Subscribing to ARTags ...\n');
-	ARTagsDataSubscriber = rossubscriber('/tag_detections');
+	ARTagsDataSubscriber = rossubscriber('/arPose');
 end 
 
 pause(0.1)
@@ -186,7 +186,7 @@ if ( strcmp(params.auto.mode,'auto'))
         end
         
         if ( mission.config.ARTags )
-    	    msg.. = ARTagsDataSubscriber.LatestMessage;
+    	    msgARtag = ARTagsDataSubscriber.LatestMessage;
         end
         
         % unpack statestimate
@@ -246,9 +246,9 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover_over_ARTags'
                     % this function is only for testing/logging data and
                     % does not currently affect hover_over_h behavior
-                    [hPixelFilt, yPixelFilt] = Hfilter(stateEstimateMsg, imuMsg, bhvTime, hDetected, hAngle, hPixelX, hPixelY, hfilterLog);
+                    %[hPixelFilt, yPixelFilt] = Hfilter(stateEstimateMsg, imuMsg, bhvTime, hDetected, hAngle, hPixelX, hPixelY, hfilterLog);
                     % behavior
-                    [completionFlag, ayprCmd] = bhv_hover_over_H(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
+                    [completionFlag, ayprCmd] = bhv_hover_over_Artag(stateEstimateMsg, ayprCmd, completion, bhvTime, tagDetected, tagAngle, tagPixelX, tagPixelY);
                     %[completionFlag, ayprCmd] = bhv_hover_over_H_impulse_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
                     %[completionFlag, ayprCmd] = bhv_hover_over_H_continuous_bound(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY)
                     mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)
