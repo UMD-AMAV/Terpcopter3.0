@@ -22,7 +22,7 @@ i = 1;
 mission.bhv{i}.name = 'bhv_takeoff';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1.75; 
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 1.5; 
 mission.bhv{i}.completion.status = false;
 
 
@@ -32,8 +32,8 @@ mission.bhv{i}.name = 'bhv_hover_over_H_align';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 2; 
-mission.bhv{i}.ayprCmd.YawSwitch = 1; 
-mission.bhv{i}.ayprCmd.YawDesiredDegrees = 230; 
+mission.bhv{i}.ayprCmd.YawSwitch = 0; 
+mission.bhv{i}.ayprCmd.YawDesiredDegrees = 95; 
 % % roll and pitch are actively controlled but we initialize values here
 mission.bhv{i}.ayprCmd.RollSwitch = 1; 
 mission.bhv{i}.ayprCmd.RollDesiredDegrees = 0; 
