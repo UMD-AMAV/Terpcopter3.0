@@ -1,4 +1,4 @@
-function [completionFlag, ayprCmd] = bhv_hover_over_River_align(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY, bhvLog)
+function [completionFlag, ayprCmd] = bhv_hover_over_River_align(stateEstimateMsg, ayprCmd, completion, bhvTime, rDetected, rAngle, rPixelX, rPixelY, bhvLog)
 
 % hDetected = 0 (no H detected) , 1 (H detected)
 % hAngle = 0 to 180 (deg) measured  CCW from x axis East
