@@ -28,7 +28,7 @@ def HBase(frame):
     higher = int(max(255,(1.0+0.33)*v))
     kernel = np.ones((5,5), np.uint8)
     lower_black = np.array([0,0,0])
-    higher_black = np.array([180,255,60]) #######Tune the V value, reduce it for robustness(Tune this at UPenn) 
+    higher_black = np.array([180,255,40]) #old--->v==60#######Tune the V value, reduce it for robustness(Tune this at UPenn) 
     masking_black = cv2.inRange(hsv_frame, lower_black, higher_black) 
     masking_black = cv2.morphologyEx(masking_black,cv2.MORPH_CLOSE,kernel)
     frame_blur = cv2.bilateralFilter(masking_black, 9, 75, 75)
@@ -47,7 +47,7 @@ def HBase(frame):
           for c1 in contours:
                (x,y,w,h) = cv2.boundingRect(c1)
                approx = cv2.approxPolyDP(c1, 0.01*cv2.arcLength(c1, True), True)
-               if(len(approx) == 12 and cv2.contourArea(c1) > 500): # Might have to tune thearea  value
+               if(len(approx) == 12 and cv2.contourArea(c1) > 400): # Might have to tune thearea  value
                     cnt.append(c1)
                     (xf,yf,wf,hf) = cv2.boundingRect(c1)
                     hbaseContour.append([xf-5,yf-5,wf+5,hf+5])

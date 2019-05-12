@@ -103,7 +103,9 @@ def imageSubscriber():
     rospy.init_node('imageSubscriber', anonymous=True)
     ###########################################################################
     # Subscribers
-    rospy.Subscriber('/terpcopter/cameras/forward/image/compressed', CompressedImage, callbackImage, queue_size=1, buff_size=5000000, tcp_nodelay=True) # (/camera/image_raw/compressed ----> using Pub as - roslaunch  video_stream_opencv camera.launch) Current Publisher - roslaunch terpcopter_driver terpcopter_camera_node.py
+    #rospy.Subscriber('/terpcopter/cameras/forward/image/compressed', CompressedImage, callbackImage, queue_size=1, buff_size=5000000, tcp_nodelay=True) 
+    rospy.Subscriber('/camera/image_raw/compressed', CompressedImage, callbackImage, queue_size=1, buff_size=2**24, tcp_nodelay=True) 
+    # ----> using Pub as - roslaunch  video_stream_opencv camera.launch) Current Publisher - roslaunch terpcopter_driver terpcopter_camera_node.py
     rospy.Subscriber('targetPose',targetPose,callBackError)
 
     rospy.spin()
