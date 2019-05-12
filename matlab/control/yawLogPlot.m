@@ -3,7 +3,7 @@ close all;
 
 clc;
 
-[file,path] = uigetfile();
+[file,path] = uigetfile('*.log');
 
 file
 filepath = [path file ];
