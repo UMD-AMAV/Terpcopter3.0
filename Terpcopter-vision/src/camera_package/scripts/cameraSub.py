@@ -13,6 +13,7 @@ import numpy as np
 import math
 from std_msgs.msg import String
 from std_msgs.msg import Float32
+from std_msgs.msg import Bool
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
 from cv_bridge import CvBridge, CvBridgeError
@@ -35,6 +36,24 @@ except:
 # Description
 #       Callback function that subscribes to '/terpcopter/cameras/forward/image/compressed' topic
 # Input Parameter: data - RGB image frame data of datatype-(CompressedImage)
+
+class ImageClass:
+	def __init__(self):
+		self.pubHPixelX = rospy.Publisher('hPixelX', Float32, queue_size=1)
+    		self.pubHPixelY = rospy.Publisher('hPixelY', Float32, queue_size=1)
+    		self.pubHAngle = rospy.Publisher('hAngle',Float32,queue_size=1)
+    		self.pubHDetected = rospy.Publisher('hDetected',Bool,queue_size=1)
+		self.mySub = rospy.Subscriber('/camera/image_raw/compressed', CompressedImage, self.callbackclassImage, queue_size=1, buff_size=2**24, tcp_nodelay=True)
+
+        
+
+	def callbackclassImage(self, data):
+		np_array = np.fromstring(data.data,np.uint8)
+		cv_image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
+		HBaseDetector.HBase(cv_image, self.pubHPixelX, self.pubHPixelY, self.pubHAngle, self.pubHDetected)
+		
+
+
 
 def callbackImage(data):
     
@@ -110,8 +129,13 @@ def imageSubscriber():
 
     rospy.spin()
 
+	
 # main loop
 if __name__ == '__main__':
     global frameCounter
     frameCounter = 0
-    imageSubscriber()
+    #imageSubscriber()
+    rospy.init_node('imageSubscriber', anonymous=True)
+    myClass = ImageClass()
+    rospy.spin()
+    

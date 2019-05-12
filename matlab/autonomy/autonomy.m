@@ -68,8 +68,9 @@ end
 % mission = loadMission_takeoffHoverFlyForwardDropPackageLand();
 % mission = loadMission_PitchRollTestJerrar();
 % mission = loadMission_StayOverHJerrar();
-% mission = loadmission_CompetitionTakeoffHoverPointLand();
-mission = loadMission_StayOverHJerrar();
+% mission = loadMission_CompetitionTakeoffHoverLand();
+mission = loadMission_CompetitionTakeoffHoverPointLand();
+% mission = loadMission_StayOverHAlign();
 
 fprintf('Launching Autonomy Node...\n');
 
@@ -195,7 +196,9 @@ if ( strcmp(params.auto.mode,'auto'))
         end
         
         % unpack statestimate
-        t = stateEstimateMsg.Time;
+        %t = stateEstimateMsg.Time;
+        t = toc( timeForPlot );
+        
         z = stateEstimateMsg.Up;
         fprintf('Received Msg, Quad Alttiude is : %3.3f m\n', z );
         
@@ -250,6 +253,9 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover_over_H_key'
                     [completionFlag, ayprCmd] = bhv_hover_over_H_key(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY);
                     mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)
+                case 'bhv_hover_over_H_align'
+                   [completionFlag, ayprCmd] = bhv_hover_over_H_align(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY, bhvLog);                    
+                   mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)                        
                 case 'bhv_hover_drop'
                     [completionFlag, servoCmd] = bhv_hover_drop(completion, bhvTime );
                 case 'bhv_point_to_direction'

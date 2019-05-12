@@ -1,7 +1,7 @@
-function mission = loadMission_Comp_takeoffHoverPointLand()
+function mission = loadMission_CompetitionTakeoffHoverLand()
 mission.config.firstLoop = 1;
 
-mission.config.H_detector = 0;
+mission.config.H_detector = 1;
 mission.config.target_detector = 0;
 mission.config.flowProbe = 0;
 
@@ -22,46 +22,41 @@ i = 1;
 mission.bhv{i}.name = 'bhv_takeoff';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.3; 
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 1.75; 
 mission.bhv{i}.completion.status = false;
 
 i = i + 1;
-% Behavior 2: Hover
-mission.bhv{i}.name = 'bhv_hover';
+% Behavior 3: Hover with a Fixed Orientation
+mission.bhv{i}.name = 'bhv_hover_over_H';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
-mission.bhv{i}.completion.durationSec = 2; % 10 seconds
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 2; 
+mission.bhv{i}.ayprCmd.RollSwitch = 1; 
+mission.bhv{i}.ayprCmd.RollDesiredDegrees = 0; 
+mission.bhv{i}.ayprCmd.PitchSwitch = 1; 
+mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 0; 
+mission.bhv{i}.completion.durationSec = 20; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;
-% Behavior 3: Point
-mission.bhv{i}.name = 'bhv_point_to_direction';
+% Behavior 3: Hover with a Fixed Orientation
+mission.bhv{i}.name = 'bhv_hover_over_H';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
-mission.bhv{i}.ayprCmd.YawSwitch = 1; 
-mission.bhv{i}.ayprCmd.YawDesiredDegrees = 290; 
-mission.bhv{i}.completion.durationSec = 8; %  seconds
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.2; 
+mission.bhv{i}.ayprCmd.RollSwitch = 1; 
+mission.bhv{i}.ayprCmd.RollDesiredDegrees = 0; 
+mission.bhv{i}.ayprCmd.PitchSwitch = 1; 
+mission.bhv{i}.ayprCmd.PitchDesiredDegrees = 0; 
+mission.bhv{i}.completion.durationSec = 5; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
-
-% i = i + 1;
-% % Behavior 3: Point
-% mission.bhv{i}.name = 'bhv_point_to_direction';
-% mission.bhv{i}.ayprCmd = default_aypr_msg();
-% mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-% mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
-% mission.bhv{i}.ayprCmd.YawSwitch = 1; 
-% mission.bhv{i}.ayprCmd.YawDesiredDegrees = 90; 
-% mission.bhv{i}.completion.durationSec = 15; %  seconds
-% mission.bhv{i}.completion.status = false;     % completion flag
 
 i = i + 1;
 % Behavior 3: Land
 mission.bhv{i}.name = 'bhv_land';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
-mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.0; 
+mission.bhv{i}.ayprCmd.AltDesiredMeters = 0.2; 
 mission.bhv{i}.completion.durationSec = 10*60; % make this very long so vehicle hovers above ground before manual takeover
 mission.bhv{i}.completion.status = false;     % completion flag
 
