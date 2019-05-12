@@ -24,6 +24,7 @@ from _targetPose import targetPose
 import ObstacleAvoidance
 import HBaseDetector
 import DropOffDetection
+import RiverDetection
 global frameCounter
 try:
     sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
@@ -39,10 +40,17 @@ except:
 
 class ImageClass:
 	def __init__(self):
+
 		self.pubHPixelX = rospy.Publisher('hPixelX', Float32, queue_size=1)
-    		self.pubHPixelY = rospy.Publisher('hPixelY', Float32, queue_size=1)
-    		self.pubHAngle = rospy.Publisher('hAngle',Float32,queue_size=1)
-    		self.pubHDetected = rospy.Publisher('hDetected',Bool,queue_size=1)
+		self.pubHPixelY = rospy.Publisher('hPixelY', Float32, queue_size=1)
+		self.pubHAngle = rospy.Publisher('hAngle',Float32,queue_size=1)
+		self.pubHDetected = rospy.Publisher('hDetected',Bool,queue_size=1)
+		######################################################################
+		self.pubRiverDetected = rospy.Publisher('RDetected',Bool,queue_size=1)
+		self.pubRiverXleft = rospy.Publisher('RYleft',Float32,queue_size=1)
+		self.pubRiverXright = rospy.Publisher('RYright',Float32,queue_size=1)
+		self.pubRiverPitch = rospy.Publisher('RPitch',Float32,queue_size=1)
+
 		self.mySub = rospy.Subscriber('/camera/image_raw/compressed', CompressedImage, self.callbackclassImage, queue_size=1, buff_size=2**24, tcp_nodelay=True)
 
         
@@ -51,7 +59,7 @@ class ImageClass:
 		np_array = np.fromstring(data.data,np.uint8)
 		cv_image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
 		HBaseDetector.HBase(cv_image, self.pubHPixelX, self.pubHPixelY, self.pubHAngle, self.pubHDetected)
-		
+		RiverDetection.riverDetection(cv_image, self.pubRiverXleft,self.pubRiverXright,self.pubRiverPitch,self.pubRiverDetected)
 
 
 
