@@ -77,3 +77,12 @@ ylim([-320 320])
 subplot(3,1,3)
 plot(hDetected)
 set(gca,'FontSize',16);
+hold off
+
+figure;
+plot(hPixelX, hPixelY,'ko','linewidth',2);
+grid on
+ylabel('Pixel Y');
+ylim([-320 320]);
+xlabel('Pixel X');
+xlim([-320 320]);
