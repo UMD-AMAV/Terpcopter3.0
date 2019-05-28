@@ -177,6 +177,7 @@ while(1)
     fprintf('Yaw :   %03.01f\n',stateMsg.Yaw);
     fprintf('Pitch : %03.01f\n',stateMsg.Pitch);
     fprintf('Roll :  %03.01f\n',stateMsg.Roll);
+    fprintf('Altitude :  %03.01f\n',stateMsg.Up);
     fprintf('LoopRate Hz: %03d\n',round(1/toc) )
      
     

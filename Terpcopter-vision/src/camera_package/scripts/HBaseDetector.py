@@ -10,13 +10,11 @@ def eucdist(x1,y1,x2,y2):
     return dist
 
 
-def HBase(frame):
+#def HBase(frame):
+def HBase(frame,pubHPixelX, pubHPixelY, pubHAngle, pubHDetected):
     #height,width= frame.shape[:2]
     #frame = cv2.resize(frame,(int(0.5*width), int(0.5*height)), interpolation = cv2.INTER_AREA)
-    pubHPixelX = rospy.Publisher('hPixelX', Float32, queue_size=1)
-    pubHPixelY = rospy.Publisher('hPixelY', Float32, queue_size=1)
-    pubHAngle = rospy.Publisher('hAngle',Float32,queue_size=1)
-    pubHDetected = rospy.Publisher('hDetected',Bool,queue_size=1)
+    
     homeBaseDetected = False
     hError = -10000.0
     vError = -10000.0
@@ -28,7 +26,7 @@ def HBase(frame):
     higher = int(max(255,(1.0+0.33)*v))
     kernel = np.ones((5,5), np.uint8)
     lower_black = np.array([0,0,0])
-    higher_black = np.array([180,255,60]) #######Tune the V value, reduce it for robustness(Tune this at UPenn) 
+    higher_black = np.array([180,255,40]) #old--->v==60#######Tune the V value, reduce it for robustness(Tune this at UPenn) 
     masking_black = cv2.inRange(hsv_frame, lower_black, higher_black) 
     masking_black = cv2.morphologyEx(masking_black,cv2.MORPH_CLOSE,kernel)
     frame_blur = cv2.bilateralFilter(masking_black, 9, 75, 75)
@@ -47,7 +45,7 @@ def HBase(frame):
           for c1 in contours:
                (x,y,w,h) = cv2.boundingRect(c1)
                approx = cv2.approxPolyDP(c1, 0.01*cv2.arcLength(c1, True), True)
-               if(len(approx) == 12 and cv2.contourArea(c1) > 500): # Might have to tune thearea  value
+               if(len(approx) == 12 and cv2.contourArea(c1) > 400): # Might have to tune thearea  value
                     cnt.append(c1)
                     (xf,yf,wf,hf) = cv2.boundingRect(c1)
                     hbaseContour.append([xf-5,yf-5,wf+5,hf+5])

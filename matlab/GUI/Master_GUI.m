@@ -22,7 +22,7 @@ function varargout = Master_GUI(varargin)
 
 % Edit the above text to modify the response to help Master_GUI
 
-% Last Modified by GUIDE v2.5 02-May-2019 20:52:22
+% Last Modified by GUIDE v2.5 11-May-2019 14:40:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -70,10 +70,7 @@ guidata(hObject, handles);
 % --- Outputs from this function are returned to the command line.
 function varargout = Master_GUI_OutputFcn(hObject, eventdata, handles)
 
-%rosinit;
-if(~robotics.ros.internal.Global.isNodeActive)
-    rosinit;
-end
+
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -95,21 +92,21 @@ disp('Callback for px4 launch...');
 system('./scripts/px4_script.sh &');
 first_run = 1;
 error_flag = 0;
-while( error_flag==1 || first_run == 1 )
-    pause(0.1);
-    try
-        disp('Trying to subscribe to /mavros/imu/data...');
-        sub = rossubscriber('/mavros/imu/data');
-        first_run = 0;
-        error_flag = 0;
-    catch error
-        disp(error.identifier)
-        error_flag = 1;
-    end
-end
-msg = receive(sub,30);
+% while( error_flag==1 || first_run == 1 )
+%     pause(0.1);
+%     try
+%         disp('Trying to subscribe to /mavros/imu/data...');
+%         sub = rossubscriber('/mavros/imu/data');
+%         first_run = 0;
+%         error_flag = 0;
+%     catch error
+%         disp(error.identifier)
+%         error_flag = 1;
+%     end
+% end
+%msg = receive(sub,30);
 set(handles.text2,'String','active');
- msg = receive(sub,30);
+% msg = receive(sub,30);
 % msg = receive(sub,30);
 
 % hObject    handle to pushbutton1 (see GCBO)
@@ -126,20 +123,20 @@ if cwd{end} ~= "GUI"
 end
 set(handles.text3,'String','launching');
 system('./scripts/camera_script.sh &')
-first_run = 1;
-error_flag = 0;
-while( error_flag==1 || first_run == 1 )
-    pause(0.1);
-    try
-        sub = rossubscriber('/terpcopter/cameras/forward/image/compressed');
-        first_run = 0;
-        error_flag = 0;
-    catch error
-        disp(error.identifier)
-        error_flag = 1;
-    end
-end
-msg = receive(sub,20);
+% first_run = 1;
+% error_flag = 0;
+% while( error_flag==1 || first_run == 1 )
+%     pause(0.1);
+%     try
+%         sub = rossubscriber('/camera/image_raw/compressed');
+%         first_run = 0;
+%         error_flag = 0;
+%     catch error
+%         disp(error.identifier)
+%         error_flag = 1;
+%     end
+% end
+% msg = receive(sub,20);
 set(handles.text3,'String','active');
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -399,3 +396,144 @@ close();
 % hObject    handle to pushbutton10 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in radiobutton3.
+function radiobutton3_Callback(hObject, eventdata, handles)
+% Change loadParams
+fid = fopen('/home/amav/amav/Terpcopter3.0/matlab/loadParams.m','rt') ;
+X = fread(fid) ;
+fclose(fid) ;
+X = char(X.') ; 
+S1='192.168.1.93';
+S2='192.168.1.81';
+Y = strrep(X, S1, S2) ;
+% replace string S1 with string S2
+fid2 = fopen('/home/amav/amav/Terpcopter3.0/matlab/loadParams.m','wt') ;
+fwrite(fid2,Y) ;
+fclose (fid2) ;
+
+% Change autolaunch_px4
+fid = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_px4','rt') ;
+X = fread(fid) ;
+fclose(fid) ;
+X = char(X.') ; 
+S1='192.168.1.93';
+S2='192.168.1.81';
+Y = strrep(X, S1, S2) ;
+% replace string S1 with string S2
+fid2 = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_px4','wt') ;
+fwrite(fid2,Y) ;
+fclose (fid2) ;
+
+% Change autolaunch_px4
+fid = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_camera','rt') ;
+X = fread(fid) ;
+fclose(fid) ;
+X = char(X.') ; 
+S1='192.168.1.93';
+S2='192.168.1.81';
+Y = strrep(X, S1, S2) ;
+% replace string S1 with string S2
+fid2 = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_camera','wt') ;
+fwrite(fid2,Y) ;
+fclose (fid2) ;
+
+% Change bashrc
+fid = fopen('~/.bashrc','rt') ;
+X = fread(fid) ;
+fclose(fid) ;
+X = char(X.') ; 
+S1='ROS_MASTER_URI=http://192.168.1.93:11311';
+S2='ROS_MASTER_URI=http://192.168.1.81:11311';
+Y = strrep(X, S1, S2) ;
+% replace string S1 with string S2
+fid2 = fopen('~/.bashrc','wt') ;
+fwrite(fid2,Y) ;
+fclose (fid2) ;
+
+
+% source bashrc
+PATH = getenv('PATH');
+setenv('PATH', [PATH ':/usr/local/desiredpath']);
+unix('source ~/.bashrc')
+
+if(~robotics.ros.internal.Global.isNodeActive)
+    rosinit('192.168.1.81');
+end
+% hObject    handle to radiobutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton3
+
+
+% --- Executes on button press in radiobutton4.
+function radiobutton4_Callback(hObject, eventdata, handles)
+
+% Change loadParams
+fid = fopen('/home/amav/amav/Terpcopter3.0/matlab/loadParams.m','rt') ;
+X = fread(fid) ;
+fclose(fid) ;
+X = char(X.') ; 
+S1='192.168.1.81';
+S2='192.168.1.93';
+Y = strrep(X, S1, S2) ;
+% replace string S1 with string S2
+fid2 = fopen('/home/amav/amav/Terpcopter3.0/matlab/loadParams.m','wt') ;
+fwrite(fid2,Y) ;
+fclose (fid2) ;
+
+% Change autolaunch_px4
+fid = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_px4','rt') ;
+X = fread(fid) ;
+fclose(fid) ;
+X = char(X.') ; 
+S1='192.168.1.81';
+S2='192.168.1.93';
+Y = strrep(X, S1, S2) ;
+% replace string S1 with string S2
+fid2 = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_px4','wt') ;
+fwrite(fid2,Y) ;
+fclose (fid2) ;
+
+% Change autolaunch_px4
+fid = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_camera','rt') ;
+X = fread(fid) ;
+fclose(fid) ;
+X = char(X.') ; 
+S1='192.168.1.81';
+S2='192.168.1.93';
+Y = strrep(X, S1, S2) ;
+% replace string S1 with string S2
+fid2 = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_camera','wt') ;
+fwrite(fid2,Y) ;
+fclose (fid2) ;
+
+% Change bashrc
+fid = fopen('~/.bashrc','rt') ;
+X = fread(fid) ;
+fclose(fid) ;
+X = char(X.') ; 
+S1='ROS_MASTER_URI=http://192.168.1.81:11311';
+S2='ROS_MASTER_URI=http://192.168.1.93:11311';
+Y = strrep(X, S1, S2) ;
+% replace string S1 with string S2
+fid2 = fopen('~/.bashrc','wt') ;
+fwrite(fid2,Y) ;
+fclose (fid2) ;
+
+
+% source bashrc
+PATH = getenv('PATH');
+setenv('PATH', [PATH ':/usr/local/desiredpath']);
+unix('source ~/.bashrc')
+
+if(~robotics.ros.internal.Global.isNodeActive)
+    rosinit('192.168.1.93');
+end
+% hObject    handle to radiobutton4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton4
