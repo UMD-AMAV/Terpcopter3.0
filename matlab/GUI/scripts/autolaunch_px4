@@ -1,6 +1,6 @@
 #!/usr/bin/expect
 
-spawn ssh odroid@192.168.1.81
+spawn ssh odroid@192.168.1.93
 expect "password"
 send "odroid\r"
 expect "odroid"

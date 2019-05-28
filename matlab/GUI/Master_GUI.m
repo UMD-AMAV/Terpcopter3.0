@@ -51,11 +51,16 @@ function Master_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to Master_GUI (see VARARGIN)
-
-global pathToGUI
-pathToGUI = '/home/amav/amav/Terpcopter3.0/matlab/GUI';
+global pathToMatlabRoot pathToGUI pathToGUIScripts
+%pathToGUI = '/home/amav/amav/Terpcopter3.0/matlab/GUI';
 %pathToGUI = '/home/wolek/Desktop/Research/Projects/UMD/AMAV/Terpcopter3.0/matlab/GUI';
+pathToGUI = '/home/zlacey/Terpcopter3.0/matlab/GUI';
+
 cd(pathToGUI)
+addpath('../');
+params = loadParams();
+pathToMatlabRoot = params.env.matlabRoot;
+pathToGUIScripts = [params.env.matlabRoot '/GUI/scripts'];
 
 % Choose default command line output for Master_GUI
 handles.output = hObject;
@@ -89,7 +94,7 @@ if cwd{end} ~= "GUI"
 end
 set(handles.text2,'String','launching');
 disp('Callback for px4 launch...');
-system('./scripts/px4_script.sh &');
+system('./scripts/px4_script.sh');
 first_run = 1;
 error_flag = 0;
 % while( error_flag==1 || first_run == 1 )
@@ -401,7 +406,8 @@ close();
 % --- Executes on button press in radiobutton3.
 function radiobutton3_Callback(hObject, eventdata, handles)
 % Change loadParams
-fid = fopen('/home/amav/amav/Terpcopter3.0/matlab/loadParams.m','rt') ;
+global pathToMatlabRoot pathToGUI pathToGUIScripts
+fid = fopen([pathToMatlabRoot '/loadParams.m'],'rt')
 X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
@@ -409,12 +415,12 @@ S1='192.168.1.93';
 S2='192.168.1.81';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
-fid2 = fopen('/home/amav/amav/Terpcopter3.0/matlab/loadParams.m','wt') ;
+fid2 = fopen([pathToMatlabRoot '/loadParams.m'],'wt') ;
 fwrite(fid2,Y) ;
 fclose (fid2) ;
 
 % Change autolaunch_px4
-fid = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_px4','rt') ;
+fid = fopen([pathToGUIScripts '/autolaunch_px4'],'rt') ;
 X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
@@ -422,12 +428,12 @@ S1='192.168.1.93';
 S2='192.168.1.81';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
-fid2 = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_px4','wt') ;
+fid2 = fopen([pathToGUIScripts '/autolaunch_px4'],'wt') ;
 fwrite(fid2,Y) ;
 fclose (fid2) ;
 
 % Change autolaunch_px4
-fid = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_camera','rt') ;
+fid = fopen([pathToGUIScripts '/autolaunch_camera'],'rt') ;
 X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
@@ -435,7 +441,7 @@ S1='192.168.1.93';
 S2='192.168.1.81';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
-fid2 = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_camera','wt') ;
+fid2 = fopen([pathToGUIScripts '/autolaunch_camera'],'wt') ;
 fwrite(fid2,Y) ;
 fclose (fid2) ;
 
@@ -472,7 +478,8 @@ end
 function radiobutton4_Callback(hObject, eventdata, handles)
 
 % Change loadParams
-fid = fopen('/home/amav/amav/Terpcopter3.0/matlab/loadParams.m','rt') ;
+global pathToMatlabRoot pathToGUI pathToGUIScripts
+fid = fopen([pathToMatlabRoot '/loadParams.m'],'rt')
 X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
@@ -480,12 +487,12 @@ S1='192.168.1.81';
 S2='192.168.1.93';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
-fid2 = fopen('/home/amav/amav/Terpcopter3.0/matlab/loadParams.m','wt') ;
+fid2 = fopen([pathToMatlabRoot '/loadParams.m'],'wt') ;
 fwrite(fid2,Y) ;
 fclose (fid2) ;
 
 % Change autolaunch_px4
-fid = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_px4','rt') ;
+fid = fopen([pathToGUIScripts '/autolaunch_px4'],'rt') ;
 X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
@@ -493,12 +500,12 @@ S1='192.168.1.81';
 S2='192.168.1.93';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
-fid2 = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_px4','wt') ;
+fid2 = fopen([pathToGUIScripts '/autolaunch_px4'],'wt') ;
 fwrite(fid2,Y) ;
 fclose (fid2) ;
 
 % Change autolaunch_px4
-fid = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_camera','rt') ;
+fid = fopen([pathToGUIScripts '/autolaunch_camera'],'rt') ;
 X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
@@ -506,7 +513,7 @@ S1='192.168.1.81';
 S2='192.168.1.93';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
-fid2 = fopen('/home/amav/amav/Terpcopter3.0/matlab/GUI/scripts/autolaunch_camera','wt') ;
+fid2 = fopen([pathToGUIScripts '/autolaunch_camera'],'wt') ;
 fwrite(fid2,Y) ;
 fclose (fid2) ;
 
