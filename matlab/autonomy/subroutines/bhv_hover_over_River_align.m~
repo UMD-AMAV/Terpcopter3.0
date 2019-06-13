@@ -1,0 +1,86 @@
+function [completionFlag, ayprCmd] = bhv_hover_over_River_align(stateEstimateMsg, ayprCmd, completion, bhvTime, rDetected, rAngle, rPixelX, rPixelY, bhvLog)
+
+% rDetected
+% rPixelX = 0 to 640 (pixels)
+% rPixelY = 0 to 480
+
+
+% Note: Pitch cmd (+) = negative pitch (nose down)
+%       Roll cmd (-) = positivie roll (right wing down)
+
+persistent filtPixelX filtPixelY errorSumX errorSumY diffX diffY desiredYaw;
+
+
+% pitch gains
+Kpitch = 0.03/100;
+Kdp = 0.005; 
+Kip = 1.5e-6;
+satLimit = 0.15;
+
+% yRiver filter 
+ySetpoint = 360; % Setpoint of River Line Midpoint
+Ky_no_det = 0.02;
+Ky_det = 0.2;
+filtTimeConstant = 1;
+dt = 1/25;
+
+% unpack state
+theta = stateEstimateMsg.Pitch;
+yaw = stateEstimateMsg.Yaw;
+
+if isempty(filtPixelY)
+    filtPixelY = 0;
+    errorSumY = 0;
+    diffY = 0;
+    desiredYaw = ayprCmd.YawDesiredDegrees;
+end
+
+filtPixelYprev = filtPixelY;
+
+if ( rDetected )
+    % filter rpixel
+    filtPixelY = filtPixelY - Ky_det*(filtPixelY - yErr);
+else
+    % converge to zero
+    filtPixelY = filtPixelY - Ky_no_det*(filtPixelY);    
+end
+       
+% leaky integrator (y pixel)
+errorSumY = errorSumY + filtPixelY;
+errorSumY = 0.95*errorSumY ; 
+
+% low pass filter (y pixel)
+alpha = dt / ( filtTimeConstant + dt); 
+diffY = (1-alpha)*diffY + alpha*(filtPixelY - filtPixelYprev);
+
+% command 
+pitchCmd = -Kpitch*filtPixelY - Kdp*diffY - Kip*errorSumX;
+
+% saturate
+ayprCmd.PitchDesiredDegrees = max(-satLimit, min(satLimit, pitchCmd));
+
+
+% if river detected 
+if (rDetected)
+    % set yaw to align with river
+    delY = yRight - yLeft;
+    rAngle = atand(delY,720);
+    desiredYawCurrent = yaw + rAngle;
+    desiredYaw = (1-alpha)*desiredYaw + alpha*desiredYawCurrent;
+    
+    % itch 
+
+    
+end
+
+
+ayprCmd.YawDesiredDegrees = desiredYaw;
+
+% behavior completes after time elapsed
+if bhvTime >= completion.durationSec
+    completionFlag = 1;
+    return;
+end
+completionFlag = 0;
+
+end

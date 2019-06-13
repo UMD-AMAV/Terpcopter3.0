@@ -10,6 +10,7 @@ params.env.catkinSrcDir = '/home/amav/catkin_ws/src';
 %params.env.catkinSrcDir = '/home/zlacey/catkin_ws/src';
 params.env.terpcopterMatlabMsgs = [params.env.catkinSrcDir '/matlab_gen/msggen'];
 %params.env.matlabRoot = '/home/wolek/Desktop/Research/Projects/UMD/AMAV/Terpcopter3.0/matlab';
+%params.env.matlabRoot = '/home/zlacey/Terpcopter3.0/matlab'
 params.env.matlabRoot = '/home/amav/amav/Terpcopter3.0/matlab';
 
 % Virtual transmitter (vtx) 

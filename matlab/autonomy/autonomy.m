@@ -69,7 +69,8 @@ end
 % mission = loadMission_PitchRollTestJerrar();
 % mission = loadMission_StayOverHJerrar();
 % mission = loadMission_CompetitionTakeoffHoverLand();
-mission = loadMission_CompetitionTakeoffHoverPointLand();
+% mission = loadMission_CompetitionTakeoffHoverPointLand();
+mission = loadMission_CompetitionTakeoffHoverPointRiverLand();
 % mission = loadMission_StayOverHAlign();
 
 fprintf('Launching Autonomy Node...\n');
@@ -101,6 +102,13 @@ fprintf('Subscribing to startMission ...\n');
 startMissionSubscriber = rossubscriber('/startMission', 'std_msgs/Bool');
 
 % vision-based subscribers depend on mission
+if ( mission.config.R_detector )
+    fprintf('Subscribing to River detector topics ...\n');
+    % R detection
+    rDetectedSub = rossubscriber('/RDetected');
+    rLeftSub = rossubscriber('/RYleft');
+    rRightSub = rossubscriber('/RYright');
+end
 if ( mission.config.H_detector )
     fprintf('Subscribing to H detector topics ...\n');
     % H detection
@@ -145,6 +153,7 @@ dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
 autonomyLog = [params.env.matlabRoot '/autonomy_' dateString '.log'];
 hfilterLog = [params.env.matlabRoot '/hFilter_' dateString '.log'];
 bhvLog = [params.env.matlabRoot '/bhv_' dateString '.log'];
+riverLog = [params.env.matlabRoot '/river_' dateString '.log'];
 
 
 timeForPlot = tic;
@@ -166,6 +175,22 @@ if ( strcmp(params.auto.mode,'auto'))
         % get latest messages
         stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
         imuMsg = imuDataSubscriber.LatestMessage;
+        if ( mission.config.R_detector )
+            try
+                rDetected = rDetectedSub.LatestMessage.Data
+                yLeft = rLeftSub.LatestMessage.Data
+                yRight = rRightSub.LatestMessage.Data
+                if ( yLeft == -10000 || yRight == -10000 )
+                    disp('Bad River message');
+                    rDetected  = 0;
+                end
+            catch
+                disp('No River message');
+                rDetected = 0;                
+                yLeft = 0;
+                yRight = 0;
+            end
+        end
         if ( mission.config.H_detector )
             try
                 hDetected = hDetectedSub.LatestMessage.Data
@@ -256,6 +281,9 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover_over_H_align'
                    [completionFlag, ayprCmd] = bhv_hover_over_H_align(stateEstimateMsg, ayprCmd, completion, bhvTime, hDetected, hAngle, hPixelX, hPixelY, bhvLog);                    
                    mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)                        
+                case 'bhv_hover_over_River_align'
+                    [completionFlag, ayprCmd] = bhv_hover_over_River_align(stateEstimateMsg, ayprCmd, completion, bhvTime, rDetected, yLeft, yRight, riverLog);
+                    mission.bhv{1}.ayprCmd = ayprCmd; % vision actively controls yaw (for now, later pitch/roll)                        
                 case 'bhv_hover_drop'
                     [completionFlag, servoCmd] = bhv_hover_drop(completion, bhvTime );
                 case 'bhv_point_to_direction'
