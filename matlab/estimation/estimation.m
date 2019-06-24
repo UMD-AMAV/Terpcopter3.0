@@ -36,12 +36,17 @@ end
 % Subscribers
 imuDataSubscriber = rossubscriber('/mavros/imu/data');
 lidarDataSubscriber = rossubscriber('/mavros/distance_sensor/hrlv_ez4_pub');
+%lidarDataSubscriber = rossubscriber('/mavros/distance_sensor/rangefinder_pub');
 
 % Publishers
 stateEstimatePublisher = rospublisher('/stateEstimate', 'terpcopter_msgs/stateEstimate');
+%fakeGPSPublisher = rospublisher('/mavros/fake_gps/mocap/pose', 'geometry_msgs/PoseStamped');
+%fakeGPSPublishedr = rospublisher('/mavros/mocap/pose', 'geometry_msgs/PoseStamped');
+fakeGPSPublisher = rospublisher('/mavros/vision_pose/pose', 'geometry_msgs/PoseStamped');
 
 pause(2)
 stateMsg = rosmessage(stateEstimatePublisher);
+fakeGPSMsg = rosmessage(fakeGPSPublisher);
 %stateMsg.Range = 0.2;
 t0 = [];
 
@@ -90,6 +95,7 @@ state.phi = rad2deg(euler(3));
 inertial_yaw_initial = state.psi_inertial;
 tic
 
+gps = 1;
 while(1)
     tic
     % Receive Latest Imu and Lidar data
@@ -180,9 +186,18 @@ while(1)
     fprintf('Altitude :  %03.01f\n',stateMsg.Up);
     fprintf('LoopRate Hz: %03d\n',round(1/toc) )
      
+    % Fake GPS/ Motion Capture
+    fakeGPSMsg.Pose.Position.X = gps;
+    fakeGPSMsg.Pose.Position.Y = 1.0;
+    fakeGPSMsg.Pose.Position.Z = 1.0;
+    fakeGPSMsg.Pose.Orientation.X = 4.0;
+    fakeGPSMsg.Pose.Orientation.Y = 3.0;
+    fakeGPSMsg.Pose.Orientation.Z = 1.0;
+    fakeGPSMsg.Pose.Orientation.W = 2.0;
     
-    % publish stateEstimate
+    gps = gps + 1;
+    % publish 
     send(stateEstimatePublisher, stateMsg);
-    
+    send(fakeGPSPublisher, fakeGPSMsg);
 end
 

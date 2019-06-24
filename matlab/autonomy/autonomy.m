@@ -56,7 +56,7 @@ end
 
 % Cypress Missions
 % missions
-% mission = loadMission_takeoffHoverLand();
+ mission = loadMission_takeoffHoverLand();
 % mission = loadMission_takeoffHoverDropPackageLand();
 % mission = loadMission_takeoffHoverFlyForwardLand();
 % mission = loadMission_takeoffHoverFlyForwardProbeLand();
@@ -70,7 +70,7 @@ end
 % mission = loadMission_StayOverHJerrar();
 % mission = loadMission_CompetitionTakeoffHoverLand();
 % mission = loadMission_CompetitionTakeoffHoverPointLand();
-mission = loadMission_CompetitionTakeoffHoverPointRiverLand();
+% mission = loadMission_CompetitionTakeoffHoverPointRiverLand();
 % mission = loadMission_StayOverHAlign();
 
 fprintf('Launching Autonomy Node...\n');

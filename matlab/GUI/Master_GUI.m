@@ -52,9 +52,9 @@ function Master_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to Master_GUI (see VARARGIN)
 global pathToMatlabRoot pathToGUI pathToGUIScripts
-%pathToGUI = '/home/amav/amav/Terpcopter3.0/matlab/GUI';
+pathToGUI = '/home/amav/amav/Terpcopter3.0/matlab/GUI';
 %pathToGUI = '/home/wolek/Desktop/Research/Projects/UMD/AMAV/Terpcopter3.0/matlab/GUI';
-pathToGUI = '/home/zlacey/Terpcopter3.0/matlab/GUI';
+%pathToGUI = '/home/zlacey/Terpcopter3.0/matlab/GUI';
 
 cd(pathToGUI)
 addpath('../');
