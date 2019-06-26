@@ -93,23 +93,21 @@ if cwd{end} ~= "GUI"
     cd(pathToGUI)
 end
 set(handles.text2,'String','launching');
-disp('Callback for px4 launch...');
-system('./scripts/px4_script.sh');
+system('./scripts/px4_script.sh &');
 first_run = 1;
 error_flag = 0;
-% while( error_flag==1 || first_run == 1 )
-%     pause(0.1);
-%     try
-%         disp('Trying to subscribe to /mavros/imu/data...');
-%         sub = rossubscriber('/mavros/imu/data');
-%         first_run = 0;
-%         error_flag = 0;
-%     catch error
-%         disp(error.identifier)
-%         error_flag = 1;
-%     end
-% end
-%msg = receive(sub,30);
+while( error_flag==1 || first_run == 1 )
+    pause(0.1);
+    try
+        sub = rossubscriber('/mavros/imu/data');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+end
+msg = receive(sub,20);
 set(handles.text2,'String','active');
 % msg = receive(sub,30);
 % msg = receive(sub,30);
@@ -536,9 +534,9 @@ PATH = getenv('PATH');
 setenv('PATH', [PATH ':/usr/local/desiredpath']);
 unix('source ~/.bashrc')
 
-if(~robotics.ros.internal.Global.isNodeActive)
-    rosinit('192.168.1.93');
-end
+% if(~robotics.ros.internal.Global.isNodeActive)
+%     rosinit('192.168.1.93');
+% end
 % hObject    handle to radiobutton4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
