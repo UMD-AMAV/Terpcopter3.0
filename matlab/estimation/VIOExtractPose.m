@@ -8,7 +8,7 @@ fprintf('Estimation Node Launching...\n');
 
 % intialize ros node
 if(~robotics.ros.internal.Global.isNodeActive)
-    rosinit;
+    rosinit('192.168.1.68');            % ip of ROS Master
 end
 
 % Subscribers
@@ -44,7 +44,7 @@ VIOphi = rad2deg(VIOeuler(3));
 
 logFlag = 1;
 dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
-VIOLog = [params.env.matlabRoot '/VIO_' dateString '.log'];
+VIOLog = ['C:\Users\CDCL\Documents\GitHub\Terpcopter3.0\matlab\estimation' '/VIO_' dateString '.log'];
 
 while(1)
 tic
@@ -55,7 +55,7 @@ VIOMsg = VIODataSubscriber.LatestMessage;
 VIOTime = VIOMsg.Header.Stamp.Sec;
 % VIO Pose
 % Position
-VIOPositionX = VIOMsg.Pose.Pose.Position.X;
+VIOPositionX = VIOMsg.Pose.Pose.Position.X
 VIOPositionY = VIOMsg.Pose.Pose.Position.Y;
 VIOPositionZ = VIOMsg.Pose.Pose.Position.Z;
 

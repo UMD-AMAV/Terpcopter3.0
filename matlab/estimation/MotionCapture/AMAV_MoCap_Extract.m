@@ -5,6 +5,8 @@ clc
 % clearvars -except K_in
 
 addpath('./WillsCode');
+addpath('../');
+
 %% Initialization
 Np    = 1; % number of guardians
 % Nt    = 0; % number of intruders
@@ -14,9 +16,44 @@ tend= 55;%55;%480; % Time that MATLAB collects Mocap data (seconds)
 SE3 = 0;
 linear = 1;
 
+ROS_Master_ip = '192.168.1.68';
+
+% intialize ros node
+if(~robotics.ros.internal.Global.isNodeActive)
+    rosinit(ROS_Master_ip);            % ip of ROS Master
+end
+
+% Subscribers
+VIODataSubscriber = rossubscriber('/camera/odom/sample', 'nav_msgs/Odometry');
+r = robotics.Rate(100);
+reset(r);
+
+VIOMsg = VIODataSubscriber.LatestMessage;
+
+% % VIO Time
+% VIOTime = VIOMsg.Header.Stamp.Sec;
+% % VIO Pose
+% % Position
+% VIOPositionX = VIOMsg.Pose.Pose.Position.X;
+% VIOPositionY = VIOMsg.Pose.Pose.Position.Y;
+% VIOPositionZ = VIOMsg.Pose.Pose.Position.Z;
+% 
+% % Orientation
+% VIOOrientationX = VIOMsg.Pose.Pose.Orientation.X;
+% VIOOrientationY = VIOMsg.Pose.Pose.Orientation.Y;
+% VIOOrientationZ = VIOMsg.Pose.Pose.Orientation.Z;
+% VIOOrientationW = VIOMsg.Pose.Pose.Orientation.W;
+% 
+% VIOeuler = quat2eul([VIOOrientationW VIOOrientationX VIOOrientationY VIOOrientationZ]);
+% 
+% VIOpsi = rad2deg(VIOeuler(1));
+% VIOtheta = rad2deg(VIOeuler(2));
+% VIOphi = rad2deg(VIOeuler(3));
+
 logFlag = 1;
 dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
-MoCapLog = ['C:\Users\CDCL\Documents\GitHub\Terpcopter3.0\matlab\estimation\MotionCapture' '\MoCap_' dateString '.log'];
+MoCapLog = ['C:\Users\CDCL\Documents\GitHub\Terpcopter3.0\matlab\estimation\MoCapAndVIOLogs' '\MoCap_' dateString '.log'];
+VIOLog = ['C:\Users\CDCL\Documents\GitHub\Terpcopter3.0\matlab\estimation\MoCapAndVIOLogs' '/VIO_' dateString '.log'];
 
 if linear && SE3
     disp('Can''t have linear and SE3 at the same time!')
@@ -48,19 +85,6 @@ else
     psi_scale = 1;
 end
     psi_des = 0*pi/4;% asin(cross([1;0;0],Eb1d))
-% vt0   = 0;%2;
-
-% % These gains can handle all of the cases I've given it!!!
-% K_in(1) = 0.36;
-% K_in(2) = 0.72;
-% K_in(3) = 150;
-% K_in(4) = 25;
-
-% % % These gains work even better!!!!!
-% K_in(1) = 3; %0.67;
-% K_in(2) = 2;%K_in(1)/3;%0.67;
-% K_in(3) = 1500;%150;
-% K_in(4) = K_in(3)/5;
 
 if SE3
     % Best gains with a fresh battery, even showing adequate disturbance
@@ -72,53 +96,6 @@ if SE3
     kpsi = [1, 0.1, 0.01];
     
 elseif linear
-    % % % Initial CONDUIT Gains
-%     K_in(1,1:3) =   [3.66,3.73,6*5.94];%[6.18,6.12,6*5.94];% 0.2*[1,1,1]; %(34/24)* %Kx 
-%     K_in(2,1:3) =   [1.48,1.44,6*9.16];%[7.22,6.30,6*9.16];%   9*[1,1,1]; %Kv
-%     K_in(3,1:3) =   [417, 416, 28.1]; %KR %500*[1,1,1];%30*%[23.9, 24.08 197.6];
-%     K_in(4,1:3) =   [18.8, 20.0, 10.0];%KOmega % 75*[1,1,1];%10*%[9.68, 9.68, 15.56];
-%     kpsi        =   73*[K_in(3,3), K_in(4,3)];
-%     k_ramp      =   [1.17; 1.20; 0.247];%[1.17; 1.20; 0.247];%[0.373; 0.333; 0.247];
-
-    % % % Gains that worked experimentally, based on CONDUIT gains
-%     K_in(1,1:3) =   [3.66,3.73,6*5.94];%[6.18,6.12,6*5.94];% 0.2*[1,1,1]; %(34/24)* %Kx 
-%     K_in(2,1:3) =   [3.48,3.44,6*9.16];%[7.22,6.30,6*9.16];%   9*[1,1,1]; %Kv
-%     K_in(3,1:3) =   [417, 416, 28.1]; %KR %500*[1,1,1];%30*%[23.9, 24.08 197.6];
-%     K_in(4,1:3) =   [18.8, 20.0, 10.0];%KOmega % 75*[1,1,1];%10*%[9.68, 9.68, 15.56];
-%     kpsi        =   73*[K_in(3,3), K_in(4,3)];
-%     k_ramp      =   [1.17; 1.20; 0.5];%[1.17; 1.20; 0.247];%[0.373; 0.333; 0.247];
-% %     z_desired = z_desired*k_ramp(3);
-    
-%     % % % Gains that are close to the experimental gains, verified in CONDUIT
-%     K_in(1,1:3) =   [4.28,3.89,6*7.11];%[6.18,6.12,6*5.94];% 0.2*[1,1,1]; %(34/24)* %Kx 
-%     K_in(2,1:3) =   [3.91,3.81,6*7.17];%[7.22,6.30,6*9.16];%   9*[1,1,1]; %Kv
-%     K_in(3,1:3) =   [417, 416, 28.1]; %KR %500*[1,1,1];%30*%[23.9, 24.08 197.6];
-%     K_in(4,1:3) =   [18.8, 20.0, 10.0];%KOmega % 75*[1,1,1];%10*%[9.68, 9.68, 15.56];
-%     kpsi        =   73*[K_in(3,3), K_in(4,3)];
-%     k_ramp      =   [1.01; 0.999; 0.784];%[1.17; 1.20; 0.247];%[0.373; 0.333; 0.247]; 
-%     % % % Improving wind rejection - Doesn't seem to make a difference to
-%     % have flow sensing with the current gains, only seems to make y
-%     % position hold worse.
-%     % % % Updated gains, which will be matched in Conduit, that were found to
-% % try and get better performance. IL were flown by hand (much better), OL
-% % testing now! and OL verified to function with these IL in conduit
-%     K_in(1,1:3) =   [7.08,7.70,6*7.11];%[6.18,6.12,6*5.94];% 0.2*[1,1,1]; %(34/24)* %Kx 
-%     K_in(2,1:3) =   [5.19,5.33,6*7.17];%[7.22,6.30,6*9.16];%   9*[1,1,1]; %Kv
-%     K_in(3,1:3) =   [500, 500, 45]; %KR %500*[1,1,1];%30*%[23.9, 24.08 197.6];
-%     K_in(4,1:3) =   [45, 45, 10];%KOmega % 75*[1,1,1];%10*%[9.68, 9.68, 15.56];
-%     kpsi        =   73*[K_in(3,3), K_in(4,3)];
-%     k_ramp      =   [1.04; 1.04; 0.784];%[1.17; 1.20; 0.247];%[0.373; 0.333; 0.247]; 
-
-%     % % % flow sensing is still worse, so I'm trying to check the gains
-%     % again
-%     K_in(1,1:3) =   [7.08,7.79,6*7.12];%[6.18,6.12,6*5.94];% 0.2*[1,1,1]; %(34/24)* %Kx 
-%     K_in(2,1:3) =   [5.96,6.30,6*9.79];%[7.22,6.30,6*9.16];%   9*[1,1,1]; %Kv
-%     K_in(3,1:3) =   [500, 500, 45]; %KR %500*[1,1,1];%30*%[23.9, 24.08 197.6];
-%     K_in(4,1:3) =   [45, 45, 10];%KOmega % 75*[1,1,1];%10*%[9.68, 9.68, 15.56];
-%     kpsi        =   73*[K_in(3,3), K_in(4,3)];
-%     K_zi        =   0*6*25;
-%     k_ramp      =   [1.28; 1.32; 0.574];%[1.17; 1.20; 0.247];%[0.373; 0.333; 0.247]; 
-    
     % % % flow sensing is still worse, so I'm trying to check the gains
     % again
     K_in(1,1:3) =   [12,12,6*7.2];%[6.18,6.12,6*5.94];% 0.2*[1,1,1]; %(34/24)* %Kx 
@@ -175,40 +152,6 @@ u_stick{1}(4) = 0;
         end
 
 
-%% Parameters (Swarming)
-% % Constant acceleration for swarming
-% umax       = 0;
-% % Pursuit
-% rho_a = 1.3;
-% rho_p = 0.5;
-% % Central force
-% Kcenter     =  0; % for crystalized swarm
-% % Kcenter     =  0.7; % for random swarm
-% Kdamp       =  1;
-% % Spacing term
-% Ksep        =  0;
-% Bsep        =  0;
-% x0          =  1;
-% rho_sep     =  x0/0.9;
-% % Gyro
-% Kgyro       =  0;
-% % Random
-% Krand       =  0;
-% intensity   =  2*pi;
-% % Bound on the range from center
-% Rmax       = 1;
-% % For position control
-% rref       = [.6;.9;.5];
-% % Centroid of the swarm
-% xcg = zeros(6*Np,1);
-% for vID = 1:Np
-%     xcg([1:3]+6*(vID-1)) = rref;
-% end
-% 
-% paramSwarming = v2struct(rho_a,rho_p,pursuit_phase,Np,Nt,umax,...
-%                          Rmax,Kcenter,Kdamp,x0,Ksep,Bsep,rho_sep,...
-%                          Kgyro,Krand,intensity);
-% 
 
 %% Run Experiment
 ii= 1;
@@ -247,31 +190,65 @@ while tnow < tend+4
     % Subtract bias
     ang= ang-ang_offset;
 
-    x = pos(1)
-    y = pos(2)
-    z = pos(3)
+    VIOMsg = VIODataSubscriber.LatestMessage;
+
+    % VIO Time
+    VIOTime = VIOMsg.Header.Stamp.Sec;
+    % VIO Pose
+    % Position
+    VIOPositionX = VIOMsg.Pose.Pose.Position.X;
+    VIOPositionY = VIOMsg.Pose.Pose.Position.Y;
+    VIOPositionZ = VIOMsg.Pose.Pose.Position.Z;
     
-    phi = ang(1)
-    theta = ang(2)
-    psi = ang(3)
+    % Orientation
+    VIOOrientationX = VIOMsg.Pose.Pose.Orientation.X;
+    VIOOrientationY = VIOMsg.Pose.Pose.Orientation.Y;
+    VIOOrientationZ = VIOMsg.Pose.Pose.Orientation.Z;
+    VIOOrientationW = VIOMsg.Pose.Pose.Orientation.W;
+    
+    VIOeuler = quat2eul([VIOOrientationW VIOOrientationX VIOOrientationY VIOOrientationZ]);
+    
+    VIOpsi = rad2deg(VIOeuler(1));
+    VIOtheta = rad2deg(VIOeuler(2));
+    VIOphi = rad2deg(VIOeuler(3));
+    
+    x = pos(1);
+    y = pos(2);
+    z = pos(3);
+    
+    phi = ang(1);
+    theta = ang(2);
+    psi = ang(3);
     
     if( logFlag )
         
-        [pFile, msg] = fopen( MoCapLog, 'a');
-        if pFile < 0
+        [pFile1, msg] = fopen( MoCapLog, 'a');
+        [pFile2, msg2] = fopen( VIOLog ,'a');
+        if pFile1 < 0
             error('Failed to open file "%s" for writing, because "%s"', MoCapLog, msg);
         end
+        if pFile2 < 0
+            error('Failed to open file "%s" for writing, because "%s"', VIOLog, msg2);
+        end
         
-        %write csv file
-        fprintf(pFile, '%6.6f,', tnow);
-        fprintf(pFile, '%6.6f,', x);
-        fprintf(pFile, '%6.6f,', y);
-        fprintf(pFile, '%6.6f,', z);
-        fprintf(pFile, '%6.6f,', phi);
-        fprintf(pFile, '%6.6f,', theta);
-        fprintf(pFile, '%6.6f\n', psi);
+        %write csv file Motion Capture
+        fprintf(pFile1, '%6.6f,', tnow);
+        fprintf(pFile1, '%6.6f,', x);
+        fprintf(pFile1, '%6.6f,', y);
+        fprintf(pFile1, '%6.6f,', z);
+        fprintf(pFile1, '%6.6f,', phi);
+        fprintf(pFile1, '%6.6f,', theta);
+        fprintf(pFile1, '%6.6f\n', psi);
     
-        fclose(pFile);
+        % write csv file Realsense VIO
+        fprintf(pFile2,'%6.6f,',VIOTime);
+        
+        fprintf(pFile2,'%6.6f,',VIOPositionX);
+        fprintf(pFile2,'%6.6f,',VIOPositionY);
+        fprintf(pFile2,'%6.6f\n',VIOPositionZ);
+        
+        fclose(pFile1);
+        fclose(pFile2);
     end
     
     % Initialization
@@ -559,6 +536,8 @@ end
     run_time(ii,2) = toc;
     
     ii= ii+1;
+    
+    waitfor(r);
 end
 
 disp('Stopped')
