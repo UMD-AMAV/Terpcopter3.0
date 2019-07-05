@@ -12,11 +12,11 @@ Np    = 1; % number of guardians
 % Nt    = 0; % number of intruders
 vIDs  = 1;%[1,2,3,4,6]; % vehicle ID specified in Motive (=ID on propeller)
 inds  = 1:Np;      % vehicle index in this simulation
-tend= 55;%55;%480; % Time that MATLAB collects Mocap data (seconds)
+tend= 125;%55;%480; % Time that MATLAB collects Mocap data (seconds)
 SE3 = 0;
 linear = 1;
 
-ROS_Master_ip = '192.168.1.68';
+ROS_Master_ip = '192.168.1.69';
 
 % intialize ros node
 if(~robotics.ros.internal.Global.isNodeActive)
