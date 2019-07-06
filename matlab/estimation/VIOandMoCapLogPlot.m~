@@ -143,44 +143,12 @@ DifferentiatedVelocityXMOCAP = gradient(PositionXMOCAP(:)) ./ gradient(TimeMOCAP
 DifferentiatedVelocityYMOCAP = gradient(PositionYMOCAP(:)) ./ gradient(TimeMOCAP(:));
 DifferentiatedVelocityZMOCAP = gradient(PositionZMOCAP(:)) ./ gradient(TimeMOCAP(:));
 
-DifferentiatedVelocityXVIO = gradient(PositionXVIO_withOffset(:)) ./ gradient(TimeMOCAP(:));
-DifferentiatedVelocityYVIO = gradient(PositionYVIO_withOffset(:)) ./ gradient(TimeMOCAP(:));
-DifferentiatedVelocityZVIO = gradient(PositionZVIO_withOffset(:)) ./ gradient(TimeMOCAP(:));
+DifferentiatedVelocityXVIO = gradient(PositionXVIO(:)) ./ gradient(TimeMOCAP(:));
+DifferentiatedVelocityYVIO = gradient(PositionYVIO(:)) ./ gradient(TimeMOCAP(:));
+DifferentiatedVelocityZVIO = gradient(PositionZVIO(:)) ./ gradient(TimeMOCAP(:));
 
 figure(4)
 subplot(3,1,1)
 hold on
 plot(TimeMOCAP, DifferentiatedVelocityXMOCAP);
 plot(TimeMOCAP, DifferentiatedVelocityXVIO);
-title('Differentiated Velocity X vs Time Comparision for Motion Capture and Realsense VIO');
-xlabel('Time (seconds)');
-ylabel('Velocity X (meters/second)');
-legend('Motion Capture','Realsense VIO');
-grid on
-set(gca, 'FontSize', 12);
-hold off
-
-subplot(3,1,2)
-hold on
-plot(TimeMOCAP, DifferentiatedVelocityYMOCAP);
-plot(TimeMOCAP, DifferentiatedVelocityYVIO);
-title('Differentiated Velocity Y vs Time Comparision for Motion Capture and Realsense VIO');
-xlabel('Time (seconds)');
-ylabel('Velocity Y (meters/second)');
-legend('Motion Capture','Realsense VIO');
-grid on
-set(gca, 'FontSize', 12);
-hold off
-
-subplot(3,1,3)
-hold on
-plot(TimeMOCAP, DifferentiatedVelocityZMOCAP);
-plot(TimeMOCAP, DifferentiatedVelocityZVIO);
-title('Differentiated Velocity Z vs Time Comparision for Motion Capture and Realsense VIO');
-xlabel('Time (seconds)');
-ylabel('Velocity Z (meters/second)');
-legend('Motion Capture','Realsense VIO');
-grid on
-set(gca, 'FontSize', 12);
-hold off
-
