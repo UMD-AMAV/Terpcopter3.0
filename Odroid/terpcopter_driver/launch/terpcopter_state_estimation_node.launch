@@ -1,0 +1,7 @@
+<launch>
+
+	<group>
+	<node pkg="terpcopter_driver" name="terpcopter_state_estimation_node" type="terpcopter_state_estimation_node.py" output="screen">
+	</node>
+	</group>
+</launch>
