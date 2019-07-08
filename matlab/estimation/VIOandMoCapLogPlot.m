@@ -32,9 +32,9 @@ PositionXMOCAP = data2(:,2);
 PositionYMOCAP = data2(:,3);
 PositionZMOCAP = data2(:,4);
 
-phi = data2(:,2);
-theta = data2(:,2);
-psi = data2(:,2);
+phi = data2(:,5);
+theta = data2(:,6);
+psi = data2(:,7);
 
 %% Plotting functions
 InitialOffsetX = PositionXMOCAP(1) + PositionXVIO(1)
