@@ -154,15 +154,6 @@ grid on
 set(gca, 'FontSize', 12);
 hold off
 
-DistanceError = sqrt(DifferencePositionX.^2 + DifferencePositionY.^2 + DifferencePositionZ.^2)
-
-figure(4)
-plot(TimeMOCAP, DistanceError);
-title('Distance Between Motion Capture and Realsense VIO Position')
-xlabel('Time (seconds)');
-ylabel('Distance (meters)');
-grid on
-set(gca, 'FontSize', 12);
 
 %% Plotting Velocity from Differentiated Position X Y Z
 DifferentiatedVelocityXMOCAP = gradient(PositionXMOCAP(:)) ./ gradient(TimeMOCAP(:));
@@ -173,7 +164,7 @@ DifferentiatedVelocityZMOCAP = gradient(PositionZMOCAP(:)) ./ gradient(TimeMOCAP
 % DifferentiatedVelocityYVIO = gradient(PositionYVIO(:)) ./ gradient(TimeMOCAP(:));
 % DifferentiatedVelocityZVIO = gradient(PositionZVIO(:)) ./ gradient(TimeMOCAP(:));
 
-figure(5)
+figure(4)
 subplot(3,1,1)
 hold on
 plot(TimeMOCAP, DifferentiatedVelocityXMOCAP);
@@ -206,55 +197,13 @@ title('Linear Velocity Z vs Time Comparision for Motion Capture and Realsense VI
 xlabel('Time (seconds)');
 ylabel('Velocity Z (meters/second)');
 legend('Differentiated Velocity Motion Capture','Velocity of Realsense VIO from Odom');
-grid on
-set(gca, 'FontSize', 12);
-hold off
-
-% Moving Average Filters on Differentiated Velocities
-DifferentiatedVelocityXMOCAP = movmean(DifferentiatedVelocityXMOCAP, 20);
-DifferentiatedVelocityYMOCAP = movmean(DifferentiatedVelocityYMOCAP, 20);
-DifferentiatedVelocityZMOCAP = movmean(DifferentiatedVelocityZMOCAP, 20);
-
-figure(6)
-subplot(3,1,1)
-hold on
-plot(TimeMOCAP, DifferentiatedVelocityXMOCAP);
-plot(TimeMOCAP, LinearVelocityXVIO);
-title('Linear Velocity X vs Time Comparision for Motion Capture and Realsense VIO');
-xlabel('Time (seconds)');
-ylabel('Velocity X (meters/second)');
-legend('Filtered Differentiated Velocity Motion Capture','Velocity of Realsense VIO from Odom');
-grid on
-set(gca, 'FontSize', 12);
-hold off
-
-subplot(3,1,2)
-hold on
-plot(TimeMOCAP, DifferentiatedVelocityYMOCAP);
-plot(TimeMOCAP, LinearVelocityYVIO);
-title('Linear Velocity Y vs Time Comparision for Motion Capture and Realsense VIO');
-xlabel('Time (seconds)');
-ylabel('Velocity Y (meters/second)');
-legend('Filtered Differentiated Velocity Motion Capture','Velocity of Realsense VIO from Odom');
-grid on
-set(gca, 'FontSize', 12);
-hold off
-
-subplot(3,1,3)
-hold on
-plot(TimeMOCAP, DifferentiatedVelocityZMOCAP);
-plot(TimeMOCAP, LinearVelocityZVIO);
-title('Linear Velocity Z vs Time Comparision for Motion Capture and Realsense VIO');
-xlabel('Time (seconds)');
-ylabel('Velocity Z (meters/second)');
-legend('Filtered Differentiated Velocity Motion Capture','Velocity of Realsense VIO from Odom');
 grid on
 set(gca, 'FontSize', 12);
 hold off
 
 
 %% Plotting Difference in Phi, Theta, Psi
-figure(7)
+figure(5)
 subplot(3,1,1)
 hold on
 plot(TimeMOCAP, OrientationPhiMOCAP);
