@@ -3,6 +3,14 @@ clear;
 close all;
 clc;
 
+global pathToMoCapLogs
+%pathToMoCapLogs = '/home/amav/amav/Terpcopter3.0/matlab/estimation/MoCapAndVIOLogs';
+%pathToMoCapLogs = '/home/wolek/Desktop/Research/Projects/UMD/AMAV/Terpcopter3.0/matlab/estimation/MoCapAndVIOLogs';
+pathToMoCapLogs = '/home/zlacey/Terpcopter3.0/matlab/estimation/MoCapAndVIOLogs';
+
+cd(pathToMoCapLogs)
+
+
 % VIO Log file should be selected FIRST
 [file1,path1] = uigetfile('*.log');
 % Motion Capture Log file should be selected SECOND
@@ -154,7 +162,8 @@ grid on
 set(gca, 'FontSize', 12);
 hold off
 
-DistanceError = sqrt(DifferencePositionX.^2 + DifferencePositionY.^2 + DifferencePositionZ.^2)
+
+DistanceError = sqrt(DifferencePositionX.^2 + DifferencePositionY.^2 + DifferencePositionZ.^2);
 
 figure(4)
 plot(TimeMOCAP, DistanceError);
