@@ -1,0 +1,8 @@
+List of changes in mocap toolbox.
+Name, .m file, Date/Time, Changes
+
+
+
+
+Tom P., get_PosAng_ID.m, 6/7/2107 2:00 pm, Line 66 normalized Q to ensure it is a rotation.
+
