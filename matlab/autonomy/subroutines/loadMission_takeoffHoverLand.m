@@ -2,6 +2,7 @@ function mission = loadMission_takeoffHoverLand()
 mission.config.firstLoop = 1;
 
 mission.config.H_detector = 0;
+mission.config.R_detector = 0;
 mission.config.target_detector = 0;
 mission.config.flowProbe = 0;
 
@@ -35,7 +36,7 @@ mission.bhv{i}.name = 'bhv_hover';
 mission.bhv{i}.ayprCmd = default_aypr_msg();
 mission.bhv{i}.ayprCmd.AltSwitch = 1; 
 mission.bhv{i}.ayprCmd.AltDesiredMeters = 1; 
-mission.bhv{i}.completion.durationSec = 5; % 10 seconds
+mission.bhv{i}.completion.durationSec = 10; % 10 seconds
 mission.bhv{i}.completion.status = false;     % completion flag
 
 

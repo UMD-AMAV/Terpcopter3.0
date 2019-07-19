@@ -52,9 +52,9 @@ function Master_GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to Master_GUI (see VARARGIN)
 global pathToMatlabRoot pathToGUI pathToGUIScripts
-%pathToGUI = '/home/amav/amav/Terpcopter3.0/matlab/GUI';
+pathToGUI = '/home/amav/amav/Terpcopter3.0/matlab/GUI';
 %pathToGUI = '/home/wolek/Desktop/Research/Projects/UMD/AMAV/Terpcopter3.0/matlab/GUI';
-pathToGUI = '/home/zlacey/Terpcopter3.0/matlab/GUI';
+%pathToGUI = '/home/zlacey/Terpcopter3.0/matlab/GUI';
 
 cd(pathToGUI)
 addpath('../');
@@ -93,26 +93,22 @@ if cwd{end} ~= "GUI"
     cd(pathToGUI)
 end
 set(handles.text2,'String','launching');
-disp('Callback for px4 launch...');
-system('./scripts/px4_script.sh');
+system('./scripts/px4_script.sh &');
 first_run = 1;
 error_flag = 0;
-% while( error_flag==1 || first_run == 1 )
-%     pause(0.1);
-%     try
-%         disp('Trying to subscribe to /mavros/imu/data...');
-%         sub = rossubscriber('/mavros/imu/data');
-%         first_run = 0;
-%         error_flag = 0;
-%     catch error
-%         disp(error.identifier)
-%         error_flag = 1;
-%     end
-% end
-%msg = receive(sub,30);
+while( error_flag==1 || first_run == 1 )
+    pause(0.1);
+    try
+        sub = rossubscriber('/mavros/imu/data');
+        first_run = 0;
+        error_flag = 0;
+    catch error
+        disp(error.identifier)
+        error_flag = 1;
+    end
+end
+msg = receive(sub,20);
 set(handles.text2,'String','active');
-% msg = receive(sub,30);
-% msg = receive(sub,30);
 
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -412,7 +408,7 @@ X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
 S1='192.168.1.93';
-S2='192.168.1.81';
+S2='192.168.1.3';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
 fid2 = fopen([pathToMatlabRoot '/loadParams.m'],'wt') ;
@@ -425,7 +421,7 @@ X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
 S1='192.168.1.93';
-S2='192.168.1.81';
+S2='192.168.1.3';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
 fid2 = fopen([pathToGUIScripts '/autolaunch_px4'],'wt') ;
@@ -438,7 +434,7 @@ X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
 S1='192.168.1.93';
-S2='192.168.1.81';
+S2='192.168.1.3';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
 fid2 = fopen([pathToGUIScripts '/autolaunch_camera'],'wt') ;
@@ -451,7 +447,7 @@ X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
 S1='ROS_MASTER_URI=http://192.168.1.93:11311';
-S2='ROS_MASTER_URI=http://192.168.1.81:11311';
+S2='ROS_MASTER_URI=http://192.168.1.3:11311';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
 fid2 = fopen('~/.bashrc','wt') ;
@@ -465,7 +461,7 @@ setenv('PATH', [PATH ':/usr/local/desiredpath']);
 unix('source ~/.bashrc')
 
 if(~robotics.ros.internal.Global.isNodeActive)
-    rosinit('192.168.1.81');
+    rosinit('192.168.1.3');
 end
 % hObject    handle to radiobutton3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -483,7 +479,7 @@ fid = fopen([pathToMatlabRoot '/loadParams.m'],'rt')
 X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
-S1='192.168.1.81';
+S1='192.168.1.3';
 S2='192.168.1.93';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
@@ -496,7 +492,7 @@ fid = fopen([pathToGUIScripts '/autolaunch_px4'],'rt') ;
 X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
-S1='192.168.1.81';
+S1='192.168.1.3';
 S2='192.168.1.93';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
@@ -509,7 +505,7 @@ fid = fopen([pathToGUIScripts '/autolaunch_camera'],'rt') ;
 X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
-S1='192.168.1.81';
+S1='192.168.1.3';
 S2='192.168.1.93';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2
@@ -522,7 +518,7 @@ fid = fopen('~/.bashrc','rt') ;
 X = fread(fid) ;
 fclose(fid) ;
 X = char(X.') ; 
-S1='ROS_MASTER_URI=http://192.168.1.81:11311';
+S1='ROS_MASTER_URI=http://192.168.1.3:11311';
 S2='ROS_MASTER_URI=http://192.168.1.93:11311';
 Y = strrep(X, S1, S2) ;
 % replace string S1 with string S2

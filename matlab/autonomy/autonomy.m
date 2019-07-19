@@ -60,7 +60,7 @@ end
 % mission = loadMission_takeoffHoverDropPackageLand();
 % mission = loadMission_takeoffHoverFlyForwardLand();
 % mission = loadMission_takeoffHoverFlyForwardProbeLand();
-% mission = loadMission_takeoffHoverPointLand();
+ mission = loadMission_takeoffHoverPointLand();
 % mission = loadMission_takeoffHoverOverHKeyLand();
 % mission = loadMission_takeoffHoverOverHLand();
 % mission = loadMission_takeoffHoverOverHWithRadiusLand();
@@ -70,7 +70,7 @@ end
 % mission = loadMission_StayOverHJerrar();
 % mission = loadMission_CompetitionTakeoffHoverLand();
 % mission = loadMission_CompetitionTakeoffHoverPointLand();
-mission = loadMission_CompetitionTakeoffHoverPointRiverLand();
+% mission = loadMission_CompetitionTakeoffHoverPointRiverLand();
 % mission = loadMission_StayOverHAlign();
 
 fprintf('Launching Autonomy Node...\n');
@@ -93,7 +93,7 @@ servoSwitchCmdPublisher = rospublisher('/servoSwitch', 'terpcopter_msgs/servoSwi
 % initialize control off
 controlStartMsg = rosmessage('std_msgs/Bool');
 controlStartMsg.Data = 0;
-send(controlStartPublisher , controlStartMsg);
+send(controlStartPublisher, controlStartMsg);
 
 % Subscribers
 fprintf('Subscribing to stateEstimate ...\n');
@@ -287,11 +287,13 @@ if ( strcmp(params.auto.mode,'auto'))
                 case 'bhv_hover_drop'
                     [completionFlag, servoCmd] = bhv_hover_drop(completion, bhvTime );
                 case 'bhv_point_to_direction'
-                    completionFlag = bhv_point_to_direction(completion, bhvTime);
+                    completionFlag = bhv_point_to_direction(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_fly_forward'
                     completionFlag = bhv_fly_forward(completion, bhvTime);
                 case 'bhv_fly_forward_until_target'
                     completionFlag = bhv_fly_forward_until_target(completion, bhvTime, targetDet);
+                case 'bhv_waypoint'
+                    completionFlag = bhv_waypoint(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_land'
                     completionFlag = bhv_land(completion, bhvTime);
                 otherwise

@@ -9,6 +9,8 @@ file
 filepath = [path file ];
 data = csvread(filepath);
 
+h_detection = 0;
+
 % parse out
 t = data(:,1);
 t = t - t(1);
@@ -33,33 +35,32 @@ est_Yaw = mod(data(:,16),360);
 est_Pitch = data(:,17);
 est_Roll = data(:,18);
 
-
-hDetected = data(:,19);
-hPixelX = data(:,20);
-hPixelY = data(:,21);
-hAngle = data(:,22);
-
-
-figure(4)
-subplot(2,1,1)
-plot(t,hDetected,'ko-','linewidth',2);
-hold on;
-grid on;
-xlabel('Time (sec)');
-ylabel('H Detected');
-set(gca,'FontSize',16);
-
-% plot switches
-subplot(2,1,2)
-plot(t,hPixelX,'bo-','linewidth',2);
-hold on;
-plot(t,hPixelY,'ro-','linewidth',2);
-grid on;
-xlabel('Time (sec)');
-ylabel('H Pixel');
-legend('Hx','Hy');
-set(gca,'FontSize',16);
-
+if (h_detection == 1)
+    hDetected = data(:,19);
+    hPixelX = data(:,20);
+    hPixelY = data(:,21);
+    hAngle = data(:,22);
+    
+    figure(4)
+    subplot(2,1,1)
+    plot(t,hDetected,'ko-','linewidth',2);
+    hold on;
+    grid on;
+    xlabel('Time (sec)');
+    ylabel('H Detected');
+    set(gca,'FontSize',16);
+    
+    % plot switches
+    subplot(2,1,2)
+    plot(t,hPixelX,'bo-','linewidth',2);
+    hold on;
+    plot(t,hPixelY,'ro-','linewidth',2);
+    grid on;
+    xlabel('Time (sec)');
+    ylabel('H Pixel');
+    legend('Hx','Hy');
+    set(gca,'FontSize',16);
+end
 %     % write csv file
 %  1           fprintf(pFile,'%6.6f,',t);
 %  2           fprintf(pFile,'%d,',currentBehavior);

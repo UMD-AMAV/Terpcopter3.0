@@ -81,6 +81,7 @@ ylabel('Position Y (m)');
 zlabel('Position Z (m)');
 legend('Motion Capture','Realsense VIO');
 set(gca, 'FontSize', 16);
+axis equal
 grid on
 hold off
 

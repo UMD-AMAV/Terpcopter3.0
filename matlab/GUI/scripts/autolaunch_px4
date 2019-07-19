@@ -1,8 +1,8 @@
 #!/usr/bin/expect
 
-spawn ssh odroid@192.168.1.93
+spawn ssh odroid@192.168.1.3
 expect "password"
 send "odroid\r"
 expect "odroid"
-send "roslaunch mavros px4.launch\r"
+send "roslaunch vision_to_mavros t265_all_nodes.launch\r"
 interact
