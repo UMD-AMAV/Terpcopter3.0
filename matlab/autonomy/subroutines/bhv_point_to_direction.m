@@ -2,7 +2,7 @@ function completionFlag = bhv_point_to_direction(stateEstimateMsg, ayprCmd, comp
     global timestamps
     toleranceYawDegrees = 5;
 
-    pointToDirectionComplete = abs(rad2deg(signedAgularDist(deg2rad(ayprCmd.YawDesiredDegrees), deg2rad(stateEstimateMsg.Yaw)))) <= toleranceYawDegrees;
+    pointToDirectionComplete = abs(rad2deg(signedAngularDist(deg2rad(ayprCmd.YawDesiredDegrees), deg2rad(stateEstimateMsg.Yaw)))) <= toleranceYawDegrees;
     
     if pointToDirectionComplete
         disp('hover alt satisfied');

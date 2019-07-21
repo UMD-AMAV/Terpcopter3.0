@@ -33,9 +33,13 @@ if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
 
+useLidarFlag = 0;
+
 % Subscribers
 imuDataSubscriber = rossubscriber('/mavros/imu/data');
-lidarDataSubscriber = rossubscriber('/mavros/distance_sensor/hrlv_ez4_pub');
+if useLidarFlag
+    lidarDataSubscriber = rossubscriber('/mavros/distance_sensor/hrlv_ez4_pub');
+end
 VIODataSubscriber = rossubscriber('/camera/odom/sample', 'nav_msgs/Odometry');
 localPositionOdomSubscriber = rossubscriber('/mavros/local_position/odom', 'nav_msgs/Odometry');
 
@@ -65,7 +69,9 @@ j = 0;
 
 % Receive Latest Imu and Lidar data
 imuMsg = imuDataSubscriber.LatestMessage;
-lidarMsg = lidarDataSubscriber.LatestMessage;
+if useLidarFlag
+    lidarMsg = lidarDataSubscriber.LatestMessage;
+end
 VIOMsg = VIODataSubscriber.LatestMessage;
 localPositionOdomMsg = localPositionOdomSubscriber.LatestMessage;
 
@@ -132,7 +138,9 @@ logFlag = 1;
 dateString = datestr(now,'mmmm_dd_yyyy_HH_MM_SS_FFF');
 VIOLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/VIO_' dateString '.log'];
 localPositionLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/localPosition_' dateString '.log'];
-lidarLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/lidar_' dateString '.log'];
+if useLidarFlag
+    lidarLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/lidar_' dateString '.log'];
+end
 stateEstimateLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/stateEstimate_' dateString '.log'];
 
 
@@ -142,7 +150,9 @@ while(1)
     tic
     % Receive Latest Imu and Lidar data
     imuMsg = imuDataSubscriber.LatestMessage;
-    lidarMsg = lidarDataSubscriber.LatestMessage;
+    if useLidarFlag
+        lidarMsg = lidarDataSubscriber.LatestMessage;
+    end
     VIOMsg = VIODataSubscriber.LatestMessage;
     localPositionOdomMsg = localPositionOdomSubscriber.LatestMessage;
     
@@ -179,28 +189,32 @@ while(1)
     if state.psi_relative> 180, state.psi_relative = state.psi_relative-360;
     elseif state.psi_relative<-180, state.psi_relative = 360+state.psi_relative;end
     
-    % condition lidar reading
-    if isempty(lidarMsg) || lidarMsg.Range_ <= 0.2
-        disp('no lidar data');
-        %get min range from lidar msg
-        stateMsg.Range = 0.2;
-    else
-        % moving average filter
-        i = j;
-        h = i;
-        g = h;
-        f = g;
-        e = f;
-        d = e;
-        c = d;
-        b = c;
-        a = b;
-        j = lidarMsg.Range_;
-        smoothed_range = (a+b+c+d+e+f+g+h+i+j)/10;
+    if useLidarFlag
         
-        stateMsg.Range = smoothed_range;
+        % condition lidar reading
+        if isempty(lidarMsg) || lidarMsg.Range_ <= 0.2
+            disp('no lidar data');
+            %get min range from lidar msg
+            stateMsg.Range = 0.2;
+        else
+            % moving average filter
+            i = j;
+            h = i;
+            g = h;
+            f = g;
+            e = f;
+            d = e;
+            c = d;
+            b = c;
+            a = b;
+            j = lidarMsg.Range_;
+            smoothed_range = (a+b+c+d+e+f+g+h+i+j)/10;
+            
+            stateMsg.Range = smoothed_range;
+        end
+    else
+        stateMsg.Range = VIOPositionZ;
     end
-    
     %lidar data is in imu frame; convert to inertial frame
     % phi and theta are in deg. so use cosd to calculate the compensated range
     stateMsg.Range = cosd(state.phi)*cosd(state.theta)*stateMsg.Range;
@@ -279,7 +293,9 @@ while(1)
     if ( logFlag )
         pFile2 = fopen(VIOLog, 'a');
         pFile1 = fopen(localPositionLog, 'a');
-        pFile3 = fopen(lidarLog, 'a');
+        if useLidarFlag
+            pFile3 = fopen(lidarLog, 'a');
+        end
         pFile4 = fopen(stateEstimateLog, 'a');
         
         % write csv file Local Position
@@ -318,10 +334,10 @@ while(1)
         fprintf(pFile2,'%6.6f,',VIOTwistAngularVelocityY);
         fprintf(pFile2,'%6.6f\n',VIOTwistAngularVelocityZ);
         
-        
-        % write csv file lidar
-        fprintf(pFile3,'%6.6f\n', lidarMsg.Range_);
-        
+        if useLidarFlag
+            % write csv file lidar
+            fprintf(pFile3,'%6.6f\n', lidarMsg.Range_);
+        end
         
         % write csv file stateEstimate
         fprintf(pFile4,'%6.6f,',stateMsg.Yaw);
@@ -333,7 +349,9 @@ while(1)
         
         fclose(pFile1);
         fclose(pFile2);
-        fclose(pFile3);
+        if useLidarFlag
+            fclose(pFile3);
+        end
         fclose(pFile4);
     end
     
@@ -356,7 +374,7 @@ while(1)
     fprintf('Altitude (Z) :  %03.01f\n',stateMsg.Up);
     fprintf('Altitude (Z) :  %03.01f\n',stateMsg.Range);
     fprintf('LoopRate Hz: %03d\n',round(1/toc) )
-     
+    
     
     % publish stateEstimate
     send(stateEstimatePublisher, stateMsg);

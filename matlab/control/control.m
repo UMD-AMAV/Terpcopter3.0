@@ -96,12 +96,16 @@ while(1)
     ayprCmdMsg = ayprCmdSubscriber.LatestMessage;
     
     % unpack state estimate
-    z = stateEstimateMsg.Range;
+    x = stateEstimateMsg.East;
+    y = stateEstimateMsg.North;
+    z = stateEstimateMsg.Up;
     pitchDeg = stateEstimateMsg.Pitch; 
     yawDeg = stateEstimateMsg.Yaw;
     rollDeg = stateEstimateMsg.Roll;
     
     % unpack command
+    x_d = ayprCmdMsg.WaypointXDesiredMeters; % desired x waypoint in the fixed global frame
+    y_d = ayprCmdMsg.WaypointYDesiredMeters; % desired y waypoint in the fixed global frame
     z_d = ayprCmdMsg.AltDesiredMeters;
     yaw_d = ayprCmdMsg.YawDesiredDegrees;
     pitch_d = ayprCmdMsg.PitchDesiredDegrees;
@@ -119,29 +123,42 @@ while(1)
         u_alt = 0;
     end
     
-    % yaw control
-    if ( ayprCmdMsg.YawSwitch==1 )
-        [u_yaw, yawControl] = yawController(yawControl, t, yawDeg, yaw_d);
+    if( ayprCmdMsg.WaypointSwitch == 0 )
+        
+        % yaw control
+        if ( ayprCmdMsg.YawSwitch==1 )
+            [u_yaw, yawControl] = yawController(yawControl, t, yawDeg, yaw_d);
+        else
+            u_yaw = 0;
+        end
+        
+        % pitch control
+        if ( ayprCmdMsg.PitchSwitch==1 )
+            %[u_pitch, pitchControl] = pitchController(pitchControl, t, pitchDeg, pitch_d);
+            u_pitch = pitch_d;
+        else
+            u_pitch = 0;
+        end
+        
+        % roll control
+        if ( ayprCmdMsg.RollSwitch==1 )
+            %[u_roll, rollControl] = rollController(rollControl, t, rollDeg, roll_d);
+            u_roll = roll_d;
+        else
+            u_roll = 0;
+        end
+    elseif ( ayprCmdMsg.WaypointSwitch == 1 )
+        [u_yaw, u_pitch, u_roll,yawControl] = waypointController(yawControl, t, yawDeg, x_d, x, y_d, y);
+        
+%         [u_yaw, yawControl] = yawController(yawControl, t, yawDeg, yaw_desired);
+%         u_pitch = 0;
+%         u_roll = 0;
+%         [u_yaw, u_pitch, u_roll] = waypointModeController(stateEstimateMsg, ayprCmdMsg);
     else
         u_yaw = 0;
-    end
-   
-    % pitch control
-    if ( ayprCmdMsg.PitchSwitch==1 )
-        %[u_pitch, pitchControl] = pitchController(pitchControl, t, pitchDeg, pitch_d);
-        u_pitch = pitch_d;
-    else
         u_pitch = 0;
-    end
-    
-    % roll control
-    if ( ayprCmdMsg.RollSwitch==1 )
-        %[u_roll, rollControl] = rollController(rollControl, t, rollDeg, roll_d);
-        u_roll = roll_d;
-    else
         u_roll = 0;
     end
-    
     % publish
     stickCmdMsg.Thrust = u_alt;
     stickCmdMsg.Yaw = u_yaw;

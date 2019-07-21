@@ -60,7 +60,7 @@ end
 % mission = loadMission_takeoffHoverDropPackageLand();
 % mission = loadMission_takeoffHoverFlyForwardLand();
 % mission = loadMission_takeoffHoverFlyForwardProbeLand();
- mission = loadMission_takeoffHoverPointLand();
+% mission = loadMission_takeoffHoverPointLand();
 % mission = loadMission_takeoffHoverOverHKeyLand();
 % mission = loadMission_takeoffHoverOverHLand();
 % mission = loadMission_takeoffHoverOverHWithRadiusLand();
@@ -72,6 +72,7 @@ end
 % mission = loadMission_CompetitionTakeoffHoverPointLand();
 % mission = loadMission_CompetitionTakeoffHoverPointRiverLand();
 % mission = loadMission_StayOverHAlign();
+mission = loadMission_takeoffHoverWaypointLand();
 
 fprintf('Launching Autonomy Node...\n');
 

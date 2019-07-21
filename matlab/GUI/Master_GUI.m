@@ -22,7 +22,7 @@ function varargout = Master_GUI(varargin)
 
 % Edit the above text to modify the response to help Master_GUI
 
-% Last Modified by GUIDE v2.5 11-May-2019 14:40:38
+% Last Modified by GUIDE v2.5 21-Jul-2019 14:16:33
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -67,6 +67,7 @@ handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
+
 
 % UIWAIT makes Master_GUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -540,3 +541,20 @@ end
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of radiobutton4
+
+
+% --- Executes on button press in pushbutton13.
+function pushbutton13_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton13 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% intialize ros node
+if(~robotics.ros.internal.Global.isNodeActive)
+    rosinit;
+end
+
+persistent startMissionPublisher;
+startMissionPublisher = rospublisher('/startMission', 'std_msgs/Bool');
+startMissionMsg = rosmessage(startMissionPublisher);
+startMissionMsg.Data = true;
+send(startMissionPublisher, startMissionMsg);
