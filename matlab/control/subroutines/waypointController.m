@@ -8,7 +8,7 @@ yawStickLimit = 0.45;
 deadbandDeg = 0.5;
 largerDeadbandDeg = 10;
 
-Kp_pitch = 0.5;
+Kp_pitch = 0.25;
 pitchStickLimit = 0.25;
 attitudeDeadbandMeters = 0.25;
 
@@ -69,7 +69,7 @@ if ( displayFlag )
     fprintf(pFile,'%6.6f,',yawFiltDeg);
     fprintf(pFile,'%6.6f,',yawErrorDeg);
     fprintf(pFile,'%6.6f,',yawStickCmd);
-    
+    [u_yaw, u_pitch, u_roll,yawControl,pitchControl, rollControl] = waypointController2(yawControl,pitchControl, rollControl, t, yawDeg, x_d, x, y_d, y);
     
     % constant parameters
     fprintf(pFile,'%6.6f,',yawFiltTimeConstant);
@@ -77,6 +77,5 @@ if ( displayFlag )
     fprintf(pFile,'%6.6f,\n',yawStickLimit);
 
     fclose(pFile);
-    
 end
 end

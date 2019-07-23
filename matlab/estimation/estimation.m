@@ -33,7 +33,7 @@ if(~robotics.ros.internal.Global.isNodeActive)
     rosinit;
 end
 
-useLidarFlag = 0;
+useLidarFlag = 1;
 
 % Subscribers
 imuDataSubscriber = rossubscriber('/mavros/imu/data');

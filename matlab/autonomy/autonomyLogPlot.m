@@ -16,30 +16,32 @@ t = data(:,1);
 t = t - t(1);
 curBhv = data(:,2);
 
-altDes = data(:,3);
-yawDes = mod(data(:,4),360);
-pitchDes = data(:,5);
-rollDes = data(:,6);
+waypointXDes = data(:,3);
+waypointYDes = data(:,4);
+altDes = data(:,5);
+yawDes = mod(data(:,6),360);
+pitchDes = data(:,7);
+rollDes = data(:,8);
 
-altSwitch = data(:,7);
-yawSwitch = data(:,8)-0.05;
-pitchSwitch = data(:,9)-0.10;
-rollSwitch = data(:,10)-0.15;
+altSwitch = data(:,9);
+yawSwitch = data(:,10)-0.05;
+pitchSwitch = data(:,11)-0.10;
+rollSwitch = data(:,12)-0.15;
 
-est_Range = data(:,11);
-est_Time = data(:,12);
-est_North = data(:,13);
-est_East = data(:,14);
-est_Up= data(:,15);
-est_Yaw = mod(data(:,16),360);
-est_Pitch = data(:,17);
-est_Roll = data(:,18);
+est_Range = data(:,13);
+est_Time = data(:,14);
+est_North = data(:,15);
+est_East = data(:,16);
+est_Up= data(:,17);
+est_Yaw = mod(data(:,18),360);
+est_Pitch = data(:,19);
+est_Roll = data(:,20);
 
 if (h_detection == 1)
-    hDetected = data(:,19);
-    hPixelX = data(:,20);
-    hPixelY = data(:,21);
-    hAngle = data(:,22);
+    hDetected = data(:,21);
+    hPixelX = data(:,22);
+    hPixelY = data(:,23);
+    hAngle = data(:,24);
     
     figure(4)
     subplot(2,1,1)
@@ -64,23 +66,25 @@ end
 %     % write csv file
 %  1           fprintf(pFile,'%6.6f,',t);
 %  2           fprintf(pFile,'%d,',currentBehavior);
-%  3           fprintf(pFile,'%6.6f,',ayprCmdMsg.AltDesiredMeters);   
-%  4           fprintf(pFile,'%6.6f,',ayprCmdMsg.YawDesiredDeg);
-%  5           fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchDesiredDeg);  
-%  6           fprintf(pFile,'%6.6f,',ayprCmdMsg.RollDesiredDeg);  
-%  7           fprintf(pFile,'%6.6f,',ayprCmdMsg.AltSwitch);  
-%  8           fprintf(pFile,'%6.6f,',ayprCmdMsg.YawSwitch);  
-%  9           fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchSwitch);  
-%  10           fprintf(pFile,'%6.6f,',ayprCmdMsg.RollSwitch);   
+%  3             fprintf(pFile,'%6.6f,',ayprCmdMsg.WaypointXDesiredMeters);
+%  4            fprintf(pFile,'%6.6f,',ayprCmdMsg.WaypointYDesiredMeters);
+%  5           fprintf(pFile,'%6.6f,',ayprCmdMsg.AltDesiredMeters);   
+%  6           fprintf(pFile,'%6.6f,',ayprCmdMsg.YawDesiredDeg);
+%  7           fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchDesiredDeg);  
+%  8           fprintf(pFile,'%6.6f,',ayprCmdMsg.RollDesiredDeg);  
+%  9           fprintf(pFile,'%6.6f,',ayprCmdMsg.AltSwitch);  
+%  10           fprintf(pFile,'%6.6f,',ayprCmdMsg.YawSwitch);  
+%  11           fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchSwitch);  
+%  12           fprintf(pFile,'%6.6f,',ayprCmdMsg.RollSwitch);   
 %             
-%  11           fprintf(pFile,'%6.6f,',stateEstimateMsg.Range);  
-%  12           fprintf(pFile,'%6.6f,',stateEstimateMsg.Time); 
-%  13           fprintf(pFile,'%6.6f,',stateEstimateMsg.North); 
-%  14           fprintf(pFile,'%6.6f,',stateEstimateMsg.East); 
-%  15           fprintf(pFile,'%6.6f,',stateEstimateMsg.Up); 
-%  16           fprintf(pFile,'%6.6f,',stateEstimateMsg.Yaw); 
-%  17           fprintf(pFile,'%6.6f,',stateEstimateMsg.Pitch);
-%  18           fprintf(pFile,'%6.6f,\n',stateEstimateMsg.Roll);  
+%  13           fprintf(pFile,'%6.6f,',stateEstimateMsg.Range);  
+%  14           fprintf(pFile,'%6.6f,',stateEstimateMsg.Time); 
+%  15           fprintf(pFile,'%6.6f,',stateEstimateMsg.North); 
+%  16           fprintf(pFile,'%6.6f,',stateEstimateMsg.East); 
+%  17           fprintf(pFile,'%6.6f,',stateEstimateMsg.Up); 
+%  18           fprintf(pFile,'%6.6f,',stateEstimateMsg.Yaw); 
+%  19           fprintf(pFile,'%6.6f,',stateEstimateMsg.Pitch);
+%  20           fprintf(pFile,'%6.6f,\n',stateEstimateMsg.Roll);  
 
 % plot current behavior
 figure(1);

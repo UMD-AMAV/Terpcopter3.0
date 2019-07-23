@@ -72,7 +72,8 @@ end
 % mission = loadMission_CompetitionTakeoffHoverPointLand();
 % mission = loadMission_CompetitionTakeoffHoverPointRiverLand();
 % mission = loadMission_StayOverHAlign();
-mission = loadMission_takeoffHoverWaypointLand();
+% mission = loadMission_takeoffHoverWaypointLand();
+mission = loadMission_takeoffHoverWaypointSquareLand();
 
 fprintf('Launching Autonomy Node...\n');
 
@@ -322,6 +323,8 @@ if ( strcmp(params.auto.mode,'auto'))
             fprintf(pFile,'%6.6f,',toc(timeForPlot));
             fprintf(pFile,'%d,',currentBehavior);
             
+            fprintf(pFile,'%6.6f,',ayprCmdMsg.WaypointXDesiredMeters);
+            fprintf(pFile,'%6.6f,',ayprCmdMsg.WaypointYDesiredMeters);
             fprintf(pFile,'%6.6f,',ayprCmdMsg.AltDesiredMeters);
             fprintf(pFile,'%6.6f,',ayprCmdMsg.YawDesiredDegrees);
             fprintf(pFile,'%6.6f,',ayprCmdMsg.PitchDesiredDegrees);
@@ -345,7 +348,7 @@ if ( strcmp(params.auto.mode,'auto'))
                 fprintf(pFile,'%6.6f,',hPixelY);
                 fprintf(pFile,'%6.6f\n',hAngle);
             else
-                fprintf(pFile,'%6.6f\n,',stateEstimateMsg.Roll);
+                fprintf(pFile,'%6.6f\n',stateEstimateMsg.Roll);
             end
             
             

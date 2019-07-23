@@ -65,15 +65,15 @@ yawControl.log=[params.env.matlabRoot '/yawControl_' dateString '.log'];
 yawControl.lastTime = 0;
 yawControl.prevVal = 0;
 
-% % initialize yaw controller state
-% pitchControl.log=[params.env.matlabRoot '/pitchControl_' dateString '.log'];
-% pitchControl.lastTime = 0;
-% pitchControl.prevVal = 0;
-% 
-% % initialize yaw controller state
-% rollControl.log=[params.env.matlabRoot '/rollControl_' dateString '.log'];
-% rollControl.lastTime = 0;
-% rollControl.prevVal = 0;
+% initialize yaw controller state
+pitchControl.log=[params.env.matlabRoot '/pitchControl_' dateString '.log'];
+pitchControl.lastTime = 0;
+pitchControl.prevVal = 0;
+
+% initialize yaw controller state
+rollControl.log=[params.env.matlabRoot '/rollControl_' dateString '.log'];
+rollControl.lastTime = 0;
+rollControl.prevVal = 0;
 
 
 disp('initialize loop');
@@ -148,12 +148,11 @@ while(1)
             u_roll = 0;
         end
     elseif ( ayprCmdMsg.WaypointSwitch == 1 )
-        [u_yaw, u_pitch, u_roll,yawControl] = waypointController(yawControl, t, yawDeg, x_d, x, y_d, y);
+        % Yaw and Pitch based waypoint control : 7/22/19: Needs tuning.
+        % Overshhots the Pitch forward
+        % [u_yaw, u_pitch, u_roll,yawControl] = waypointController(yawControl, t, yawDeg, x_d, x, y_d, y);
         
-%         [u_yaw, yawControl] = yawController(yawControl, t, yawDeg, yaw_desired);
-%         u_pitch = 0;
-%         u_roll = 0;
-%         [u_yaw, u_pitch, u_roll] = waypointModeController(stateEstimateMsg, ayprCmdMsg);
+        [u_yaw, u_pitch, u_roll,yawControl,pitchControl, rollControl] = waypointController2(yawControl,pitchControl, rollControl, t, yawDeg, x_d, x, y_d, y);
     else
         u_yaw = 0;
         u_pitch = 0;
