@@ -27,7 +27,6 @@ end
 VIODataSubscriber = rossubscriber('/camera/odom/sample', 'nav_msgs/Odometry');
 lidarDataSubscriber = rossubscriber('/mavros/distance_sensor/hrlv_ez4_pub');
 localPositionOdomSubscriber = rossubscriber('/mavros/local_position/odom', 'nav_msgs/Odometry');
-stateEstimateSubscriber = rossubscriber('/stateEstimate');
 
 % Publishers
 MOCAPDataPublisher = rospublisher('/mocap_data/quad_1/odom', 'nav_msgs/Odometry');
@@ -39,7 +38,6 @@ reset(r);
 VIOMsg = VIODataSubscriber.LatestMessage;
 lidarMsg = lidarDataSubscriber.LatestMessage;
 localPositionOdomMsg = localPositionOdomSubscriber.LatestMessage;
-stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
 
 % % VIO Time
 % VIOTime = VIOMsg.Header.Stamp.Sec;
@@ -67,7 +65,6 @@ MoCapLog = ['C:\Users\CDCL\Documents\GitHub\Terpcopter3.0\matlab\estimation\MoCa
 VIOLog = ['C:\Users\CDCL\Documents\GitHub\Terpcopter3.0\matlab\estimation\MoCapAndVIOLogs' '/VIO_' dateString '.log'];
 localPositionLog = ['C:\Users\CDCL\Documents\GitHub\Terpcopter3.0\matlab\estimation\MoCapAndVIOLogs' '/localPosition_' dateString '.log'];
 lidarLog = ['C:\Users\CDCL\Documents\GitHub\Terpcopter3.0\matlab\estimation\MoCapAndVIOLogs' '/lidar_' dateString '.log'];
-stateEstimateLog = ['C:\Users\CDCL\Documents\GitHub\Terpcopter3.0\matlab\estimation\MoCapAndVIOLogs' '/stateEstimate_' dateString '.log'];
 
 if linear && SE3
     disp('Can''t have linear and SE3 at the same time!')
@@ -208,7 +205,6 @@ while tnow < tend+4
     VIOMsg = VIODataSubscriber.LatestMessage;
     lidarMsg = lidarDataSubscriber.LatestMessage;
     localPositionOdomMsg = localPositionOdomSubscriber.LatestMessage;
-    stateEstimateMsg = stateEstimateSubscriber.LatestMessage;
     
 %%  VIO  
     % VIO Time
@@ -284,10 +280,6 @@ while tnow < tend+4
         
         [pFile1, msg] = fopen( MoCapLog, 'a');
         [pFile2, msg2] = fopen( VIOLog ,'a');
-        pFile3 = fopen(localPositionLog, 'a');
-        pFile4 = fopen(lidarLog, 'a');
-        pFile5 = fopen(stateEstimateLog, 'a');
-        
         if pFile1 < 0
             error('Failed to open file "%s" for writing, because "%s"', MoCapLog, msg);
         end
@@ -321,41 +313,8 @@ while tnow < tend+4
         fprintf(pFile2,'%6.6f,',VIOTwistAngularVelocityY);
         fprintf(pFile2,'%6.6f\n',VIOTwistAngularVelocityZ);
         
-        % write csv file Local Position
-        fprintf(pFile3,'%6.6f,',localPositionTime);
-        
-        fprintf(pFile3,'%6.6f,',localPositionX);
-        fprintf(pFile3,'%6.6f,',localPositionY);
-        fprintf(pFile3,'%6.6f,',localPositionZ);
-        fprintf(pFile3,'%6.6f,',localPositionPhi);
-        fprintf(pFile3,'%6.6f,',localPositionTheta);
-        fprintf(pFile3,'%6.6f,',localPositionPsi);
-        
-        fprintf(pFile3,'%6.6f,',localPositionTwistLinearVelocityX);
-        fprintf(pFile3,'%6.6f,',localPositionTwistLinearVelocityY);
-        fprintf(pFile3,'%6.6f,',localPositionTwistLinearVelocityZ);
-        fprintf(pFile3,'%6.6f,',localPositionTwistAngularVelocityX);
-        fprintf(pFile3,'%6.6f,',localPositionTwistAngularVelocityY);
-        fprintf(pFile3,'%6.6f\n',localPositionTwistAngularVelocityZ);
-        
-        
-        % write csv file lidar
-        fprintf(pFile4,'%6.6f\n', lidarMsg.Range_);
-           
-        
-        % write csv file stateEstimate
-        fprintf(pFile5,'%6.6f,',stateMsg.Yaw);
-        fprintf(pFile5,'%6.6f,',stateMsg.Pitch);
-        fprintf(pFile5,'%6.6f,',stateMsg.Roll);
-        fprintf(pFile5,'%6.6f,',stateMsg.East);        % X axis
-        fprintf(pFile5,'%6.6f,',stateMsg.North);       % Y axis
-        fprintf(pFile5,'%6.6f\n',stateMsg.Up);         % Z axis
-        
         fclose(pFile1);
         fclose(pFile2);
-        fclose(pFile3);
-        fclose(pFile4);
-        fclose(pFile5);
     end
     
     % Initialization
