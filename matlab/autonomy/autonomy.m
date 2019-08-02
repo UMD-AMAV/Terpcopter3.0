@@ -73,8 +73,9 @@ end
 % mission = loadMission_CompetitionTakeoffHoverPointRiverLand();
 % mission = loadMission_StayOverHAlign();
 % mission = loadMission_takeoffHoverWaypointLand();
-mission = loadMission_takeoffHoverWaypointSquareLand();
-
+% mission = loadMission_takeoffHoverWaypointSquareLand();
+% mission = loadMission_followCSVWaypoints();
+mission = loadMission_CSVTest()
 fprintf('Launching Autonomy Node...\n');
 
 global timestamps
@@ -298,6 +299,10 @@ if ( strcmp(params.auto.mode,'auto'))
                     completionFlag = bhv_waypoint(stateEstimateMsg, ayprCmd, completion, t);
                 case 'bhv_land'
                     completionFlag = bhv_land(completion, bhvTime);
+                case 'bhv_FollowCSVWaypoints'
+                    [completionFlag,ayprCmd] = bhv_FollowCSVWaypoints(stateEstimateMsg,ayprCmd,completion,t);
+                case 'bhv_CSVTest'
+                    [completionFlag, ayprCmd] = bhv_CSVTest(stateEstimateMsg, ayprCmd, completion, t)
                 otherwise
             end
             mission.bhv{1}.completion.status = completionFlag;

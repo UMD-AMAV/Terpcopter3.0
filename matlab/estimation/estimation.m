@@ -51,11 +51,13 @@ stateMsg = rosmessage(stateEstimatePublisher);
 
 pause(2)
 t0 = [];
+t0_log = [];
+t0_memory = [];
 
 r = robotics.Rate(100);
 reset(r);
 
-% smooting filter
+% smoothing filter
 a = 0;
 b = 0;
 c = 0;
@@ -142,9 +144,21 @@ if useLidarFlag
     lidarLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/lidar_' dateString '.log'];
 end
 stateEstimateLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/EstimationLogs' '/stateEstimate_' dateString '.log'];
-
-
+WaypointLog = ['/home/amav/amav/Terpcopter3.0/matlab/estimation/WaypointLogs' '/WaypointLog_' dateString '.log'];
 tic
+
+%Initialization for Waypoint Flight Log
+k = 1;
+t_lastWaypoint = zeros(500,1);
+lastWaypointX = zeros(500,1);
+lastWaypointY = zeros(500,1);
+lastWaypointZ = zeros(500,1);
+t = 0;
+LogWaypoints = 1; % 1=on 0=off | Turns logging on or off
+Discretation_log = 0; %Set to either Time=1 or Distance=0
+TimeInterval = 4; %Time span between waypoint logging in seconds.
+DistanceInterval = 0.5; %Distance between waypoint logging in meters.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 while(1)
     tic
@@ -221,7 +235,7 @@ while(1)
     stateMsg.Range = round(stateMsg.Range,2);
     %change Up to the estimated output from the filter instead of from the
     %range
-    stateMsg.Up = stateMsg.Range;
+%     stateMsg.Up = stateMsg.Range;  %%%%%Changing to VIO Alt to Test CSV
     %disp(stateMsg.Up);
     %stateMsg.Yaw = state.psi_inertial;
     stateMsg.Yaw = state.psi_relative;
@@ -268,6 +282,7 @@ while(1)
     localPositionZ = localPositionOdomMsg.Pose.Pose.Position.Z;
     stateMsg.East = localPositionX;
     stateMsg.North = localPositionY;
+    stateMsg.Up = localPositionZ;
     
     % Orientation
     localOrientationX = localPositionOdomMsg.Pose.Pose.Orientation.X;
@@ -297,6 +312,7 @@ while(1)
             pFile3 = fopen(lidarLog, 'a');
         end
         pFile4 = fopen(stateEstimateLog, 'a');
+        pFile5 = fopen(WaypointLog, 'a');
         
         % write csv file Local Position
         fprintf(pFile1,'%6.6f,',localPositionTime);
@@ -347,12 +363,55 @@ while(1)
         fprintf(pFile4,'%6.6f,',stateMsg.North);       % Y axis
         fprintf(pFile4,'%6.6f\n',stateMsg.Up);         % Z axis
         
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+        % Write CSV File for Waypoint Log
+        if LogWaypoints == 1
+            if Discretation_log==1 % Time Discretation
+                if t > (t_lastWaypoint(k) + TimeInterval)
+                    k = k+1;
+                    fprintf(pFile5,'%6.6f,',localPositionX);
+                    fprintf(pFile5,'%6.6f,',localPositionY);
+                    fprintf(pFile5,'%6.6f,',localPositionZ);
+                    fprintf(pFile5,'%6.6f\n',t);
+                    if ~isempty(t_lastWaypoint(k))
+                    t_lastWaypoint(k) = t;
+                    end
+                      % Useful for Debugging
+%                     fprintf('Time Elapsed: %6.6f\n',t)
+%                     fprintf('Time Last: %6.6f\n',t_lastWaypoint(k))
+                end       
+            end
+            if Discretation_log==0 % Distance Discretation
+                DistanceTraveled=sqrt((localPositionX-lastWaypointX(k))^2+(localPositionY-lastWaypointY(k))^2+(localPositionZ-lastWaypointZ(k))^2);
+                if DistanceTraveled > DistanceInterval
+                    k=k+1;
+                    fprintf(pFile5,'%6.6f,',localPositionX);
+                    fprintf(pFile5,'%6.6f,',localPositionY);
+                    fprintf(pFile5,'%6.6f,',localPositionZ);
+                    fprintf(pFile5,'%6.6f\n',t);
+                    if ~isempty(lastWaypointX(k))
+                        lastWaypointX(k) = localPositionX;
+                    end 
+                    if ~isempty(lastWaypointY(k))
+                        lastWaypointY(k) = localPositionY;
+                    end 
+                    if ~isempty(lastWaypointZ(k))
+                        lastWaypointZ(k) = localPositionZ;
+                    end
+                    fprintf('Distance Traveled: %6.6f\n',DistanceTraveled)
+                    fprintf('Current Waypoint: %6.6f\n',k)
+                end
+            end
+        end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%        
+        
         fclose(pFile1);
         fclose(pFile2);
         if useLidarFlag
             fclose(pFile3);
         end
         fclose(pFile4);
+        fclose(pFile5);
     end
     
     % timestamp
@@ -362,18 +421,21 @@ while(1)
     
     if isempty(t0), t0 = abs_t; end
     t = abs_t-t0;
+    t1 = abs_t-t0;
     stateMsg.Time = t;
     % fixed loop pause
     waitfor(r);
     
-    fprintf('Yaw :   %03.01f\n',stateMsg.Yaw);
-    fprintf('Pitch : %03.01f\n',stateMsg.Pitch);
-    fprintf('Roll :  %03.01f\n',stateMsg.Roll);
-    fprintf('East (X) :  %03.01f\n',stateMsg.East);
-    fprintf('North (Y) :  %03.01f\n',stateMsg.North);
-    fprintf('Altitude (Z) :  %03.01f\n',stateMsg.Up);
-    fprintf('Altitude (Z) :  %03.01f\n',stateMsg.Range);
-    fprintf('LoopRate Hz: %03d\n',round(1/toc) )
+%     fprintf('Yaw :   %03.01f\n',stateMsg.Yaw);
+%     fprintf('Pitch : %03.01f\n',stateMsg.Pitch);
+%     fprintf('Roll :  %03.01f\n',stateMsg.Roll);
+%     fprintf('East (X) :  %03.01f\n',stateMsg.East);
+%     fprintf('North (Y) :  %03.01f\n',stateMsg.North);
+%     fprintf('Altitude (Z) :  %03.01f\n',stateMsg.Up);
+%     fprintf('Altitude (Z) :  %03.01f\n',stateMsg.Range);
+%     fprintf('LoopRate Hz: %03d\n',round(1/toc) )
+      
+        
     
     
     % publish stateEstimate
