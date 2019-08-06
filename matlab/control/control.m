@@ -75,6 +75,15 @@ rollControl.log=[params.env.matlabRoot '/rollControl_' dateString '.log'];
 rollControl.lastTime = 0;
 rollControl.prevVal = 0;
 
+velPitchControl.error = 0;
+velPitchControl.errorsum = 0;
+velPitchControl.preverror = 0;
+velPitchControl.Iflag = false;
+
+velRollControl.error = 0;
+velRollControl.errorsum = 0;
+velRollControl.preverror = 0;
+velRollControl.Iflag = false;
 
 disp('initialize loop');
 r = robotics.Rate(90);
@@ -110,6 +119,8 @@ while(1)
     yaw_d = ayprCmdMsg.YawDesiredDegrees;
     pitch_d = ayprCmdMsg.PitchDesiredDegrees;
     roll_d = ayprCmdMsg.RollDesiredDegrees;
+    vx_d = ayprCmdMsg.CrabVelocityDesired;
+    vy_d = ayprCmdMsg.ForwardVelocityDesired;
     
     % timestamp
     ti = rostime('now');
@@ -135,6 +146,7 @@ while(1)
         % pitch control
         if ( ayprCmdMsg.PitchSwitch==1 )
             %[u_pitch, pitchControl] = pitchController(pitchControl, t, pitchDeg, pitch_d);
+%             [pitchStickCmd, velPitchControl] = pitchVelocityPID(velPitchControl, vy_d, vy);
             u_pitch = pitch_d;
         else
             u_pitch = 0;
@@ -143,16 +155,27 @@ while(1)
         % roll control
         if ( ayprCmdMsg.RollSwitch==1 )
             %[u_roll, rollControl] = rollController(rollControl, t, rollDeg, roll_d);
+%             [rollStickCmd, velRollControl] = rollVelocityPID(velRollControl, vx_d, vx);
             u_roll = roll_d;
         else
             u_roll = 0;
         end
     elseif ( ayprCmdMsg.WaypointSwitch == 1 )
-        % Yaw and Pitch based waypoint control : 7/22/19: Needs tuning.
-        % Overshhots the Pitch forward
-        % [u_yaw, u_pitch, u_roll,yawControl] = waypointController(yawControl, t, yawDeg, x_d, x, y_d, y);
+        % Possible Switch Statement waypointPointOnly, crabOnly, hybrid 
         
-        [u_yaw, u_pitch, u_roll,yawControl,pitchControl, rollControl] = waypointController2(yawControl,pitchControl, rollControl, t, yawDeg, x_d, x, y_d, y);
+        
+%         [u_yaw, u_pitch, u_roll,yawControl,pitchControl, rollControl] = VelocityPID(yawControl,pitchControl, rollControl, t, yawDeg, x_d, x, y_d, y);
+        
+        [u_yaw, u_pitch, u_roll, yawControl] = waypointPointAndMoveForwardController(yawControl, t, yawDeg, x_d, x, y_d, y);
+        [u_yaw, u_pitch, u_roll] = waypointForwardCrabController(t, yawDeg, x_d, x, y_d, y);
+        [u_yaw, u_pitch, u_roll, yawControl] = waypointHybridController(yawControl, t, yawDeg, x_d, x, y_d, y);
+        
+        % Note: Previous waypoint controls. Should be kept until
+        % waypointPointAndMoveForwardController,
+        % waypointForwardCrabController, and waypointHybrid
+        % Controller are tested. 
+        % [u_yaw, u_pitch, u_roll,yawControl] = waypointController(yawControl, t, yawDeg, x_d, x, y_d, y);
+        % [u_yaw, u_pitch, u_roll,yawControl,pitchControl, rollControl] = waypointController2(yawControl,pitchControl, rollControl, t, yawDeg, x_d, x, y_d, y);
     else
         u_yaw = 0;
         u_pitch = 0;
