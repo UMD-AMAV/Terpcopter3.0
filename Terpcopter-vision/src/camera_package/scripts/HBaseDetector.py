@@ -4,6 +4,9 @@ import numpy as np
 import math
 from std_msgs.msg import Bool
 from std_msgs.msg import Float32
+import os
+import glob
+import sys
 
 def eucdist(x1,y1,x2,y2):
     dist = math.sqrt((x1-x2)**2 + (y1-y2)**2)
@@ -12,25 +15,24 @@ def eucdist(x1,y1,x2,y2):
 
 #def HBase(frame):
 def HBase(frame,pubHPixelX, pubHPixelY, pubHAngle, pubHDetected):
-    #height,width= frame.shape[:2]
-    #frame = cv2.resize(frame,(int(0.5*width), int(0.5*height)), interpolation = cv2.INTER_AREA)
-    
     homeBaseDetected = False
     hError = -10000.0
     vError = -10000.0
     angle = -10000.0
+    
     h_image,w_image= frame.shape[:2] #here we store width and height of frame
+
     hsv_frame = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) #convert RGB color scheme to HSV color scheme for better color recognition
     v = np.median(frame)
     lower = int(max(0,(1.0-0.33)*v))
     higher = int(max(255,(1.0+0.33)*v))
     kernel = np.ones((5,5), np.uint8)
     lower_black = np.array([0,0,0])
-    higher_black = np.array([180,255,40]) #old--->v==60#######Tune the V value, reduce it for robustness(Tune this at UPenn) 
+    higher_black = np.array([180,255,70]) #old--->v==60#######Tune the V value, reduce it for robustness(Tune this at UPenn) 
     masking_black = cv2.inRange(hsv_frame, lower_black, higher_black) 
     masking_black = cv2.morphologyEx(masking_black,cv2.MORPH_CLOSE,kernel)
     frame_blur = cv2.bilateralFilter(masking_black, 9, 75, 75)
-    autoEdge = cv2.Canny(frame_blur, lower, higher)
+    autoEdge = cv2.Canny(frame, 500, 800) #600-800
     #contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_CCOMP,cv2.CHAIN_APPROX_NONE) #for different version of OpenCV we only have 2 values to unpack from findContour
     im2, contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE) #finding the contour around the yellow region
     contourFound = 0
@@ -99,5 +101,13 @@ def HBase(frame,pubHPixelX, pubHPixelY, pubHAngle, pubHDetected):
     pubHAngle.publish(angle)
     pubHPixelX.publish(hError)
     pubHPixelY.publish(vError)
+    WINDOW_TITLE = 'HomeBase'
+    #cv2.namedWindow(WINDOW_TITLE, cv2.WINDOW_NORMAL)
+    #numpy_vertical = np.vstack((frame, autoEdge))
+    #numpy_vertical_concat = np.concatenate((frame, autoEdge), axis=0)
+    cv2.imshow(WINDOW_TITLE, frame)
     cv2.imshow("HomeBase", frame)
-    cv2.waitKey(1)
+    key = cv2.waitKey(1)
+    # Press esc or 'q' to close the image window
+    if key & 0xFF == ord('q') or key == 27:
+        cv2.destroyAllWindows()
