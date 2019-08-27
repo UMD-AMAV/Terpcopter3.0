@@ -23,9 +23,11 @@ from _targetPose import targetPose
 # import ObstacleDetection
 import ObstacleAvoidance
 import HBaseDetector
+import redDotDetect
 import DropOffDetection
 import RiverDetection
 global frameCounter
+
 try:
     sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 except:
@@ -46,20 +48,22 @@ class ImageClass:
 		self.pubHAngle = rospy.Publisher('hAngle',Float32,queue_size=1)
 		self.pubHDetected = rospy.Publisher('hDetected',Bool,queue_size=1)
 		######################################################################
-		self.pubRiverDetected = rospy.Publisher('RDetected',Bool,queue_size=1)
-		self.pubRiverXleft = rospy.Publisher('RYleft',Float32,queue_size=1)
-		self.pubRiverXright = rospy.Publisher('RYright',Float32,queue_size=1)
-		self.pubRiverPitch = rospy.Publisher('RPitch',Float32,queue_size=1)
+		#self.pubRiverDetected = rospy.Publisher('RDetected',Bool,queue_size=1)
+		#self.pubRiverXleft = rospy.Publisher('RYleft',Float32,queue_size=1)
+		#self.pubRiverXright = rospy.Publisher('RYright',Float32,queue_size=1)
+		#self.pubRiverPitch = rospy.Publisher('RPitch',Float32,queue_size=1)
 
-		self.mySub = rospy.Subscriber('/camera/image_raw/compressed', CompressedImage, self.callbackclassImage, queue_size=1, buff_size=2**24, tcp_nodelay=True)
-
+		#self.mySub = rospy.Subscriber('/camera/image_raw/compressed', CompressedImage, self.callbackclassImage, queue_size=1, buff_size=2**24, tcp_nodelay=True)
+		self.mySub = rospy.Subscriber('/stereoCamera/colorImage/compressed', CompressedImage, self.callbackclassImage, queue_size=1, buff_size=2**24, tcp_nodelay=True)
         
 
 	def callbackclassImage(self, data):
 		np_array = np.fromstring(data.data,np.uint8)
-		cv_image = cv2.imdecode(np_array, cv2.IMREAD_COLOR)
-		HBaseDetector.HBase(cv_image, self.pubHPixelX, self.pubHPixelY, self.pubHAngle, self.pubHDetected)
-		RiverDetection.riverDetection(cv_image, self.pubRiverXleft,self.pubRiverXright,self.pubRiverPitch,self.pubRiverDetected)
+        	cv_image = cv2.imdecode(np_array,cv2.IMREAD_COLOR)
+        	#redDotDetect.imageProcessing(cv_image)
+		redDotDetect.imageProcessing(cv_image)
+		#HBaseDetector.HBase(cv_image, self.pubHPixelX, self.pubHPixelY, self.pubHAngle, self.pubHDetected)
+        #RiverDetection.riverDetection(cv_image, self.pubRiverXleft,self.pubRiverXright,self.pubRiverPitch,self.pubRiverDetected)
 
 
 
@@ -102,7 +106,9 @@ def callbackImage(data):
     #                   Input Parameters: Image frame in openCV image format, blob detection parameter object
     #ObstacleAvoidance.obstacleDetection(cv_image, detector_obst)
     # ObstacleDetection.objectDetect(cv_image,detector_target)
-    HBaseDetector.HBase(cv_image)
+    #HBaseDetector.HBase(cv_image)
+    redDotDetect.imageProcessing(cv_image)
+
     #DropOffDetection.dropOffDetection(cv_image)
 
 ###############################################################################
@@ -131,7 +137,7 @@ def imageSubscriber():
     ###########################################################################
     # Subscribers
     #rospy.Subscriber('/terpcopter/cameras/forward/image/compressed', CompressedImage, callbackImage, queue_size=1, buff_size=5000000, tcp_nodelay=True) 
-    rospy.Subscriber('/camera/image_raw/compressed', CompressedImage, callbackImage, queue_size=1, buff_size=2**24, tcp_nodelay=True) 
+    rospy.Subscriber('/stereoCamera/colorImage/compressed', CompressedImage, callbackImage, queue_size=1, buff_size=2**24, tcp_nodelay=True) 
     # ----> using Pub as - roslaunch  video_stream_opencv camera.launch) Current Publisher - roslaunch terpcopter_driver terpcopter_camera_node.py
     rospy.Subscriber('targetPose',targetPose,callBackError)
 
