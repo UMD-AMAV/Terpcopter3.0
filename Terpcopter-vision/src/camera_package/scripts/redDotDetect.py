@@ -10,16 +10,13 @@ from _targetPose import targetPose
 # import redDotDetect
 # import autoCannyVideo
 # global hError, vError
+
 def imageProcessing(frame):
     pubIP = rospy.Publisher('targetPose', targetPose, queue_size=10)
     hsv_frame = cv2.cvtColor(frame,cv2.COLOR_BGR2HSV) #convert RGB color scheme to HSV color scheme for better color recognition
     w,h= frame.shape[:2]
-    lower_red = np.array([0,70,50])  #set the lower bound for red
-    higher_red = np.array([10,255,250]) #set the higher bound for red
-    masking = cv2.inRange(hsv_frame, lower_red, higher_red) #with both the red color limits we detect red color from the image
-
-    ret,thresh = cv2.threshold(masking,127,255,0)
-    im2, contours, hierarchy = cv2.findContours(thresh,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
+    autoEdge = cv2.Canny(frame, 300, 600)
+    im2, contours, hierarchy = cv2.findContours(autoEdge,cv2.RETR_TREE,cv2.CHAIN_APPROX_NONE)
 
     if len(contours) > 0:
 		contour_detected = 1
@@ -82,6 +79,6 @@ def imageProcessing(frame):
     a.v = vError
     a.targetName = 'RedDot'
     pubIP.publish(a)
-    cv2.imshow("frames", frame)
+    cv2.imshow("frames", autoEdge)
     cv2.waitKey(3)
     # return hError, vError
